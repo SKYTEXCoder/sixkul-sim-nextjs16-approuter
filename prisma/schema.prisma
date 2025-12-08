@@ -1,0 +1,203 @@
+// SIXKUL - Sistem Informasi Ekstrakurikuler
+// Prisma Schema for High School Extracurriculars Management System
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// ENUMS
+// ============================================
+
+enum UserRole {
+  ADMIN
+  PEMBINA
+  SISWA
+}
+
+enum ExtracurricularStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum EnrollmentStatus {
+  PENDING
+  ACTIVE
+  REJECTED
+  ALUMNI
+}
+
+enum AttendanceStatus {
+  PRESENT
+  SICK
+  PERMISSION
+  ALPHA
+}
+
+// ============================================
+// MODELS
+// ============================================
+
+/// Central User entity for authentication
+model User {
+  id            String   @id @default(cuid())
+  email         String   @unique
+  password_hash String
+  full_name     String
+  role          UserRole
+  avatar_url    String?
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+
+  // Relations
+  studentProfile StudentProfile?
+  pembinaProfile PembinaProfile?
+  notifications  Notification[]
+  announcements  Announcement[]
+
+  @@map("users")
+}
+
+/// Student profile - One-to-One with User
+model StudentProfile {
+  id           String  @id @default(cuid())
+  user_id      String  @unique
+  nis          String  @unique // Nomor Induk Siswa
+  class_name   String  // e.g., "XII IPA 1"
+  major        String  // e.g., "IPA", "IPS"
+  phone_number String?
+
+  // Relations
+  user        User         @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  enrollments Enrollment[]
+
+  @@map("student_profiles")
+}
+
+/// Pembina (Advisor/Coach) profile - One-to-One with User
+model PembinaProfile {
+  id           String  @id @default(cuid())
+  user_id      String  @unique
+  nip          String  @unique // Nomor Induk Pegawai
+  expertise    String? // Bidang keahlian
+  phone_number String?
+
+  // Relations
+  user             User              @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  extracurriculars Extracurricular[]
+
+  @@map("pembina_profiles")
+}
+
+/// Extracurricular activity/club
+model Extracurricular {
+  id          String                 @id @default(cuid())
+  name        String
+  category    String // e.g., "Olahraga", "Seni", "Akademik"
+  description String?
+  logo_url    String?
+  status      ExtracurricularStatus  @default(ACTIVE)
+  pembina_id  String
+  created_at  DateTime               @default(now())
+  updated_at  DateTime               @updatedAt
+
+  // Relations
+  pembina       PembinaProfile @relation(fields: [pembina_id], references: [id], onDelete: Restrict)
+  enrollments   Enrollment[]
+  schedules     Schedule[]
+  announcements Announcement[]
+
+  @@map("extracurriculars")
+}
+
+/// Enrollment - Junction table for Many-to-Many between Student and Extracurricular
+model Enrollment {
+  id                 String           @id @default(cuid())
+  student_id         String
+  extracurricular_id String
+  status             EnrollmentStatus @default(PENDING)
+  joined_at          DateTime         @default(now())
+  academic_year      String // e.g., "2024/2025"
+  updated_at         DateTime         @updatedAt
+
+  // Relations
+  student         StudentProfile  @relation(fields: [student_id], references: [id], onDelete: Cascade)
+  extracurricular Extracurricular @relation(fields: [extracurricular_id], references: [id], onDelete: Cascade)
+  attendances     Attendance[]
+
+  // Prevent duplicate enrollments
+  @@unique([student_id, extracurricular_id])
+  @@map("enrollments")
+}
+
+/// Schedule for extracurricular activities
+model Schedule {
+  id                 String @id @default(cuid())
+  extracurricular_id String
+  day_of_week        String // e.g., "MONDAY", "TUESDAY"
+  start_time         String // e.g., "14:00"
+  end_time           String // e.g., "16:00"
+  location           String // e.g., "Lapangan Basket", "Ruang Musik"
+
+  // Relations
+  extracurricular Extracurricular @relation(fields: [extracurricular_id], references: [id], onDelete: Cascade)
+  attendances     Attendance[]
+
+  @@map("schedules")
+}
+
+/// Attendance tracking - Linked to Enrollment (not Student directly)
+model Attendance {
+  id            String           @id @default(cuid())
+  enrollment_id String
+  schedule_id   String? // Optional link to specific schedule/event
+  date          DateTime
+  status        AttendanceStatus
+  notes         String?
+  created_at    DateTime         @default(now())
+
+  // Relations
+  enrollment Enrollment @relation(fields: [enrollment_id], references: [id], onDelete: Cascade)
+  schedule   Schedule?  @relation(fields: [schedule_id], references: [id], onDelete: SetNull)
+
+  // Prevent duplicate attendance records for same day
+  @@unique([enrollment_id, date])
+  @@map("attendances")
+}
+
+/// Announcements for extracurricular activities
+model Announcement {
+  id                 String   @id @default(cuid())
+  extracurricular_id String
+  author_id          String
+  title              String
+  content            String
+  created_at         DateTime @default(now())
+
+  // Relations
+  extracurricular Extracurricular @relation(fields: [extracurricular_id], references: [id], onDelete: Cascade)
+  author          User            @relation(fields: [author_id], references: [id], onDelete: Cascade)
+
+  @@map("announcements")
+}
+
+/// Notifications for users
+model Notification {
+  id         String   @id @default(cuid())
+  user_id    String
+  title      String
+  message    String
+  is_read    Boolean  @default(false)
+  created_at DateTime @default(now())
+
+  // Relations
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
+}
