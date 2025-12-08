@@ -1,0 +1,192 @@
+"use client";
+
+/**
+ * SIXKUL Top Navigation Bar Component
+ * 
+ * Includes search, notifications, and logout functionality.
+ * 
+ * @module components/layout/TopNavbar
+ */
+
+import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Bell,
+  Search,
+  LogOut,
+  User,
+  Settings,
+  Menu,
+  Loader2,
+} from "lucide-react";
+
+// ============================================
+// Types
+// ============================================
+
+interface TopNavbarProps {
+  user: {
+    name: string;
+    email: string;
+    role: string;
+    avatarUrl?: string;
+  };
+  onMenuClick?: () => void;
+  showSearch?: boolean;
+}
+
+// ============================================
+// TopNavbar Component
+// ============================================
+
+export function TopNavbar({ user, onMenuClick, showSearch = true }: TopNavbarProps) {
+  const router = useRouter();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+
+  // ----------------------------------------
+  // Handle Logout
+  // ----------------------------------------
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+
+    try {
+      const response = await fetch("/api/auth/logout", {
+        method: "POST",
+      });
+
+      if (response.ok) {
+        toast.success("Logout berhasil", {
+          description: "Sampai jumpa lagi!",
+        });
+        router.push("/login");
+        router.refresh();
+      } else {
+        toast.error("Logout gagal", {
+          description: "Silakan coba lagi.",
+        });
+      }
+    } catch (error) {
+      console.error("Logout error:", error);
+      toast.error("Terjadi kesalahan", {
+        description: "Tidak dapat logout. Silakan coba lagi.",
+      });
+    } finally {
+      setIsLoggingOut(false);
+    }
+  };
+
+  return (
+    <header className="fixed top-0 right-0 left-0 md:left-64 z-30 h-16 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-all duration-300">
+      <div className="flex items-center justify-between h-full px-4 md:px-6">
+        {/* Left Section */}
+        <div className="flex items-center gap-4">
+          {/* Mobile Menu Button */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="md:hidden text-slate-600 dark:text-slate-400"
+            onClick={onMenuClick}
+          >
+            <Menu className="h-5 w-5" />
+          </Button>
+
+          {/* Search Bar */}
+          {showSearch && (
+            <div className="hidden sm:flex relative max-w-md">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <Input
+                type="search"
+                placeholder="Cari..."
+                className="pl-10 w-64 bg-slate-100 dark:bg-slate-800 border-0 focus-visible:ring-1"
+              />
+            </div>
+          )}
+        </div>
+
+        {/* Right Section */}
+        <div className="flex items-center gap-2">
+          {/* Notifications */}
+          <Button
+            variant="ghost"
+            size="icon"
+            className="relative text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+          >
+            <Bell className="h-5 w-5" />
+            <span className="absolute top-1 right-1 h-2 w-2 bg-red-500 rounded-full" />
+          </Button>
+
+          {/* User Dropdown */}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                variant="ghost"
+                className="flex items-center gap-2 px-2 hover:bg-slate-100 dark:hover:bg-slate-800"
+              >
+                <Avatar className="h-8 w-8">
+                  <AvatarImage src={user.avatarUrl} alt={user.name} />
+                  <AvatarFallback className="bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-300 text-sm">
+                    {user.name.charAt(0).toUpperCase()}
+                  </AvatarFallback>
+                </Avatar>
+                <div className="hidden md:flex flex-col items-start">
+                  <span className="text-sm font-medium text-slate-900 dark:text-white">
+                    {user.name}
+                  </span>
+                  <span className="text-xs text-slate-500 dark:text-slate-400">
+                    {user.role}
+                  </span>
+                </div>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" className="w-56">
+              <DropdownMenuLabel>
+                <div className="flex flex-col">
+                  <span className="font-medium">{user.name}</span>
+                  <span className="text-xs font-normal text-slate-500">
+                    {user.email}
+                  </span>
+                </div>
+              </DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem>
+                <User className="mr-2 h-4 w-4" />
+                Profil Saya
+              </DropdownMenuItem>
+              <DropdownMenuItem>
+                <Settings className="mr-2 h-4 w-4" />
+                Pengaturan
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                onClick={handleLogout}
+                disabled={isLoggingOut}
+                className="text-red-600 dark:text-red-400 focus:text-red-600 dark:focus:text-red-400"
+              >
+                {isLoggingOut ? (
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                ) : (
+                  <LogOut className="mr-2 h-4 w-4" />
+                )}
+                {isLoggingOut ? "Logging out..." : "Logout"}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </div>
+    </header>
+  );
+}
+
+export default TopNavbar;
