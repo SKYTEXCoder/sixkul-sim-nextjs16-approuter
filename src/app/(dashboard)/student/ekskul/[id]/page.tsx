@@ -32,6 +32,7 @@ import {
   Users,
   CheckCircle2,
 } from "lucide-react";
+import { EkskulLogo } from "@/components/ekskul/EkskulLogo";
 
 // ============================================
 // Types
@@ -189,17 +190,12 @@ export default async function EkskulDetailPage({ params }: PageProps) {
           {/* Header Card */}
           <Card>
             <div className="h-48 bg-gradient-to-br from-blue-500 to-indigo-600 rounded-t-lg relative flex items-center justify-center">
-              {extracurricular.logo_url ? (
-                <img
-                  src={extracurricular.logo_url}
-                  alt={extracurricular.name}
-                  className="h-24 w-24 object-contain rounded-lg bg-white p-2"
-                />
-              ) : (
-                <div className="h-24 w-24 rounded-full bg-white/20 flex items-center justify-center">
-                  <BookOpen className="h-12 w-12 text-white" />
-                </div>
-              )}
+              <EkskulLogo
+                logoUrl={extracurricular.logo_url}
+                name={extracurricular.name}
+                category={extracurricular.category}
+                size="lg"
+              />
             </div>
             <CardHeader>
               <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
@@ -281,9 +277,9 @@ export default async function EkskulDetailPage({ params }: PageProps) {
         </div>
 
         {/* Right Column - Sidebar */}
-        <div className="space-y-6">
+        <div className="space-y-6 lg:sticky lg:top-24 lg:self-start">
           {/* Join Card */}
-          <Card className="sticky top-24">
+          <Card>
             <CardHeader>
               <CardTitle>Bergabung Sekarang</CardTitle>
               <CardDescription>

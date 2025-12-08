@@ -312,7 +312,7 @@ export default function LoginPage() {
         {/* Logo & Title */}
         <div className="text-center mb-8">
           <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-primary/10 mb-4">
-            <GraduationCap className="w-8 h-8 text-primary" />
+            <GraduationCap className="w-8 h-8 text-white" />
           </div>
           <h1 className="text-3xl font-bold text-white tracking-tight">
             SIXKUL
@@ -370,7 +370,7 @@ export default function LoginPage() {
               Belum punya akun?{" "}
               <Link
                 href="/register"
-                className="text-primary hover:underline font-medium"
+                className="text-white hover:underline font-medium"
               >
                 Hubungi Admin
               </Link>
