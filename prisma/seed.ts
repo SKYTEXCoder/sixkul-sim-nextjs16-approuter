@@ -1,14 +1,18 @@
 import { PrismaClient } from '../src/generated/prisma';
-import bcrypt from 'bcrypt';
 
 const prisma = new PrismaClient();
 
+/**
+ * SIXKUL Database Seed Script
+ * 
+ * Creates placeholder users linked to Clerk authentication.
+ * NOTE: Actual Clerk users must be created in Clerk Dashboard with matching clerk_id.
+ * 
+ * After creating users in Clerk Dashboard, update the clerk_id values below to match.
+ */
+
 async function main() {
   console.log('🌱 Starting database seeding...');
-
-  // Hash default password
-  const defaultPassword = 'password123';
-  const hashedPassword = await bcrypt.hash(defaultPassword, 12);
 
   // Clean existing data (optional - remove if you want to keep existing data)
   console.log('🧹 Cleaning existing data...');
@@ -23,19 +27,20 @@ async function main() {
   await prisma.user.deleteMany();
 
   // ============================================
-  // 1. Create Admin User
+  // 1. Create Admin User (linked to Clerk)
   // ============================================
   console.log('👤 Creating Admin user...');
   const admin = await prisma.user.create({
     data: {
+      clerk_id: 'clerk_admin_placeholder', // Replace with actual Clerk user ID
+      username: 'admin',
       email: 'admin@sixkul.sch.id',
-      password_hash: hashedPassword,
       full_name: 'Administrator SIXKUL',
       role: 'ADMIN',
       avatar_url: null,
     },
   });
-  console.log(`✅ Admin created: ${admin.email}`);
+  console.log(`✅ Admin created: ${admin.username}`);
 
   // ============================================
   // 2. Create Pembina User with Profile
@@ -43,8 +48,9 @@ async function main() {
   console.log('👤 Creating Pembina user...');
   const pembina = await prisma.user.create({
     data: {
+      clerk_id: 'clerk_pembina_placeholder', // Replace with actual Clerk user ID
+      username: 'pembina',
       email: 'pembina@sixkul.sch.id',
-      password_hash: hashedPassword,
       full_name: 'Budi Santoso, S.Pd',
       role: 'PEMBINA',
       avatar_url: null,
@@ -60,7 +66,7 @@ async function main() {
       pembinaProfile: true,
     },
   });
-  console.log(`✅ Pembina created: ${pembina.email}`);
+  console.log(`✅ Pembina created: ${pembina.username}`);
 
   // ============================================
   // 3. Create Student User with Profile
@@ -68,8 +74,9 @@ async function main() {
   console.log('👤 Creating Student user...');
   const student = await prisma.user.create({
     data: {
+      clerk_id: 'clerk_student_placeholder', // Replace with actual Clerk user ID
+      username: 'student',
       email: 'student@sixkul.sch.id',
-      password_hash: hashedPassword,
       full_name: 'Siti Nurhaliza',
       role: 'SISWA',
       avatar_url: null,
@@ -86,7 +93,7 @@ async function main() {
       studentProfile: true,
     },
   });
-  console.log(`✅ Student created: ${student.email}`);
+  console.log(`✅ Student created: ${student.username}`);
 
   // ============================================
   // 4. Create 5 Extracurriculars
@@ -241,10 +248,9 @@ async function main() {
   console.log(`   📅 Schedules: 3`);
   console.log(`   📝 Enrollments: 1`);
   console.log(`   📢 Announcements: 1`);
-  console.log('\n🔑 Default credentials:');
-  console.log(`   Email: admin@sixkul.sch.id | Password: ${defaultPassword}`);
-  console.log(`   Email: pembina@sixkul.sch.id | Password: ${defaultPassword}`);
-  console.log(`   Email: student@sixkul.sch.id | Password: ${defaultPassword}`);
+  console.log('\n🔑 Clerk Authentication:');
+  console.log(`   Users must be created in Clerk Dashboard with matching clerk_id values.`);
+  console.log(`   Set publicMetadata.role = "ADMIN" | "PEMBINA" | "SISWA" for each user.`);
 }
 
 main()

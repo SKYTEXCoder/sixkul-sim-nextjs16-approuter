@@ -39,7 +39,7 @@ export default function UnauthorizedPage({
         </h1>
 
         {/* Error Code */}
-        <p className="text-5xl font-bold text-red-500 mb-4">401</p>
+        <p className="text-5xl font-bold text-red-500 mb-4">401 Unauthorized</p>
 
         {/* Message */}
         <p className="text-gray-600 mb-8">{message}</p>
@@ -62,7 +62,7 @@ export default function UnauthorizedPage({
 
         {/* Help Text */}
         <p className="mt-6 text-sm text-gray-500">
-          Jika Anda merasa ini adalah kesalahan, silakan hubungi administrator.
+          Jika Anda merasa ini adalah kesalahan, <br /> silakan hubungi administrator.
         </p>
       </div>
     </div>

@@ -44,11 +44,12 @@ enum AttendanceStatus {
 // MODELS
 // ============================================
 
-/// Central User entity for authentication
+/// Central User entity - linked to Clerk authentication
 model User {
   id            String   @id @default(cuid())
-  email         String   @unique
-  password_hash String
+  clerk_id      String   @unique  // Clerk user ID (e.g., "user_2abc123...")
+  username      String   @unique  // Username for display and auth
+  email         String?           // Optional, synced from Clerk
   full_name     String
   role          UserRole
   avatar_url    String?

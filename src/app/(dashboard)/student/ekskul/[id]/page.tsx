@@ -8,9 +8,9 @@
 
 import { notFound } from "next/navigation";
 import Link from "next/link";
-import { cookies } from "next/headers";
-import * as jwt from "jsonwebtoken";
+import { auth } from "@clerk/nextjs/server";
 import prisma from "@/lib/prisma";
+import { getOrCreateUserId } from "@/lib/sync-user";
 import {
   Card,
   CardContent,
@@ -61,10 +61,14 @@ interface ExtracurricularDetailData {
   status: string;
   created_at: Date;
   pembina: {
+    id: string;
+    user_id: string;
+    nip: string;
     expertise: string | null;
+    phone_number: string | null;
     user: {
       full_name: string;
-      email: string;
+      email: string | null;
       avatar_url: string | null;
     };
   };
@@ -73,18 +77,17 @@ interface ExtracurricularDetailData {
 }
 
 // ============================================
-// Helper: Get Current User ID from Cookie
+// Helper: Get Current User ID with JIT Sync
 // ============================================
 
 async function getCurrentUserId(): Promise<string | null> {
   try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get("sixkul_auth_token")?.value;
+    const { userId, sessionClaims } = await auth();
     
-    if (!token) return null;
+    if (!userId) return null;
     
-    const decoded = jwt.decode(token) as { userId?: string } | null;
-    return decoded?.userId || null;
+    // Use JIT sync to get or create user and return their local DB ID
+    return await getOrCreateUserId(userId, sessionClaims);
   } catch {
     return null;
   }
@@ -324,7 +327,7 @@ export default async function EkskulDetailPage({ params }: PageProps) {
                     {extracurricular.pembina.user.full_name}
                   </p>
                   <p className="text-sm text-slate-500">
-                    {extracurricular.pembina.user.email}
+                    {extracurricular.pembina.user.email || "Email tidak tersedia"}
                   </p>
                   {extracurricular.pembina.expertise && (
                     <Badge variant="secondary" className="mt-1">

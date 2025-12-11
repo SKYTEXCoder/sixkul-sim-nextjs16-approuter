@@ -9,7 +9,8 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { verifyToken, AUTH_CONFIG } from '@/lib/auth';
+import { auth } from '@clerk/nextjs/server';
+import { getOrCreatePembinaProfile } from '@/lib/sync-user';
 
 // ============================================
 // Type Definitions
@@ -51,26 +52,29 @@ interface ErrorResponse {
 // Helper Functions
 // ============================================
 
-async function authenticatePembina(request: NextRequest): Promise<{
+/**
+ * Authenticate user and verify PEMBINA or ADMIN role using Clerk with JIT sync
+ */
+async function authenticatePembina(): Promise<{
   success: boolean;
   pembinaProfileId?: string;
   error?: string;
   statusCode?: number;
 }> {
-  const token = request.cookies.get(AUTH_CONFIG.COOKIE_NAME)?.value;
-  
-  if (!token) {
-    return {
-      success: false,
-      error: 'Authentication required. Please login.',
-      statusCode: 401,
-    };
-  }
-
   try {
-    const payload = verifyToken(token);
+    const { userId, sessionClaims } = await auth();
     
-    if (payload.role !== 'PEMBINA' && payload.role !== 'ADMIN') {
+    if (!userId) {
+      return {
+        success: false,
+        error: 'Authentication required. Please login.',
+        statusCode: 401,
+      };
+    }
+
+    const userRole = (sessionClaims?.public_metadata as { role?: string })?.role;
+    
+    if (userRole !== 'PEMBINA' && userRole !== 'ADMIN') {
       return {
         success: false,
         error: 'Only Pembina can access this resource.',
@@ -78,28 +82,26 @@ async function authenticatePembina(request: NextRequest): Promise<{
       };
     }
 
-    const pembinaProfile = await prisma.pembinaProfile.findUnique({
-      where: { user_id: payload.userId },
-      select: { id: true },
-    });
-
-    if (!pembinaProfile) {
+    // Use JIT sync to get or create pembina profile
+    const result = await getOrCreatePembinaProfile(userId, sessionClaims);
+    
+    if (!result) {
       return {
         success: false,
-        error: 'Pembina profile not found.',
+        error: 'Pembina profile not found or could not be created.',
         statusCode: 404,
       };
     }
 
     return {
       success: true,
-      pembinaProfileId: pembinaProfile.id,
+      pembinaProfileId: result.pembinaProfile.id,
     };
   } catch (error) {
     console.error('[PEMBINA AUTH ERROR]', error);
     return {
       success: false,
-      error: 'Invalid or expired token. Please login again.',
+      error: 'Authentication failed. Please login again.',
       statusCode: 401,
     };
   }
@@ -117,12 +119,12 @@ export async function GET(
     const { id: extracurricularId } = await params;
 
     // Authenticate pembina
-    const auth = await authenticatePembina(request);
+    const authResult = await authenticatePembina();
     
-    if (!auth.success || !auth.pembinaProfileId) {
+    if (!authResult.success || !authResult.pembinaProfileId) {
       return NextResponse.json(
-        { success: false, message: auth.error! },
-        { status: auth.statusCode }
+        { success: false, message: authResult.error! },
+        { status: authResult.statusCode }
       );
     }
 
@@ -130,7 +132,7 @@ export async function GET(
     const extracurricular = await prisma.extracurricular.findFirst({
       where: {
         id: extracurricularId,
-        pembina_id: auth.pembinaProfileId,
+        pembina_id: authResult.pembinaProfileId,
       },
       select: { id: true },
     });

@@ -11,7 +11,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { verifyToken, hashPassword, AUTH_CONFIG } from '@/lib/auth';
+import { auth } from '@clerk/nextjs/server';
 import { UserRole } from '@/generated/prisma';
 
 // ============================================
@@ -40,7 +40,7 @@ interface UserSuccessResponse {
   message: string;
   data: {
     id: string;
-    email: string;
+    email: string | null;
     full_name: string;
     role: string;
     avatar_url: string | null;
@@ -63,7 +63,7 @@ interface UserListResponse {
   message: string;
   data: Array<{
     id: string;
-    email: string;
+    email: string | null;
     full_name: string;
     role: string;
     avatar_url: string | null;
@@ -94,28 +94,28 @@ interface UserErrorResponse {
 // ============================================
 
 /**
- * Authenticate user and verify ADMIN role
+ * Authenticate user and verify ADMIN role using Clerk
  */
-async function authenticateAdmin(request: NextRequest): Promise<{
+async function authenticateAdmin(): Promise<{
   success: boolean;
   userId?: string;
   error?: string;
   statusCode?: number;
 }> {
-  const token = request.cookies.get(AUTH_CONFIG.COOKIE_NAME)?.value;
-  
-  if (!token) {
-    return {
-      success: false,
-      error: 'Authentication required. Please login.',
-      statusCode: 401,
-    };
-  }
-
   try {
-    const payload = verifyToken(token);
+    const { userId, sessionClaims } = await auth();
     
-    if (payload.role !== 'ADMIN') {
+    if (!userId) {
+      return {
+        success: false,
+        error: 'Authentication required. Please login.',
+        statusCode: 401,
+      };
+    }
+
+    const userRole = (sessionClaims?.public_metadata as { role?: string })?.role;
+    
+    if (userRole !== 'ADMIN') {
       return {
         success: false,
         error: 'Admin access required.',
@@ -125,13 +125,13 @@ async function authenticateAdmin(request: NextRequest): Promise<{
 
     return {
       success: true,
-      userId: payload.userId,
+      userId,
     };
   } catch (error) {
     console.error('[ADMIN AUTH ERROR]', error);
     return {
       success: false,
-      error: 'Invalid or expired token. Please login again.',
+      error: 'Authentication failed. Please login again.',
       statusCode: 401,
     };
   }
@@ -218,12 +218,12 @@ export async function POST(
     // ----------------------------------------
     // Step 1: Authenticate and verify ADMIN role
     // ----------------------------------------
-    const auth = await authenticateAdmin(request);
+    const authResult = await authenticateAdmin();
     
-    if (!auth.success) {
+    if (!authResult.success) {
       return NextResponse.json(
-        { success: false, message: auth.error! },
-        { status: auth.statusCode }
+        { success: false, message: authResult.error! },
+        { status: authResult.statusCode }
       );
     }
 
@@ -257,20 +257,22 @@ export async function POST(
       validation.data;
 
     // ----------------------------------------
-    // Step 3: Check for duplicate email
+    // Step 3: Check for duplicate email (optional field but should be unique if provided)
     // ----------------------------------------
-    const existingUser = await prisma.user.findUnique({
-      where: { email },
-    });
+    if (email) {
+      const existingUser = await prisma.user.findFirst({
+        where: { email },
+      });
 
-    if (existingUser) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: `User dengan email "${email}" sudah ada.`,
-        },
-        { status: 409 }
-      );
+      if (existingUser) {
+        return NextResponse.json(
+          {
+            success: false,
+            message: `User dengan email "${email}" sudah ada.`,
+          },
+          { status: 409 }
+        );
+      }
     }
 
     // ----------------------------------------
@@ -305,9 +307,12 @@ export async function POST(
     }
 
     // ----------------------------------------
-    // Step 5: Hash default password
+    // Step 5: Generate placeholder clerk_id and username
+    // Note: In production, users should be created via Clerk Dashboard or Clerk Backend API
     // ----------------------------------------
-    const hashedPassword = await hashPassword(DEFAULT_PASSWORD);
+    const timestamp = Date.now();
+    const placeholderClerkId = `placeholder_${timestamp}`;
+    const username = `${role.toLowerCase()}_${specificId || timestamp}`;
 
     // ----------------------------------------
     // Step 6: Create user with profile in transaction
@@ -316,8 +321,9 @@ export async function POST(
       // Create the user
       const newUser = await tx.user.create({
         data: {
-          email,
-          password_hash: hashedPassword,
+          clerk_id: placeholderClerkId,
+          username,
+          email: email || null,
           full_name: name,
           role,
           avatar_url: null,
@@ -376,12 +382,12 @@ export async function POST(
     );
 
     // ----------------------------------------
-    // Step 7: Return created user (excluding password_hash)
+    // Step 7: Return created user
     // ----------------------------------------
     return NextResponse.json(
       {
         success: true,
-        message: `User ${role} berhasil dibuat!`,
+        message: `User ${role} berhasil dibuat! Note: Untuk login, user harus dibuat via Clerk Dashboard.`,
         data: {
           id: result.user.id,
           email: result.user.email,
@@ -391,7 +397,7 @@ export async function POST(
           created_at: result.user.created_at,
           profile: result.profile || undefined,
         },
-        defaultPassword: DEFAULT_PASSWORD,
+        defaultPassword: 'N/A - Create user in Clerk Dashboard',
       },
       { status: 201 }
     );
@@ -418,12 +424,12 @@ export async function GET(
 ): Promise<NextResponse<UserListResponse | UserErrorResponse>> {
   try {
     // Authenticate admin
-    const auth = await authenticateAdmin(request);
+    const authResult = await authenticateAdmin();
     
-    if (!auth.success) {
+    if (!authResult.success) {
       return NextResponse.json(
-        { success: false, message: auth.error! },
-        { status: auth.statusCode }
+        { success: false, message: authResult.error! },
+        { status: authResult.statusCode }
       );
     }
 

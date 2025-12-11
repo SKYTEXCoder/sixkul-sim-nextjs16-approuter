@@ -11,7 +11,7 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { verifyToken, AUTH_CONFIG } from '@/lib/auth';
+import { auth } from '@clerk/nextjs/server';
 import { ExtracurricularStatus } from '@/generated/prisma';
 
 // ============================================
@@ -43,7 +43,7 @@ interface EkskulSuccessResponse {
       nip: string;
       user: {
         full_name: string;
-        email: string;
+        email: string | null;
       };
     };
   };
@@ -64,7 +64,7 @@ interface EkskulListResponse {
       nip: string;
       user: {
         full_name: string;
-        email: string;
+        email: string | null;
       };
     };
     _count: {
@@ -86,28 +86,28 @@ interface EkskulErrorResponse {
 // ============================================
 
 /**
- * Authenticate user and verify ADMIN role
+ * Authenticate user and verify ADMIN role using Clerk
  */
-async function authenticateAdmin(request: NextRequest): Promise<{
+async function authenticateAdmin(): Promise<{
   success: boolean;
   userId?: string;
   error?: string;
   statusCode?: number;
 }> {
-  const token = request.cookies.get(AUTH_CONFIG.COOKIE_NAME)?.value;
-  
-  if (!token) {
-    return {
-      success: false,
-      error: 'Authentication required. Please login.',
-      statusCode: 401,
-    };
-  }
-
   try {
-    const payload = verifyToken(token);
+    const { userId, sessionClaims } = await auth();
     
-    if (payload.role !== 'ADMIN') {
+    if (!userId) {
+      return {
+        success: false,
+        error: 'Authentication required. Please login.',
+        statusCode: 401,
+      };
+    }
+
+    const userRole = (sessionClaims?.public_metadata as { role?: string })?.role;
+    
+    if (userRole !== 'ADMIN') {
       return {
         success: false,
         error: 'Admin access required.',
@@ -117,13 +117,13 @@ async function authenticateAdmin(request: NextRequest): Promise<{
 
     return {
       success: true,
-      userId: payload.userId,
+      userId,
     };
   } catch (error) {
     console.error('[ADMIN AUTH ERROR]', error);
     return {
       success: false,
-      error: 'Invalid or expired token. Please login again.',
+      error: 'Authentication failed. Please login again.',
       statusCode: 401,
     };
   }
@@ -200,12 +200,12 @@ export async function POST(
     // ----------------------------------------
     // Step 1: Authenticate and verify ADMIN role
     // ----------------------------------------
-    const auth = await authenticateAdmin(request);
+    const authResult = await authenticateAdmin();
     
-    if (!auth.success) {
+    if (!authResult.success) {
       return NextResponse.json(
-        { success: false, message: auth.error! },
-        { status: auth.statusCode }
+        { success: false, message: authResult.error! },
+        { status: authResult.statusCode }
       );
     }
 
@@ -352,12 +352,12 @@ export async function GET(
 ): Promise<NextResponse<EkskulListResponse | EkskulErrorResponse>> {
   try {
     // Authenticate admin
-    const auth = await authenticateAdmin(request);
+    const authResult = await authenticateAdmin();
     
-    if (!auth.success) {
+    if (!authResult.success) {
       return NextResponse.json(
-        { success: false, message: auth.error! },
-        { status: auth.statusCode }
+        { success: false, message: authResult.error! },
+        { status: authResult.statusCode }
       );
     }
 

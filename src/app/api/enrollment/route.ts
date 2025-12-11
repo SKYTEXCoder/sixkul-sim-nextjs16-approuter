@@ -12,7 +12,8 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { verifyToken, AUTH_CONFIG } from '@/lib/auth';
+import { auth } from '@clerk/nextjs/server';
+import { getOrCreateStudentProfile } from '@/lib/sync-user';
 
 // ============================================
 // Type Definitions
@@ -84,32 +85,30 @@ function getCurrentAcademicYear(): string {
 }
 
 /**
- * Authenticate user from request and verify role
+ * Authenticate user and verify SISWA role using Clerk with JIT sync
  */
-async function authenticateStudent(request: NextRequest): Promise<{
+async function authenticateStudent(): Promise<{
   success: boolean;
   userId?: string;
   studentProfileId?: string;
   error?: string;
   statusCode?: number;
 }> {
-  // Get token from cookie
-  const token = request.cookies.get(AUTH_CONFIG.COOKIE_NAME)?.value;
-  
-  if (!token) {
-    return {
-      success: false,
-      error: 'Authentication required. Please login.',
-      statusCode: 401,
-    };
-  }
-
   try {
-    // Verify token
-    const payload = verifyToken(token);
+    const { userId, sessionClaims } = await auth();
+    
+    if (!userId) {
+      return {
+        success: false,
+        error: 'Authentication required. Please login.',
+        statusCode: 401,
+      };
+    }
+
+    const userRole = (sessionClaims?.public_metadata as { role?: string })?.role;
     
     // Check if user has SISWA role
-    if (payload.role !== 'SISWA') {
+    if (userRole !== 'SISWA') {
       return {
         success: false,
         error: 'Only students can enroll in extracurriculars.',
@@ -117,30 +116,27 @@ async function authenticateStudent(request: NextRequest): Promise<{
       };
     }
 
-    // Get student profile
-    const studentProfile = await prisma.studentProfile.findUnique({
-      where: { user_id: payload.userId },
-      select: { id: true },
-    });
-
-    if (!studentProfile) {
+    // Use JIT sync to get or create student profile
+    const result = await getOrCreateStudentProfile(userId, sessionClaims);
+    
+    if (!result) {
       return {
         success: false,
-        error: 'Student profile not found. Please complete your profile first.',
+        error: 'Student profile not found or could not be created.',
         statusCode: 404,
       };
     }
 
     return {
       success: true,
-      userId: payload.userId,
-      studentProfileId: studentProfile.id,
+      userId: result.userId,
+      studentProfileId: result.studentProfile.id,
     };
   } catch (error) {
     console.error('[ENROLLMENT AUTH ERROR]', error);
     return {
       success: false,
-      error: 'Invalid or expired token. Please login again.',
+      error: 'Authentication failed. Please login again.',
       statusCode: 401,
     };
   }
@@ -203,16 +199,16 @@ export async function POST(
     // ----------------------------------------
     // Step 1: Authenticate user and verify SISWA role
     // ----------------------------------------
-    const auth = await authenticateStudent(request);
+    const authResult = await authenticateStudent();
     
-    if (!auth.success) {
+    if (!authResult.success) {
       return NextResponse.json(
-        { success: false, message: auth.error! },
-        { status: auth.statusCode }
+        { success: false, message: authResult.error! },
+        { status: authResult.statusCode }
       );
     }
 
-    const studentProfileId = auth.studentProfileId!;
+    const studentProfileId = authResult.studentProfileId!;
 
     // ----------------------------------------
     // Step 2: Parse and validate request body
@@ -383,16 +379,16 @@ export async function GET(
 ): Promise<NextResponse<EnrollmentListResponse | EnrollmentErrorResponse>> {
   try {
     // Authenticate user
-    const auth = await authenticateStudent(request);
+    const authResult = await authenticateStudent();
     
-    if (!auth.success) {
+    if (!authResult.success) {
       return NextResponse.json(
-        { success: false, message: auth.error! },
-        { status: auth.statusCode }
+        { success: false, message: authResult.error! },
+        { status: authResult.statusCode }
       );
     }
 
-    const studentProfileId = auth.studentProfileId!;
+    const studentProfileId = authResult.studentProfileId!;
 
     // Get all enrollments for this student
     const enrollments = await prisma.enrollment.findMany({

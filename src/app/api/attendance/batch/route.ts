@@ -11,8 +11,9 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
-import { verifyToken, AUTH_CONFIG } from '@/lib/auth';
+import { auth } from '@clerk/nextjs/server';
 import { AttendanceStatus } from '@/generated/prisma';
+import { getOrCreateUser } from '@/lib/sync-user';
 
 // ============================================
 // Type Definitions
@@ -63,32 +64,30 @@ const VALID_STATUS_VALUES: AttendanceStatus[] = [
 // ============================================
 
 /**
- * Authenticate user from request and verify PEMBINA role
+ * Authenticate user and verify PEMBINA or ADMIN role using Clerk with JIT sync
  */
-async function authenticatePembina(request: NextRequest): Promise<{
+async function authenticatePembina(): Promise<{
   success: boolean;
   userId?: string;
   pembinaProfileId?: string;
   error?: string;
   statusCode?: number;
 }> {
-  // Get token from cookie
-  const token = request.cookies.get(AUTH_CONFIG.COOKIE_NAME)?.value;
-  
-  if (!token) {
-    return {
-      success: false,
-      error: 'Authentication required. Please login.',
-      statusCode: 401,
-    };
-  }
-
   try {
-    // Verify token
-    const payload = verifyToken(token);
+    const { userId, sessionClaims } = await auth();
+    
+    if (!userId) {
+      return {
+        success: false,
+        error: 'Authentication required. Please login.',
+        statusCode: 401,
+      };
+    }
+
+    const userRole = (sessionClaims?.public_metadata as { role?: string })?.role;
     
     // Check if user has PEMBINA or ADMIN role
-    if (payload.role !== 'PEMBINA' && payload.role !== 'ADMIN') {
+    if (userRole !== 'PEMBINA' && userRole !== 'ADMIN') {
       return {
         success: false,
         error: 'Only Pembina or Admin can manage attendance.',
@@ -96,14 +95,22 @@ async function authenticatePembina(request: NextRequest): Promise<{
       };
     }
 
-    // Get pembina profile if role is PEMBINA
-    if (payload.role === 'PEMBINA') {
-      const pembinaProfile = await prisma.pembinaProfile.findUnique({
-        where: { user_id: payload.userId },
-        select: { id: true },
-      });
+    // Use JIT sync to get or create user
+    const syncResult = await getOrCreateUser(userId, sessionClaims);
+    
+    if (!syncResult.success) {
+      return {
+        success: false,
+        error: syncResult.error,
+        statusCode: syncResult.statusCode,
+      };
+    }
 
-      if (!pembinaProfile) {
+    const { user, profile } = syncResult.data;
+
+    // For PEMBINA, verify profile exists
+    if (userRole === 'PEMBINA') {
+      if (!profile) {
         return {
           success: false,
           error: 'Pembina profile not found.',
@@ -113,21 +120,21 @@ async function authenticatePembina(request: NextRequest): Promise<{
 
       return {
         success: true,
-        userId: payload.userId,
-        pembinaProfileId: pembinaProfile.id,
+        userId: user.id,
+        pembinaProfileId: profile.id,
       };
     }
 
     // Admin doesn't need pembina profile
     return {
       success: true,
-      userId: payload.userId,
+      userId: user.id,
     };
   } catch (error) {
     console.error('[ATTENDANCE AUTH ERROR]', error);
     return {
       success: false,
-      error: 'Invalid or expired token. Please login again.',
+      error: 'Authentication failed. Please login again.',
       statusCode: 401,
     };
   }
@@ -231,12 +238,12 @@ export async function POST(
     // ----------------------------------------
     // Step 1: Authenticate user and verify PEMBINA role
     // ----------------------------------------
-    const auth = await authenticatePembina(request);
+    const authResult = await authenticatePembina();
     
-    if (!auth.success) {
+    if (!authResult.success) {
       return NextResponse.json(
-        { success: false, message: auth.error! },
-        { status: auth.statusCode }
+        { success: false, message: authResult.error! },
+        { status: authResult.statusCode }
       );
     }
 
