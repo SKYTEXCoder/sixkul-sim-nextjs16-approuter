@@ -318,7 +318,7 @@ export default function LoginPage() {
             SIXKUL
           </h1>
           <p className="text-slate-400 mt-2">
-            Sistem Informasi Ekstrakurikuler <br /> Untuk Suatu Sekolah Menengah Atas (SMA)
+            Sistem Informasi Ekstrakurikuler (SIXKUL) <br /> Untuk Suatu Sekolah Menengah Atas (SMA)
           </p>
         </div>
 
