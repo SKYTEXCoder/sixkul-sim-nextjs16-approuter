@@ -12,14 +12,28 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useClerk } from "@clerk/nextjs";
+import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
   ChevronLeft,
   ChevronRight,
   GraduationCap,
   LucideIcon,
+  User,
+  Settings,
+  LogOut,
+  Loader2,
 } from "lucide-react";
 
 // ============================================
@@ -66,10 +80,29 @@ const roleLabels = {
 
 export function Sidebar({ menuItems, user }: SidebarProps) {
   const pathname = usePathname();
+  const { signOut } = useClerk();
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const gradientColor = roleColors[user.role as keyof typeof roleColors] || roleColors.SISWA;
   const roleLabel = roleLabels[user.role as keyof typeof roleLabels] || user.role;
+
+  // Handle Logout
+  const handleLogout = async () => {
+    setIsLoggingOut(true);
+    try {
+      await signOut({ redirectUrl: "/sign-in" });
+      toast.success("Logout berhasil", {
+        description: "Sampai jumpa lagi!",
+      });
+    } catch (error) {
+      console.error("Logout error:", error);
+      toast.error("Terjadi kesalahan", {
+        description: "Tidak dapat logout. Silakan coba lagi.",
+      });
+      setIsLoggingOut(false);
+    }
+  };
 
   return (
     <aside
@@ -141,34 +174,71 @@ export function Sidebar({ menuItems, user }: SidebarProps) {
         </ul>
       </nav>
 
-      {/* User Profile */}
+      {/* User Profile with Dropdown */}
       <div className={cn(
         "border-t border-slate-800 p-4",
         isCollapsed ? "flex justify-center" : ""
       )}>
-        {isCollapsed ? (
-          <Avatar className="h-10 w-10 border-2 border-slate-700">
-            <AvatarImage src={user.avatarUrl} alt={user.name} />
-            <AvatarFallback className="bg-slate-700 text-slate-300 text-sm">
-              {user.name.charAt(0).toUpperCase()}
-            </AvatarFallback>
-          </Avatar>
-        ) : (
-          <div className="flex items-center gap-3">
-            <Avatar className="h-10 w-10 border-2 border-slate-700">
-              <AvatarImage src={user.avatarUrl} alt={user.name} />
-              <AvatarFallback className="bg-slate-700 text-slate-300 text-sm">
-                {user.name.charAt(0).toUpperCase()}
-              </AvatarFallback>
-            </Avatar>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-white truncate">
-                {user.name}
-              </p>
-              <p className="text-xs text-slate-400 truncate">{roleLabel}</p>
-            </div>
-          </div>
-        )}
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button className={cn(
+              "flex items-center gap-3 w-full rounded-lg p-2 -m-2 transition-colors",
+              "hover:bg-slate-800/50 cursor-pointer focus:outline-none focus:ring-2 focus:ring-slate-600",
+              isCollapsed ? "justify-center" : ""
+            )}>
+              <Avatar className="h-10 w-10 border-2 border-slate-700">
+                <AvatarImage src={user.avatarUrl} alt={user.name} />
+                <AvatarFallback className="bg-slate-700 text-slate-300 text-sm">
+                  {user.name.charAt(0).toUpperCase()}
+                </AvatarFallback>
+              </Avatar>
+              {!isCollapsed && (
+                <div className="flex-1 min-w-0 text-left">
+                  <p className="text-sm font-medium text-white truncate">
+                    {user.name}
+                  </p>
+                  <p className="text-xs text-slate-400 truncate">{roleLabel}</p>
+                </div>
+              )}
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent 
+            align={isCollapsed ? "center" : "end"} 
+            side="top"
+            className="w-56 mb-2"
+          >
+            <DropdownMenuLabel>
+              <div className="flex flex-col">
+                <span className="font-medium">{user.name}</span>
+                <span className="text-xs font-normal text-slate-500">
+                  {user.email}
+                </span>
+              </div>
+            </DropdownMenuLabel>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>
+              <User className="mr-2 h-4 w-4" />
+              Profil Saya
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Settings className="mr-2 h-4 w-4" />
+              Pengaturan
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem
+              onClick={handleLogout}
+              disabled={isLoggingOut}
+              className="text-red-600 dark:text-red-400 focus:text-red-600 dark:focus:text-red-400"
+            >
+              {isLoggingOut ? (
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              ) : (
+                <LogOut className="mr-2 h-4 w-4" />
+              )}
+              {isLoggingOut ? "Logging out..." : "Logout"}
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       {/* Collapse Toggle */}

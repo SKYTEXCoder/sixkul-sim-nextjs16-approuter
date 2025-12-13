@@ -200,64 +200,84 @@ export default function StudentDashboardPage() {
       {/* Stats Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Ekskul Diikuti */}
-        <Card className="bg-gradient-to-br from-blue-500 to-indigo-600 text-white border-0">
-          <CardHeader className="pb-2">
-            <CardDescription className="text-blue-100">
-              Ekskul Diikuti
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              <span className="text-3xl font-bold">{data.stats.activeEnrollmentsCount}</span>
-              <Trophy className="h-8 w-8 text-blue-200" />
-            </div>
-          </CardContent>
-        </Card>
+        <Link href="/student/enrollments">
+          <Card className="bg-gradient-to-br from-blue-500 to-indigo-600 text-white border-0 cursor-pointer hover:shadow-lg hover:scale-[1.02] transition-all">
+            <CardHeader className="pb-2">
+              <CardDescription className="text-blue-100">
+                Ekskul Diikuti
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="text-3xl font-bold">{data.stats.activeEnrollmentsCount}</span>
+                  <p className="text-sm text-blue-100 mt-1">sedang aktif</p>
+                </div>
+                <Trophy className="h-8 w-8 text-blue-200" />
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
 
         {/* Kehadiran */}
-        <Card className="bg-gradient-to-br from-emerald-500 to-teal-600 text-white border-0">
-          <CardHeader className="pb-2">
-            <CardDescription className="text-emerald-100">
-              Kehadiran
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              <span className="text-3xl font-bold">{data.stats.attendancePercentage}%</span>
-              <CheckCircle2 className="h-8 w-8 text-emerald-200" />
-            </div>
-          </CardContent>
-        </Card>
+        <Link href="/student/attendance">
+          <Card className="bg-gradient-to-br from-emerald-500 to-teal-600 text-white border-0 cursor-pointer hover:shadow-lg hover:scale-[1.02] transition-all">
+            <CardHeader className="pb-2">
+              <CardDescription className="text-emerald-100">
+                Kehadiran
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="text-3xl font-bold">{data.stats.attendancePercentage}%</span>
+                  <p className="text-sm text-emerald-100 mt-1">semester ini</p>
+                </div>
+                <CheckCircle2 className="h-8 w-8 text-emerald-200" />
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
 
         {/* Jadwal Minggu Ini */}
-        <Card className="bg-gradient-to-br from-amber-500 to-orange-600 text-white border-0">
-          <CardHeader className="pb-2">
-            <CardDescription className="text-amber-100">
-              Jadwal Minggu Ini
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              <span className="text-3xl font-bold">{data.stats.schedulesThisWeek}</span>
-              <Calendar className="h-8 w-8 text-amber-200" />
-            </div>
-          </CardContent>
-        </Card>
+        <Link href="/student/schedule">
+          <Card className="bg-gradient-to-br from-amber-500 to-orange-600 text-white border-0 cursor-pointer hover:shadow-lg hover:scale-[1.02] transition-all">
+            <CardHeader className="pb-2">
+              <CardDescription className="text-amber-100">
+                Jadwal Minggu Ini
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="text-3xl font-bold">{data.stats.schedulesThisWeek}</span>
+                  <p className="text-sm text-amber-100 mt-1">pertemuan</p>
+                </div>
+                <Calendar className="h-8 w-8 text-amber-200" />
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
 
         {/* Pengumuman Baru */}
-        <Card className="bg-gradient-to-br from-purple-500 to-violet-600 text-white border-0">
-          <CardHeader className="pb-2">
-            <CardDescription className="text-purple-100">
-              Pengumuman Baru
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              <span className="text-3xl font-bold">{data.stats.newAnnouncementsCount}</span>
-              <Megaphone className="h-8 w-8 text-purple-200" />
-            </div>
-          </CardContent>
-        </Card>
+        <Link href="/student/announcements">
+          <Card className="bg-gradient-to-br from-purple-500 to-violet-600 text-white border-0 cursor-pointer hover:shadow-lg hover:scale-[1.02] transition-all">
+            <CardHeader className="pb-2">
+              <CardDescription className="text-purple-100">
+                Pengumuman Baru
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="text-3xl font-bold">{data.stats.newAnnouncementsCount}</span>
+                  <p className="text-sm text-purple-100 mt-1">perlu dibaca</p>
+                </div>
+                <Megaphone className="h-8 w-8 text-purple-200" />
+              </div>
+            </CardContent>
+          </Card>
+        </Link>
       </div>
 
       {/* Ekskul Saya & Jadwal Mendatang */}
@@ -303,6 +323,17 @@ export default function StudentDashboardPage() {
               ))
             )}
           </CardContent>
+          
+          {/* Footer Link */}
+          <div className="px-6 pb-4 pt-2 border-t border-slate-100 dark:border-slate-800">
+            <Link 
+              href="/student/enrollments" 
+              className="flex items-center justify-center text-sm font-medium text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 transition-colors"
+            >
+              Lihat semua ekskul
+              <ChevronRight className="h-4 w-4 ml-1" />
+            </Link>
+          </div>
         </Card>
 
         {/* Jadwal Mendatang */}
@@ -341,6 +372,17 @@ export default function StudentDashboardPage() {
               ))
             )}
           </CardContent>
+          
+          {/* Footer Link */}
+          <div className="px-6 pb-4 pt-2 border-t border-slate-100 dark:border-slate-800">
+            <Link 
+              href="/student/schedule" 
+              className="flex items-center justify-center text-sm font-medium text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 transition-colors"
+            >
+              Buka kalender
+              <ChevronRight className="h-4 w-4 ml-1" />
+            </Link>
+          </div>
         </Card>
       </div>
 

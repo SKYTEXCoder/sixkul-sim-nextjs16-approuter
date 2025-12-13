@@ -404,7 +404,7 @@ async function main() {
       });
     }
 
-    createdUsers[userData.role] = { clerkId, prismaUser };
+    createdUsers[userData.email] = { clerkId, prismaUser };
     console.log(`   ✅ Created in Prisma: ${prismaUser.username} (DB ID: ${prismaUser.id})\n`);
   }
 
@@ -413,7 +413,7 @@ async function main() {
   // ============================================
   console.log('🎯 Creating Extracurriculars...');
 
-  const pembinaProfileId = createdUsers['PEMBINA'].prismaUser.pembinaProfile.id;
+  const pembinaProfileId = createdUsers['pembina@sixkul.sch.id'].prismaUser.pembinaProfile.id;
 
   const extracurriculars = await Promise.all([
     prisma.extracurricular.create({
@@ -512,7 +512,7 @@ async function main() {
   // ============================================
   console.log('📝 Creating enrollments...');
 
-  const studentProfileId = createdUsers['SISWA'].prismaUser.studentProfile.id;
+  const studentProfileId = createdUsers['student@sixkul.sch.id'].prismaUser.studentProfile.id;
 
   // Enroll first student in multiple extracurriculars
   const enrollments = await Promise.all([
@@ -588,7 +588,7 @@ async function main() {
   // ============================================
   console.log('📢 Creating announcements...');
 
-  const pembinaUserId = createdUsers['PEMBINA'].prismaUser.id;
+  const pembinaUserId = createdUsers['pembina@sixkul.sch.id'].prismaUser.id;
 
   await Promise.all([
     // Recent announcement (today)
