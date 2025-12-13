@@ -47,11 +47,13 @@ interface DashboardData {
   };
   myEkskul: Array<{
     id: string;
+    enrollmentId: string;
     name: string;
     category: string;
     status: string;
   }>;
   upcomingSchedules: Array<{
+    scheduleId: string;
     ekskulId: string;
     ekskulName: string;
     day: string;

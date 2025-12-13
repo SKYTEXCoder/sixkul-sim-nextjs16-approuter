@@ -230,9 +230,11 @@ export function Sidebar({ menuItems, user, isCollapsed: externalIsCollapsed, onC
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
-              <User className="mr-2 h-4 w-4" />
-              Profil Saya
+            <DropdownMenuItem asChild>
+              <Link href={user.role === "SISWA" ? "/student/profile" : user.role === "PEMBINA" ? "/pembina/profile" : "/admin/profile"}>
+                <User className="mr-2 h-4 w-4" />
+                Profil Saya
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuItem>
               <Settings className="mr-2 h-4 w-4" />

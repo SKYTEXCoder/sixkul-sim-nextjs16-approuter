@@ -20,6 +20,9 @@ import {
   Calendar,
   History,
   Trophy,
+  ClipboardCheck,
+  Megaphone,
+  UserCircle,
 } from "lucide-react";
 
 // ============================================
@@ -48,9 +51,24 @@ const studentMenuItems: NavItem[] = [
     icon: Calendar,
   },
   {
+    label: "Absensi Saya",
+    href: "/student/attendance",
+    icon: ClipboardCheck,
+  },
+  {
+    label: "Pengumuman",
+    href: "/student/announcements",
+    icon: Megaphone,
+  },
+  {
     label: "Riwayat & Nilai",
     href: "/student/history",
     icon: History,
+  },
+  {
+    label: "Profil Saya",
+    href: "/student/profile",
+    icon: UserCircle,
   },
 ];
 
