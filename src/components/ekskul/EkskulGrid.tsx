@@ -204,7 +204,7 @@ export function EkskulGrid({ extracurriculars }: EkskulGridProps) {
           {filteredExtracurriculars.map((ekskul) => {
             const categoryColor =
               categoryColors[ekskul.category] || categoryColors.default;
-            const memberCount = ekskul.enrollments.filter(e => e.status === "APPROVED").length;
+            const memberCount = ekskul.enrollments.filter(e => e.status === "ACTIVE").length;
             const CategoryIcon = getCategoryIcon(ekskul.category, ekskul.name);
             const gradient = categoryGradients[ekskul.category] || categoryGradients.default;
 

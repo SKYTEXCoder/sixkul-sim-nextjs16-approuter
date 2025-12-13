@@ -174,7 +174,7 @@ export default async function EkskulDetailPage({ params }: PageProps) {
 
   const isAlreadyEnrolled = !!enrollment;
   const enrollmentStatus = enrollment?.status;
-  const memberCount = extracurricular.enrollments.filter(e => e.status === "APPROVED").length;
+  const memberCount = extracurricular.enrollments.filter(e => e.status === "ACTIVE").length;
 
   return (
     <div className="space-y-6">

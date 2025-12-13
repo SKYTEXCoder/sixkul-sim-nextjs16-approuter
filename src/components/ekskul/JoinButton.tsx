@@ -135,7 +135,7 @@ export function JoinButton({
         label: "Menunggu Persetujuan",
         className: "bg-amber-100 text-amber-700 border-amber-300 dark:bg-amber-900/30 dark:text-amber-400",
       },
-      APPROVED: {
+      ACTIVE: {
         label: "Sudah Terdaftar",
         className: "bg-emerald-100 text-emerald-700 border-emerald-300 dark:bg-emerald-900/30 dark:text-emerald-400",
       },
