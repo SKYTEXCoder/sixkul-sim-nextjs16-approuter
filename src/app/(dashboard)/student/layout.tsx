@@ -39,7 +39,7 @@ const studentMenuItems: NavItem[] = [
   },
   {
     label: "Ekskul Saya",
-    href: "/student/my-ekskul",
+    href: "/student/enrollments",
     icon: Trophy,
   },
   {

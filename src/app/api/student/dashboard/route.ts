@@ -35,12 +35,14 @@ interface DashboardSuccessResponse {
       newAnnouncementsCount: number;
     };
     myEkskul: Array<{
+      enrollmentId: string;
       id: string;
       name: string;
       category: string;
       status: string;
     }>;
     upcomingSchedules: Array<{
+      scheduleId: string;
       ekskulId: string;
       ekskulName: string;
       day: string;
@@ -133,6 +135,7 @@ function getRelativeTimeString(date: Date): string {
  */
 function getUpcomingSchedules(
   schedules: Array<{
+    id: string;
     day_of_week: string;
     start_time: string;
     end_time: string;
@@ -140,6 +143,7 @@ function getUpcomingSchedules(
     extracurricular: { id: string; name: string };
   }>
 ): Array<{
+  scheduleId: string;
   ekskulId: string;
   ekskulName: string;
   day: string;
@@ -191,6 +195,7 @@ function getUpcomingSchedules(
 
   // Take max 10 and format
   return upcoming.slice(0, 10).map(({ schedule }) => ({
+    scheduleId: schedule.id,
     ekskulId: schedule.extracurricular.id,
     ekskulName: schedule.extracurricular.name,
     day: getDayNameIndonesian(schedule.day_of_week),
@@ -269,6 +274,7 @@ export async function GET(): Promise<NextResponse<DashboardSuccessResponse | Das
             status: true,
             schedules: {
               select: {
+                id: true,
                 day_of_week: true,
                 start_time: true,
                 end_time: true,
@@ -327,6 +333,7 @@ export async function GET(): Promise<NextResponse<DashboardSuccessResponse | Das
 
     // Collect all schedules from active enrollments
     const allSchedules: Array<{
+      id: string;
       day_of_week: string;
       start_time: string;
       end_time: string;
@@ -374,6 +381,7 @@ export async function GET(): Promise<NextResponse<DashboardSuccessResponse | Das
     // Step 8: Get my ekskul list
     // ----------------------------------------
     const myEkskul = activeEnrollments.map(e => ({
+      enrollmentId: e.id,
       id: e.extracurricular.id,
       name: e.extracurricular.name,
       category: e.extracurricular.category,

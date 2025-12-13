@@ -306,9 +306,10 @@ export default function StudentDashboardPage() {
               </div>
             ) : (
               data.myEkskul.map((ekskul) => (
-                <div
-                  key={ekskul.id}
-                  className="flex items-center justify-between p-3 rounded-lg bg-slate-50 dark:bg-slate-800"
+                <Link
+                  key={ekskul.enrollmentId}
+                  href={`/student/enrollments/${ekskul.enrollmentId}`}
+                  className="flex items-center justify-between p-3 rounded-lg bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
                 >
                   <div>
                     <p className="font-medium text-slate-900 dark:text-white">
@@ -316,10 +317,13 @@ export default function StudentDashboardPage() {
                     </p>
                     <p className="text-sm text-slate-500">{ekskul.category}</p>
                   </div>
-                  <Badge className="bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
-                    Aktif
-                  </Badge>
-                </div>
+                  <div className="flex items-center gap-2">
+                    <Badge className="bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400">
+                      Aktif
+                    </Badge>
+                    <ChevronRight className="h-4 w-4 text-slate-400" />
+                  </div>
+                </Link>
               ))
             )}
           </CardContent>
@@ -355,9 +359,10 @@ export default function StudentDashboardPage() {
               </div>
             ) : (
               data.upcomingSchedules.slice(0, 5).map((schedule, i) => (
-                <div
-                  key={`${schedule.ekskulId}-${schedule.dayOfWeek}-${i}`}
-                  className="flex items-center justify-between p-3 rounded-lg bg-slate-50 dark:bg-slate-800"
+                <Link
+                  key={`${schedule.scheduleId}-${schedule.dayOfWeek}-${i}`}
+                  href={`/student/schedule/${schedule.scheduleId}`}
+                  className="flex items-center justify-between p-3 rounded-lg bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
                 >
                   <div>
                     <p className="font-medium text-slate-900 dark:text-white">
@@ -365,10 +370,13 @@ export default function StudentDashboardPage() {
                     </p>
                     <p className="text-sm text-slate-500">{schedule.day}</p>
                   </div>
-                  <span className="text-sm font-medium text-slate-600 dark:text-slate-400">
-                    {schedule.startTime} - {schedule.endTime}
-                  </span>
-                </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm font-medium text-slate-600 dark:text-slate-400">
+                      {schedule.startTime} - {schedule.endTime}
+                    </span>
+                    <ChevronRight className="h-4 w-4 text-slate-400" />
+                  </div>
+                </Link>
               ))
             )}
           </CardContent>
@@ -408,8 +416,9 @@ export default function StudentDashboardPage() {
           ) : (
             <div className="space-y-3">
               {data.recentAnnouncements.map((announcement) => (
-                <div
+                <Link
                   key={announcement.id}
+                  href={`/student/announcements/${announcement.id}`}
                   className="flex items-center justify-between p-4 rounded-lg bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
                 >
                   <div>
@@ -421,7 +430,7 @@ export default function StudentDashboardPage() {
                     </p>
                   </div>
                   <ChevronRight className="h-5 w-5 text-slate-400" />
-                </div>
+                </Link>
               ))}
             </div>
           )}
