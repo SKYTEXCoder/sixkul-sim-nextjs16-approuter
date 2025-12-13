@@ -8,10 +8,12 @@
  * @module app/(dashboard)/student/layout
  */
 
+import { useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import { useAuthSync } from "@/hooks/useAuthSync";
 import { Sidebar, NavItem } from "@/components/layout/Sidebar";
 import { TopNavbar } from "@/components/layout/TopNavbar";
+import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
   BookOpen,
@@ -61,6 +63,9 @@ export default function StudentLayout({
 }: {
   children: React.ReactNode;
 }) {
+  // Sidebar collapse state - managed here to make content responsive
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+
   // Get user data from Clerk
   const { user, isLoaded } = useUser();
   
@@ -86,12 +91,25 @@ export default function StudentLayout({
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
       {/* Sidebar */}
-      <Sidebar menuItems={studentMenuItems} user={userData} />
+      <Sidebar 
+        menuItems={studentMenuItems} 
+        user={userData}
+        isCollapsed={isSidebarCollapsed}
+        onCollapseChange={setIsSidebarCollapsed}
+      />
 
-      {/* Main Content Area */}
-      <div className="md:ml-64 transition-all duration-300">
-        {/* Top Navigation */}
-        <TopNavbar user={userData} />
+      {/* Main Content Area - responsive to sidebar state */}
+      <div className={cn(
+        "transition-all duration-300",
+        isSidebarCollapsed ? "md:ml-20" : "md:ml-64"
+      )}>
+        {/* Top Navigation - also responsive to sidebar state */}
+        <header className={cn(
+          "fixed top-0 right-0 z-30 h-16 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-all duration-300",
+          isSidebarCollapsed ? "left-0 md:left-20" : "left-0 md:left-64"
+        )}>
+          <TopNavbar user={userData} />
+        </header>
 
         {/* Page Content */}
         <main className="pt-20 px-4 md:px-6 pb-8">

@@ -56,6 +56,8 @@ export interface SidebarProps {
     avatarUrl?: string;
   };
   accentColor?: string;
+  isCollapsed?: boolean;
+  onCollapseChange?: (collapsed: boolean) => void;
 }
 
 // ============================================
@@ -78,14 +80,26 @@ const roleLabels = {
 // Sidebar Component
 // ============================================
 
-export function Sidebar({ menuItems, user }: SidebarProps) {
+export function Sidebar({ menuItems, user, isCollapsed: externalIsCollapsed, onCollapseChange }: SidebarProps) {
   const pathname = usePathname();
   const { signOut } = useClerk();
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  // Use external state if provided, otherwise use internal state
+  const [internalIsCollapsed, setInternalIsCollapsed] = useState(false);
+  const isCollapsed = externalIsCollapsed ?? internalIsCollapsed;
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   const gradientColor = roleColors[user.role as keyof typeof roleColors] || roleColors.SISWA;
   const roleLabel = roleLabels[user.role as keyof typeof roleLabels] || user.role;
+
+  // Handle collapse toggle
+  const handleCollapseToggle = () => {
+    const newState = !isCollapsed;
+    if (onCollapseChange) {
+      onCollapseChange(newState);
+    } else {
+      setInternalIsCollapsed(newState);
+    }
+  };
 
   // Handle Logout
   const handleLogout = async () => {
@@ -245,7 +259,7 @@ export function Sidebar({ menuItems, user }: SidebarProps) {
       <Button
         variant="ghost"
         size="icon"
-        onClick={() => setIsCollapsed(!isCollapsed)}
+        onClick={handleCollapseToggle}
         className="absolute -right-3 top-20 h-6 w-6 rounded-full bg-slate-800 border border-slate-700 text-slate-400 hover:text-white hover:bg-slate-700"
       >
         {isCollapsed ? (
