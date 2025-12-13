@@ -192,7 +192,7 @@ export default function StudentDashboardPage() {
           </p>
         </div>
         <Button className="w-fit" asChild>
-          <Link href="/student/ekskul">
+          <Link href="/student/ekstrakurikuler">
             <BookOpen className="mr-2 h-4 w-4" />
             Jelajahi Ekskul
           </Link>
@@ -303,7 +303,7 @@ export default function StudentDashboardPage() {
                   Kamu belum mengikuti ekstrakurikuler apapun.
                 </p>
                 <Button variant="link" asChild className="mt-2">
-                  <Link href="/student/ekskul">Jelajahi Ekskul →</Link>
+                  <Link href="/student/ekstrakurikuler">Jelajahi Ekskul →</Link>
                 </Button>
               </div>
             ) : (

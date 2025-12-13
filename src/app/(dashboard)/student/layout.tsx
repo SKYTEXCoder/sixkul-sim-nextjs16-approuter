@@ -37,7 +37,7 @@ const studentMenuItems: NavItem[] = [
   },
   {
     label: "Jelajahi Ekskul",
-    href: "/student/ekskul",
+    href: "/student/ekstrakurikuler",
     icon: BookOpen,
   },
   {

@@ -4,7 +4,7 @@
  * Lists all active extracurriculars for students to browse and join.
  * Uses direct Prisma queries as a Server Component.
  * 
- * @module app/(dashboard)/student/ekskul/page
+ * @module app/(dashboard)/student/ekstrakurikuler/page
  */
 
 import prisma from "@/lib/prisma";

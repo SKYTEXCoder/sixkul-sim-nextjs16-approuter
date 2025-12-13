@@ -251,7 +251,7 @@ export function EkskulGrid({ extracurriculars }: EkskulGridProps) {
                 </CardContent>
 
                 <CardFooter>
-                  <Link href={`/student/ekskul/${ekskul.id}`} className="w-full">
+                  <Link href={`/student/ekstrakurikuler/${ekskul.id}`} className="w-full">
                     <Button
                       variant="outline"
                       className="w-full group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-600 transition-all"

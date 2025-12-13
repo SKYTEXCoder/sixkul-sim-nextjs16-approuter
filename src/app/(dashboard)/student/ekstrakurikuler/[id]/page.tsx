@@ -3,7 +3,7 @@
  * 
  * Shows full details of an extracurricular with enrollment option.
  * 
- * @module app/(dashboard)/student/ekskul/[id]/page
+ * @module app/(dashboard)/student/ekstrakurikuler/[id]/page
  */
 
 import { notFound } from "next/navigation";
@@ -179,7 +179,7 @@ export default async function EkskulDetailPage({ params }: PageProps) {
   return (
     <div className="space-y-6">
       {/* Back Button */}
-      <Link href="/student/ekskul">
+      <Link href="/student/ekstrakurikuler">
         <Button variant="ghost" className="gap-2">
           <ArrowLeft className="h-4 w-4" />
           Kembali ke Daftar Ekskul
