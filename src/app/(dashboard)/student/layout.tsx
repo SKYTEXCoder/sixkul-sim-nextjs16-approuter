@@ -41,7 +41,7 @@ const studentMenuItems: NavItem[] = [
     icon: BookOpen,
   },
   {
-    label: "Ekskul Saya",
+    label: "Ekstrakurikuler Saya",
     href: "/student/enrollments",
     icon: Trophy,
   },

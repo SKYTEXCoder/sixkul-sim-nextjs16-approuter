@@ -32,7 +32,7 @@ const pembinaMenuItems: NavItem[] = [
     icon: LayoutDashboard,
   },
   {
-    label: "Ekskul Saya",
+    label: "Ekstrakurikuler Saya",
     href: "/pembina/my-ekskul",
     icon: BookOpen,
   },

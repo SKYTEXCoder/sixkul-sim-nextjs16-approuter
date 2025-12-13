@@ -282,14 +282,14 @@ export default function StudentDashboardPage() {
         </Link>
       </div>
 
-      {/* Ekskul Saya & Jadwal Mendatang */}
+      {/* Ekstrakurikuler Saya & Jadwal Mendatang */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Ekskul Saya */}
+        {/* Ekstrakurikuler Saya */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Trophy className="h-5 w-5 text-blue-500" />
-              Ekskul Saya
+              Ekstrakurikuler Saya
             </CardTitle>
             <CardDescription>
               Ekstrakurikuler yang sedang kamu ikuti

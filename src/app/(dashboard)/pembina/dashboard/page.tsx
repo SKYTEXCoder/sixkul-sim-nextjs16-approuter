@@ -108,7 +108,7 @@ export default function PembinaDashboardPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <BookOpen className="h-5 w-5 text-emerald-500" />
-              Ekskul Saya
+              Ekstrakurikuler Saya
             </CardTitle>
             <CardDescription>
               Ekstrakurikuler yang Anda bimbing
