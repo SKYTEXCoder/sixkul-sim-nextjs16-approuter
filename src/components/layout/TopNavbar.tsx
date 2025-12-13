@@ -10,9 +10,10 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useClerk } from "@clerk/nextjs";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -24,7 +25,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {
   Bell,
-  Search,
+
   LogOut,
   User,
   Settings,
@@ -53,6 +54,7 @@ interface TopNavbarProps {
 
 export function TopNavbar({ user, onMenuClick, showSearch = true }: TopNavbarProps) {
   const router = useRouter();
+  const { signOut } = useClerk();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
   // ----------------------------------------
@@ -62,29 +64,19 @@ export function TopNavbar({ user, onMenuClick, showSearch = true }: TopNavbarPro
     setIsLoggingOut(true);
 
     try {
-      const response = await fetch("/api/auth/logout", {
-        method: "POST",
+      await signOut({ redirectUrl: "/sign-in" });
+      
+      toast.success("Logout berhasil", {
+        description: "Sampai jumpa lagi!",
       });
-
-      if (response.ok) {
-        toast.success("Logout berhasil", {
-          description: "Sampai jumpa lagi!",
-        });
-        router.push("/login");
-        router.refresh();
-      } else {
-        toast.error("Logout gagal", {
-          description: "Silakan coba lagi.",
-        });
-      }
     } catch (error) {
       console.error("Logout error:", error);
       toast.error("Terjadi kesalahan", {
         description: "Tidak dapat logout. Silakan coba lagi.",
       });
-    } finally {
       setIsLoggingOut(false);
     }
+    // Note: Don't reset isLoggingOut in finally block since page will redirect on success
   };
 
   return (
@@ -102,17 +94,7 @@ export function TopNavbar({ user, onMenuClick, showSearch = true }: TopNavbarPro
             <Menu className="h-5 w-5" />
           </Button>
 
-          {/* Search Bar */}
-          {showSearch && (
-            <div className="hidden sm:flex relative max-w-md">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
-              <Input
-                type="search"
-                placeholder="Cari..."
-                className="pl-10 w-64 bg-slate-100 dark:bg-slate-800 border-0 focus-visible:ring-1"
-              />
-            </div>
-          )}
+          {/* Search Bar - Removed for cleaner UI */}
         </div>
 
         {/* Right Section */}

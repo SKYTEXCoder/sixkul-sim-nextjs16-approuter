@@ -508,38 +508,132 @@ async function main() {
   console.log('   ✅ Created 3 schedules\n');
 
   // ============================================
-  // Step 5: Create Sample Enrollment
+  // Step 5: Create Multiple Enrollments for First Student
   // ============================================
-  console.log('📝 Creating sample enrollment...');
+  console.log('📝 Creating enrollments...');
 
   const studentProfileId = createdUsers['SISWA'].prismaUser.studentProfile.id;
 
-  await prisma.enrollment.create({
-    data: {
-      student_id: studentProfileId,
-      extracurricular_id: extracurriculars[2].id, // Game Dev
-      status: 'ACTIVE',
-      academic_year: '2024/2025',
-    },
-  });
+  // Enroll first student in multiple extracurriculars
+  const enrollments = await Promise.all([
+    prisma.enrollment.create({
+      data: {
+        student_id: studentProfileId,
+        extracurricular_id: extracurriculars[0].id, // Basket
+        status: 'ACTIVE',
+        academic_year: '2024/2025',
+      },
+    }),
+    prisma.enrollment.create({
+      data: {
+        student_id: studentProfileId,
+        extracurricular_id: extracurriculars[1].id, // Robotik
+        status: 'ACTIVE',
+        academic_year: '2024/2025',
+      },
+    }),
+    prisma.enrollment.create({
+      data: {
+        student_id: studentProfileId,
+        extracurricular_id: extracurriculars[2].id, // Game Dev
+        status: 'ACTIVE',
+        academic_year: '2024/2025',
+      },
+    }),
+  ]);
 
-  console.log('   ✅ Created sample enrollment\n');
+  console.log(`   ✅ Created ${enrollments.length} enrollments\n`);
 
   // ============================================
-  // Step 6: Create Sample Announcement
+  // Step 6: Create Sample Attendance Records
   // ============================================
-  console.log('📢 Creating sample announcement...');
+  console.log('📋 Creating attendance records...');
 
-  await prisma.announcement.create({
-    data: {
-      extracurricular_id: extracurriculars[2].id,
-      author_id: createdUsers['PEMBINA'].prismaUser.id,
-      title: 'Selamat Datang di Ekstrakurikuler Game Development!',
-      content: 'Halo semua! Selamat bergabung di ekstrakurikuler Game Development.',
-    },
+  // Create attendance records for the past few weeks
+  const today = new Date();
+  const attendanceData = [];
+  
+  // For each enrollment, create some attendance records
+  for (const enrollment of enrollments) {
+    // Create attendance for past 10 sessions
+    for (let i = 1; i <= 10; i++) {
+      const date = new Date(today);
+      date.setDate(date.getDate() - (i * 7)); // Weekly sessions
+      
+      // Mix of attendance statuses (mostly PRESENT)
+      let status: 'PRESENT' | 'SICK' | 'PERMISSION' | 'ALPHA';
+      const rand = Math.random();
+      if (rand < 0.7) status = 'PRESENT';
+      else if (rand < 0.85) status = 'SICK';
+      else if (rand < 0.95) status = 'PERMISSION';
+      else status = 'ALPHA';
+
+      attendanceData.push({
+        enrollment_id: enrollment.id,
+        date: date,
+        status: status,
+        notes: status !== 'PRESENT' ? `Status: ${status}` : null,
+      });
+    }
+  }
+
+  await prisma.attendance.createMany({
+    data: attendanceData,
   });
 
-  console.log('   ✅ Created sample announcement\n');
+  console.log(`   ✅ Created ${attendanceData.length} attendance records\n`);
+
+  // ============================================
+  // Step 7: Create Sample Announcements
+  // ============================================
+  console.log('📢 Creating announcements...');
+
+  const pembinaUserId = createdUsers['PEMBINA'].prismaUser.id;
+
+  await Promise.all([
+    // Recent announcement (today)
+    prisma.announcement.create({
+      data: {
+        extracurricular_id: extracurriculars[0].id, // Basket
+        author_id: pembinaUserId,
+        title: 'Perubahan Jadwal Latihan Basket',
+        content: 'Latihan minggu ini dipindahkan ke hari Kamis karena ada renovasi lapangan.',
+        created_at: new Date(),
+      },
+    }),
+    // 2 days ago
+    prisma.announcement.create({
+      data: {
+        extracurricular_id: extracurriculars[1].id, // Robotik
+        author_id: pembinaUserId,
+        title: 'Latihan Robotik Diliburkan',
+        content: 'Latihan robotik diliburkan minggu ini karena pembina berhalangan.',
+        created_at: new Date(today.getTime() - 2 * 24 * 60 * 60 * 1000),
+      },
+    }),
+    // 5 days ago
+    prisma.announcement.create({
+      data: {
+        extracurricular_id: extracurriculars[2].id, // Game Dev
+        author_id: pembinaUserId,
+        title: 'Selamat Datang di Ekstrakurikuler Game Development!',
+        content: 'Halo semua! Selamat bergabung di ekstrakurikuler Game Development. Persiapkan laptop kalian!',
+        created_at: new Date(today.getTime() - 5 * 24 * 60 * 60 * 1000),
+      },
+    }),
+    // 1 week ago
+    prisma.announcement.create({
+      data: {
+        extracurricular_id: extracurriculars[0].id, // Basket
+        author_id: pembinaUserId,
+        title: 'Pengumpulan Seragam Tim',
+        content: 'Seragam tim basket sudah tersedia. Harap dikumpulkan ukuran masing-masing.',
+        created_at: new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000),
+      },
+    }),
+  ]);
+
+  console.log('   ✅ Created 4 announcements\n');
 
   // ============================================
   // Summary
@@ -547,12 +641,13 @@ async function main() {
   console.log('═'.repeat(50));
   console.log('🎉 SEEDING COMPLETED SUCCESSFULLY!\n');
   console.log('📊 Summary:');
-  console.log('   👥 Users: 3 (1 Admin, 1 Pembina, 1 Student)');
+  console.log('   👥 Users: 13 (3 Admin, 5 Pembina, 5 Students)');
   console.log(`   🎯 Extracurriculars: ${extracurriculars.length}`);
   console.log('   📅 Schedules: 3');
-  console.log('   📝 Enrollments: 1');
-  console.log('   📢 Announcements: 1');
-  console.log('\n� Login Credentials:');
+  console.log(`   📝 Enrollments: ${enrollments.length}`);
+  console.log(`   📋 Attendance Records: ${attendanceData.length}`);
+  console.log('   📢 Announcements: 4');
+  console.log('\n🔑 Login Credentials:');
   console.log('═'.repeat(50));
   seedUsers.forEach((user) => {
     console.log(`   ${user.role.padEnd(8)} | ${user.email} | ${user.password}`);
