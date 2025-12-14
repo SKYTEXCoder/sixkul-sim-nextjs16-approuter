@@ -113,6 +113,7 @@ model Extracurricular {
   pembina       PembinaProfile @relation(fields: [pembina_id], references: [id], onDelete: Restrict)
   enrollments   Enrollment[]
   schedules     Schedule[]
+  sessions      Session[]
   announcements Announcement[]
 
   @@map("extracurriculars")
@@ -149,16 +150,37 @@ model Schedule {
 
   // Relations
   extracurricular Extracurricular @relation(fields: [extracurricular_id], references: [id], onDelete: Cascade)
-  attendances     Attendance[]
+  sessions        Session[]
 
   @@map("schedules")
 }
 
-/// Attendance tracking - Linked to Enrollment (not Student directly)
+/// Session (Pertemuan) - Concrete calendar-dated extracurricular event
+model Session {
+  id                 String   @id @default(cuid())
+  extracurricular_id String
+  schedule_id        String?  // Optional: parent Schedule template
+  date               DateTime // Calendar date of the session
+  start_time         String   // e.g., "14:00"
+  end_time           String   // e.g., "16:00"
+  location           String
+  notes              String?
+  is_cancelled       Boolean  @default(false)
+  created_at         DateTime @default(now())
+
+  // Relations
+  extracurricular Extracurricular @relation(fields: [extracurricular_id], references: [id], onDelete: Cascade)
+  schedule        Schedule?       @relation(fields: [schedule_id], references: [id], onDelete: SetNull)
+  attendances     Attendance[]
+
+  @@map("sessions")
+}
+
+/// Attendance tracking - Linked to Enrollment and optionally to Session
 model Attendance {
   id            String           @id @default(cuid())
   enrollment_id String
-  schedule_id   String? // Optional link to specific schedule/event
+  session_id    String?          // Optional link to specific Session (concrete event)
   date          DateTime
   status        AttendanceStatus
   notes         String?
@@ -166,7 +188,7 @@ model Attendance {
 
   // Relations
   enrollment Enrollment @relation(fields: [enrollment_id], references: [id], onDelete: Cascade)
-  schedule   Schedule?  @relation(fields: [schedule_id], references: [id], onDelete: SetNull)
+  session    Session?   @relation(fields: [session_id], references: [id], onDelete: SetNull)
 
   // Prevent duplicate attendance records for same day
   @@unique([enrollment_id, date])

@@ -42,7 +42,8 @@ interface DashboardSuccessResponse {
       status: string;
     }>;
     upcomingSchedules: Array<{
-      scheduleId: string;
+      sessionId: string;
+      enrollmentId: string;
       ekskulId: string;
       ekskulName: string;
       day: string;
@@ -94,21 +95,6 @@ function getDayNameIndonesian(dayOfWeek: string): string {
   return dayMap[dayOfWeek.toUpperCase()] || dayOfWeek;
 }
 
-/**
- * Get day index (0=Sunday, 1=Monday, etc) from day string
- */
-function getDayIndex(dayOfWeek: string): number {
-  const dayMap: Record<string, number> = {
-    'MINGGU': 0, 'SUNDAY': 0,
-    'SENIN': 1, 'MONDAY': 1,
-    'SELASA': 2, 'TUESDAY': 2,
-    'RABU': 3, 'WEDNESDAY': 3,
-    'KAMIS': 4, 'THURSDAY': 4,
-    'JUMAT': 5, 'FRIDAY': 5,
-    'SABTU': 6, 'SATURDAY': 6,
-  };
-  return dayMap[dayOfWeek.toUpperCase()] ?? -1;
-}
 
 /**
  * Get relative time string in Indonesian
@@ -131,79 +117,19 @@ function getRelativeTimeString(date: Date): string {
 }
 
 /**
- * Get upcoming schedules for the next 7 days (max 10)
+ * Format session date to Indonesian day name
  */
-function getUpcomingSchedules(
-  schedules: Array<{
-    id: string;
-    day_of_week: string;
-    start_time: string;
-    end_time: string;
-    location: string;
-    extracurricular: { id: string; name: string };
-  }>
-): Array<{
-  scheduleId: string;
-  ekskulId: string;
-  ekskulName: string;
-  day: string;
-  dayOfWeek: string;
-  startTime: string;
-  endTime: string;
-  location: string;
-}> {
-  const now = new Date();
-  const todayDayIndex = now.getDay(); // 0=Sunday, 1=Monday, etc.
-  const currentTime = now.getHours() * 60 + now.getMinutes();
+function formatSessionDay(date: Date): string {
+  const dayNames = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+  return dayNames[date.getDay()];
+}
 
-  // Create list of upcoming schedule occurrences
-  const upcoming: Array<{
-    schedule: typeof schedules[0];
-    daysUntil: number;
-    isPast: boolean;
-  }> = [];
-
-  for (const schedule of schedules) {
-    const scheduleDayIndex = getDayIndex(schedule.day_of_week);
-    if (scheduleDayIndex === -1) continue;
-
-    // Calculate days until this schedule
-    let daysUntil = scheduleDayIndex - todayDayIndex;
-    if (daysUntil < 0) daysUntil += 7;
-
-    // Check if it's today but already past
-    const [startHour, startMinute] = schedule.start_time.split(':').map(Number);
-    const scheduleTimeMinutes = startHour * 60 + startMinute;
-    const isPast = daysUntil === 0 && scheduleTimeMinutes < currentTime;
-
-    // If today and past, add for next week
-    if (isPast) {
-      daysUntil = 7;
-    }
-
-    // Only include schedules within the next 7 days
-    if (daysUntil <= 7) {
-      upcoming.push({ schedule, daysUntil, isPast: false });
-    }
-  }
-
-  // Sort by days until (ascending), then by start time
-  upcoming.sort((a, b) => {
-    if (a.daysUntil !== b.daysUntil) return a.daysUntil - b.daysUntil;
-    return a.schedule.start_time.localeCompare(b.schedule.start_time);
-  });
-
-  // Take max 10 and format
-  return upcoming.slice(0, 10).map(({ schedule }) => ({
-    scheduleId: schedule.id,
-    ekskulId: schedule.extracurricular.id,
-    ekskulName: schedule.extracurricular.name,
-    day: getDayNameIndonesian(schedule.day_of_week),
-    dayOfWeek: schedule.day_of_week,
-    startTime: schedule.start_time,
-    endTime: schedule.end_time,
-    location: schedule.location,
-  }));
+/**
+ * Get day of week string from date
+ */
+function getDayOfWeekFromDate(date: Date): string {
+  const dayNames = ['MINGGU', 'SENIN', 'SELASA', 'RABU', 'KAMIS', 'JUMAT', 'SABTU'];
+  return dayNames[date.getDay()];
 }
 
 // ============================================
@@ -314,58 +240,61 @@ export async function GET(): Promise<NextResponse<DashboardSuccessResponse | Das
     }
 
     // ----------------------------------------
-    // Step 6: Count schedules this week
+    // Step 6: Count sessions this week and fetch upcoming sessions
     // ----------------------------------------
     const now = new Date();
-    const todayDayIndex = now.getDay();
-    const currentDayNames = ['MINGGU', 'SENIN', 'SELASA', 'RABU', 'KAMIS', 'JUMAT', 'SABTU'];
+    const startOfToday = new Date(now);
+    startOfToday.setHours(0, 0, 0, 0);
     
-    // Get remaining days of this week (including today)
-    const remainingDays: string[] = [];
-    for (let i = todayDayIndex; i <= 6; i++) {
-      remainingDays.push(currentDayNames[i]);
-    }
-    // Also add English variations
-    const englishDays = ['SUNDAY', 'MONDAY', 'TUESDAY', 'WEDNESDAY', 'THURSDAY', 'FRIDAY', 'SATURDAY'];
-    for (let i = todayDayIndex; i <= 6; i++) {
-      remainingDays.push(englishDays[i]);
-    }
+    // End of this week (Sunday)
+    const endOfWeek = new Date(startOfToday);
+    endOfWeek.setDate(endOfWeek.getDate() + (7 - endOfWeek.getDay()));
+    endOfWeek.setHours(23, 59, 59, 999);
 
-    // Collect all schedules from active enrollments
-    const allSchedules: Array<{
-      id: string;
-      day_of_week: string;
-      start_time: string;
-      end_time: string;
-      location: string;
-      extracurricular: { id: string; name: string };
-    }> = [];
+    // Create enrollment map for navigation
+    const enrollmentMap = new Map(
+      activeEnrollments.map(e => [e.extracurricular_id, e.id])
+    );
 
-    for (const enrollment of activeEnrollments) {
-      for (const schedule of enrollment.extracurricular.schedules) {
-        allSchedules.push({
-          ...schedule,
-          extracurricular: {
-            id: enrollment.extracurricular.id,
-            name: enrollment.extracurricular.name,
-          },
-        });
-      }
-    }
+    const extracurricularIds = activeEnrollments.map(e => e.extracurricular.id);
 
-    // Count schedules for remaining days of this week
-    const schedulesThisWeek = allSchedules.filter(s => 
-      remainingDays.includes(s.day_of_week.toUpperCase())
-    ).length;
+    // Fetch sessions from database (not computing virtual occurrences)
+    const upcomingSessions = await prisma.session.findMany({
+      where: {
+        is_cancelled: false,
+        date: { gte: startOfToday },
+        extracurricular_id: { in: extracurricularIds },
+      },
+      include: {
+        extracurricular: {
+          select: { id: true, name: true },
+        },
+      },
+      orderBy: [
+        { date: 'asc' },
+        { start_time: 'asc' },
+      ],
+      take: 10,
+    });
 
+    // Count sessions this week
+    const sessionsThisWeek = await prisma.session.count({
+      where: {
+        is_cancelled: false,
+        date: {
+          gte: startOfToday,
+          lte: endOfWeek,
+        },
+        extracurricular_id: { in: extracurricularIds },
+      },
+    });
+    
     // ----------------------------------------
     // Step 7: Get new announcements count (last 7 days)
     // ----------------------------------------
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
 
-    const extracurricularIds = activeEnrollments.map(e => e.extracurricular.id);
-    
     let newAnnouncementsCount = 0;
     
     if (extracurricularIds.length > 0) {
@@ -389,9 +318,19 @@ export async function GET(): Promise<NextResponse<DashboardSuccessResponse | Das
     }));
 
     // ----------------------------------------
-    // Step 9: Get upcoming schedules (max 10)
+    // Step 9: Format upcoming sessions for response
     // ----------------------------------------
-    const upcomingSchedules = getUpcomingSchedules(allSchedules);
+    const upcomingSchedules = upcomingSessions.map(session => ({
+      sessionId: session.id,
+      enrollmentId: enrollmentMap.get(session.extracurricular_id) || '',
+      ekskulId: session.extracurricular.id,
+      ekskulName: session.extracurricular.name,
+      day: formatSessionDay(session.date),
+      dayOfWeek: getDayOfWeekFromDate(session.date),
+      startTime: session.start_time,
+      endTime: session.end_time,
+      location: session.location,
+    }));
 
     // ----------------------------------------
     // Step 10: Get recent announcements
@@ -431,7 +370,7 @@ export async function GET(): Promise<NextResponse<DashboardSuccessResponse | Das
         stats: {
           activeEnrollmentsCount,
           attendancePercentage,
-          schedulesThisWeek,
+          schedulesThisWeek: sessionsThisWeek,
           newAnnouncementsCount,
         },
         myEkskul,

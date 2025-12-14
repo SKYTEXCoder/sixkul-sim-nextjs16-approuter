@@ -324,8 +324,9 @@ async function main() {
   // Step 1: Clean existing data
   // ============================================
   console.log('🧹 Cleaning existing database data...');
-  await prisma.announcement.deleteMany();
   await prisma.attendance.deleteMany();
+  await prisma.session.deleteMany();
+  await prisma.announcement.deleteMany();
   await prisma.schedule.deleteMany();
   await prisma.enrollment.deleteMany();
   await prisma.extracurricular.deleteMany();
@@ -475,7 +476,7 @@ async function main() {
   // ============================================
   console.log('📅 Creating schedules...');
 
-  await Promise.all([
+  const schedules = await Promise.all([
     prisma.schedule.create({
       data: {
         extracurricular_id: extracurriculars[0].id,
@@ -506,6 +507,69 @@ async function main() {
   ]);
 
   console.log('   ✅ Created 3 schedules\n');
+
+  // ============================================
+  // Step 4.5: Generate Sessions from Schedule Templates
+  // ============================================
+  console.log('📆 Generating Sessions from Schedule templates...');
+
+  // Map day names to JavaScript day indices (0 = Sunday, 1 = Monday, etc.)
+  const dayNameToIndex: Record<string, number> = {
+    'MINGGU': 0, 'SUNDAY': 0,
+    'SENIN': 1, 'MONDAY': 1,
+    'SELASA': 2, 'TUESDAY': 2,
+    'RABU': 3, 'WEDNESDAY': 3,
+    'KAMIS': 4, 'THURSDAY': 4,
+    'JUMAT': 5, 'FRIDAY': 5,
+    'SABTU': 6, 'SATURDAY': 6,
+  };
+
+  // Generate sessions for the next 4 weeks
+  const sessionsToCreate: Array<{
+    extracurricular_id: string;
+    schedule_id: string;
+    date: Date;
+    start_time: string;
+    end_time: string;
+    location: string;
+  }> = [];
+
+  const todayDate = new Date();
+  todayDate.setHours(0, 0, 0, 0);
+
+  for (const schedule of schedules) {
+    const targetDayIndex = dayNameToIndex[schedule.day_of_week.toUpperCase()];
+    if (targetDayIndex === undefined) continue;
+
+    // Generate sessions for 4 weeks
+    for (let week = 0; week < 4; week++) {
+      // Calculate the next occurrence of this day
+      const sessionDate = new Date(todayDate);
+      const currentDayIndex = sessionDate.getDay();
+      let daysUntil = targetDayIndex - currentDayIndex;
+      if (daysUntil < 0) daysUntil += 7;
+      if (daysUntil === 0 && week === 0) {
+        // If today is the target day, include it
+        daysUntil = 0;
+      }
+      sessionDate.setDate(sessionDate.getDate() + daysUntil + (week * 7));
+
+      sessionsToCreate.push({
+        extracurricular_id: schedule.extracurricular_id,
+        schedule_id: schedule.id,
+        date: sessionDate,
+        start_time: schedule.start_time,
+        end_time: schedule.end_time,
+        location: schedule.location,
+      });
+    }
+  }
+
+  await prisma.session.createMany({
+    data: sessionsToCreate,
+  });
+
+  console.log(`   ✅ Created ${sessionsToCreate.length} sessions\n`);
 
   // ============================================
   // Step 5: Create Multiple Enrollments for First Student
@@ -644,6 +708,7 @@ async function main() {
   console.log('   👥 Users: 13 (3 Admin, 5 Pembina, 5 Students)');
   console.log(`   🎯 Extracurriculars: ${extracurriculars.length}`);
   console.log('   📅 Schedules: 3');
+  console.log(`   📆 Sessions: ${sessionsToCreate.length}`);
   console.log(`   📝 Enrollments: ${enrollments.length}`);
   console.log(`   📋 Attendance Records: ${attendanceData.length}`);
   console.log('   📢 Announcements: 4');

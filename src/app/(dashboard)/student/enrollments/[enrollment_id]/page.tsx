@@ -180,7 +180,7 @@ export default async function EnrollmentDetailPage({ params }: PageProps) {
       {isActive && (
         <div className="space-y-6">
           {/* Schedule */}
-          <EnrollmentSchedule schedules={enrollment.schedules} />
+          <EnrollmentSchedule sessions={enrollment.sessions} />
 
           {/* Attendance */}
           <EnrollmentAttendance attendances={enrollment.attendances} />

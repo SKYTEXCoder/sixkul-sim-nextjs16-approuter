@@ -30,9 +30,9 @@ export interface EnrollmentDetailViewModel {
     name: string;
     email: string | null;
   };
-  schedules: Array<{
+  sessions: Array<{
     id: string;
-    dayOfWeek: string;
+    date: Date;
     startTime: string;
     endTime: string;
     location: string;
@@ -125,10 +125,15 @@ export async function getEnrollmentDetail(enrollmentId: string): Promise<Enrollm
                 },
               },
             },
-            schedules: {
-              orderBy: {
-                day_of_week: 'asc',
+            sessions: {
+              where: {
+                is_cancelled: false,
+                date: { gte: new Date() },
               },
+              orderBy: {
+                date: 'asc',
+              },
+              take: 10, // Show next 10 upcoming sessions
             },
             announcements: {
               orderBy: {
@@ -187,12 +192,12 @@ export async function getEnrollmentDetail(enrollmentId: string): Promise<Enrollm
         name: enrollment.extracurricular.pembina.user.full_name,
         email: enrollment.extracurricular.pembina.user.email,
       },
-      schedules: enrollment.extracurricular.schedules.map((schedule) => ({
-        id: schedule.id,
-        dayOfWeek: schedule.day_of_week,
-        startTime: schedule.start_time,
-        endTime: schedule.end_time,
-        location: schedule.location,
+      sessions: enrollment.extracurricular.sessions.map((session) => ({
+        id: session.id,
+        date: session.date,
+        startTime: session.start_time,
+        endTime: session.end_time,
+        location: session.location,
       })),
       attendances: enrollment.attendances.map((attendance) => ({
         id: attendance.id,
