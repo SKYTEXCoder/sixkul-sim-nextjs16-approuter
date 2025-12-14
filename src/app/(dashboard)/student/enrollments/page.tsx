@@ -71,7 +71,7 @@ export default async function StudentEnrollmentsPage() {
             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
               <Trophy className="w-5 h-5 text-white" />
             </div>
-            Ekstrakurikuler Saya
+            Ekstrakurikuler-Ekstrakurikuler Saya
           </h1>
           <p className="text-slate-500 dark:text-slate-400 mt-2">
             Daftar ekstrakurikuler yang kamu ikuti
