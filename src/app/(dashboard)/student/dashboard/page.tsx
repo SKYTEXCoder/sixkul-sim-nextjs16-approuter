@@ -53,7 +53,8 @@ interface DashboardData {
     status: string;
   }>;
   upcomingSchedules: Array<{
-    scheduleId: string;
+    sessionId: string;
+    enrollmentId: string;
     ekskulId: string;
     ekskulName: string;
     day: string;
@@ -362,8 +363,8 @@ export default function StudentDashboardPage() {
             ) : (
               data.upcomingSchedules.slice(0, 5).map((schedule, i) => (
                 <Link
-                  key={`${schedule.scheduleId}-${schedule.dayOfWeek}-${i}`}
-                  href={`/student/schedule/${schedule.scheduleId}`}
+                  key={`${schedule.sessionId}-${i}`}
+                  href={`/student/enrollments/${schedule.enrollmentId}`}
                   className="flex items-center justify-between p-3 rounded-lg bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
                 >
                   <div>
