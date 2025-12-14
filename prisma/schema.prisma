@@ -39,6 +39,7 @@ enum AttendanceStatus {
   SICK
   PERMISSION
   ALPHA
+  LATE
 }
 
 // ============================================
