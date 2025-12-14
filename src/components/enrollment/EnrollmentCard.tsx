@@ -13,8 +13,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import {
   Eye,
-  Calendar,
-  ClipboardCheck,
   User,
   Clock,
   GraduationCap,
@@ -92,8 +90,6 @@ function CategoryBadge({ category }: { category: string }) {
 // ============================================
 
 export function EnrollmentCard({ enrollment }: EnrollmentCardProps) {
-  const isActive = enrollment.status === "ACTIVE";
-  const isPending = enrollment.status === "PENDING";
 
   return (
     <Card className="overflow-hidden transition-all hover:shadow-md">
@@ -140,46 +136,18 @@ export function EnrollmentCard({ enrollment }: EnrollmentCardProps) {
 
         {/* Actions */}
         <div className="flex flex-wrap gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
-          {/* Lihat Detail - Disabled for PENDING */}
+          {/* Lihat Aktivitas - Available for ALL statuses */}
           <Button
             variant="outline"
             size="sm"
-            asChild={isActive}
-            disabled={isPending}
+            asChild
             className="gap-1.5"
           >
-            {isActive ? (
-              <Link href={`/student/ekstrakurikuler/${enrollment.extracurricular.id}`}>
-                <Eye className="w-4 h-4" />
-                Lihat Detail
-              </Link>
-            ) : (
-              <>
-                <Eye className="w-4 h-4" />
-                Lihat Detail
-              </>
-            )}
+            <Link href={`/student/enrollments/${enrollment.id}`}>
+              <Eye className="w-4 h-4" />
+              Lihat Aktivitas
+            </Link>
           </Button>
-
-          {/* Jadwal - Only for ACTIVE */}
-          {isActive && (
-            <Button variant="outline" size="sm" asChild className="gap-1.5">
-              <Link href="/student/schedule">
-                <Calendar className="w-4 h-4" />
-                Jadwal
-              </Link>
-            </Button>
-          )}
-
-          {/* Absensi - Only for ACTIVE */}
-          {isActive && (
-            <Button variant="outline" size="sm" asChild className="gap-1.5">
-              <Link href="/student/attendance">
-                <ClipboardCheck className="w-4 h-4" />
-                Absensi
-              </Link>
-            </Button>
-          )}
         </div>
       </CardContent>
     </Card>

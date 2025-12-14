@@ -289,7 +289,7 @@ export default function StudentDashboardPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Trophy className="h-5 w-5 text-blue-500" />
-              Ekstrakurikuler Saya
+              Ekstrakurikuler-Ekstrakurikuler Saya
             </CardTitle>
             <CardDescription>
               Ekstrakurikuler yang sedang kamu ikuti
