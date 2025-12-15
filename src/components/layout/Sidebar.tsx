@@ -2,10 +2,10 @@
 
 /**
  * SIXKUL Sidebar Component
- * 
+ *
  * Reusable navigation sidebar for dashboard layouts.
  * Accepts menu items with labels, hrefs, and icons.
- * 
+ *
  * @module components/layout/Sidebar
  */
 
@@ -80,7 +80,12 @@ const roleLabels = {
 // Sidebar Component
 // ============================================
 
-export function Sidebar({ menuItems, user, isCollapsed: externalIsCollapsed, onCollapseChange }: SidebarProps) {
+export function Sidebar({
+  menuItems,
+  user,
+  isCollapsed: externalIsCollapsed,
+  onCollapseChange,
+}: SidebarProps) {
   const pathname = usePathname();
   const { signOut } = useClerk();
   // Use external state if provided, otherwise use internal state
@@ -88,8 +93,10 @@ export function Sidebar({ menuItems, user, isCollapsed: externalIsCollapsed, onC
   const isCollapsed = externalIsCollapsed ?? internalIsCollapsed;
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
-  const gradientColor = roleColors[user.role as keyof typeof roleColors] || roleColors.SISWA;
-  const roleLabel = roleLabels[user.role as keyof typeof roleLabels] || user.role;
+  const gradientColor =
+    roleColors[user.role as keyof typeof roleColors] || roleColors.SISWA;
+  const roleLabel =
+    roleLabels[user.role as keyof typeof roleLabels] || user.role;
 
   // Handle collapse toggle
   const handleCollapseToggle = () => {
@@ -126,14 +133,18 @@ export function Sidebar({ menuItems, user, isCollapsed: externalIsCollapsed, onC
       )}
     >
       {/* Header / Logo */}
-      <div className={cn(
-        "flex items-center gap-3 px-4 py-5 border-b border-slate-800",
-        isCollapsed ? "justify-center" : ""
-      )}>
-        <div className={cn(
-          "flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br",
-          gradientColor
-        )}>
+      <div
+        className={cn(
+          "flex items-center gap-3 px-4 py-5 border-b border-slate-800",
+          isCollapsed ? "justify-center" : ""
+        )}
+      >
+        <div
+          className={cn(
+            "flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br",
+            gradientColor
+          )}
+        >
           <GraduationCap className="w-5 h-5 text-white" />
         </div>
         {!isCollapsed && (
@@ -148,7 +159,8 @@ export function Sidebar({ menuItems, user, isCollapsed: externalIsCollapsed, onC
       <nav className="flex-1 overflow-y-auto py-4 px-3">
         <ul className="space-y-1">
           {menuItems.map((item) => {
-            const isActive = pathname === item.href || pathname.startsWith(item.href + "/");
+            const isActive =
+              pathname === item.href || pathname.startsWith(item.href + "/");
             const Icon = item.icon;
 
             return (
@@ -162,20 +174,24 @@ export function Sidebar({ menuItems, user, isCollapsed: externalIsCollapsed, onC
                       : "text-slate-400 hover:text-white hover:bg-slate-800/50"
                   )}
                 >
-                  <Icon className={cn(
-                    "flex-shrink-0 w-5 h-5 transition-transform",
-                    isActive ? "scale-110" : "group-hover:scale-110"
-                  )} />
+                  <Icon
+                    className={cn(
+                      "flex-shrink-0 w-5 h-5 transition-transform",
+                      isActive ? "scale-110" : "group-hover:scale-110"
+                    )}
+                  />
                   {!isCollapsed && (
                     <>
                       <span className="font-medium truncate">{item.label}</span>
                       {item.badge && (
-                        <span className={cn(
-                          "ml-auto text-xs font-semibold px-2 py-0.5 rounded-full",
-                          isActive
-                            ? "bg-white/20 text-white"
-                            : "bg-slate-700 text-slate-300"
-                        )}>
+                        <span
+                          className={cn(
+                            "ml-auto text-xs font-semibold px-2 py-0.5 rounded-full",
+                            isActive
+                              ? "bg-white/20 text-white"
+                              : "bg-slate-700 text-slate-300"
+                          )}
+                        >
                           {item.badge}
                         </span>
                       )}
@@ -189,17 +205,21 @@ export function Sidebar({ menuItems, user, isCollapsed: externalIsCollapsed, onC
       </nav>
 
       {/* User Profile with Dropdown */}
-      <div className={cn(
-        "border-t border-slate-800 p-4",
-        isCollapsed ? "flex justify-center" : ""
-      )}>
+      <div
+        className={cn(
+          "border-t border-slate-800 p-4",
+          isCollapsed ? "flex justify-center" : ""
+        )}
+      >
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <button className={cn(
-              "flex items-center gap-3 w-full rounded-lg p-2 -m-2 transition-colors",
-              "hover:bg-slate-800/50 cursor-pointer focus:outline-none focus:ring-2 focus:ring-slate-600",
-              isCollapsed ? "justify-center" : ""
-            )}>
+            <button
+              className={cn(
+                "flex items-center gap-3 w-full rounded-lg p-2 -m-2 transition-colors",
+                "hover:bg-slate-800/50 cursor-pointer focus:outline-none focus:ring-2 focus:ring-slate-600",
+                isCollapsed ? "justify-center" : ""
+              )}
+            >
               <Avatar className="h-10 w-10 border-2 border-slate-700">
                 <AvatarImage src={user.avatarUrl} alt={user.name} />
                 <AvatarFallback className="bg-slate-700 text-slate-300 text-sm">
@@ -216,8 +236,8 @@ export function Sidebar({ menuItems, user, isCollapsed: externalIsCollapsed, onC
               )}
             </button>
           </DropdownMenuTrigger>
-          <DropdownMenuContent 
-            align={isCollapsed ? "center" : "end"} 
+          <DropdownMenuContent
+            align={isCollapsed ? "center" : "end"}
             side="top"
             className="w-56 mb-2"
           >
@@ -231,7 +251,15 @@ export function Sidebar({ menuItems, user, isCollapsed: externalIsCollapsed, onC
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-              <Link href={user.role === "SISWA" ? "/student/profile" : user.role === "PEMBINA" ? "/pembina/profile" : "/admin/profile"}>
+              <Link
+                href={
+                  user.role === "SISWA"
+                    ? "/student/profile"
+                    : user.role === "PEMBINA"
+                    ? "/pembina/profile"
+                    : "/admin/profile"
+                }
+              >
                 <User className="mr-2 h-4 w-4" />
                 Profil Saya
               </Link>

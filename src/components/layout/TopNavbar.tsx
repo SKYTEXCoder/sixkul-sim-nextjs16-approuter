@@ -2,9 +2,9 @@
 
 /**
  * SIXKUL Top Navigation Bar Component
- * 
+ *
  * Includes search, notifications, and logout functionality.
- * 
+ *
  * @module components/layout/TopNavbar
  */
 
@@ -24,15 +24,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Bell,
-
-  LogOut,
-  User,
-  Settings,
-  Menu,
-  Loader2,
-} from "lucide-react";
+import { Bell, LogOut, User, Settings, Menu, Loader2 } from "lucide-react";
 
 // ============================================
 // Types
@@ -53,7 +45,11 @@ interface TopNavbarProps {
 // TopNavbar Component
 // ============================================
 
-export function TopNavbar({ user, onMenuClick, showSearch = true }: TopNavbarProps) {
+export function TopNavbar({
+  user,
+  onMenuClick,
+  showSearch = true,
+}: TopNavbarProps) {
   const router = useRouter();
   const { signOut } = useClerk();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -66,7 +62,7 @@ export function TopNavbar({ user, onMenuClick, showSearch = true }: TopNavbarPro
 
     try {
       await signOut({ redirectUrl: "/sign-in" });
-      
+
       toast.success("Logout berhasil", {
         description: "Sampai jumpa lagi!",
       });
@@ -144,7 +140,15 @@ export function TopNavbar({ user, onMenuClick, showSearch = true }: TopNavbarPro
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-              <Link href={user?.role === "SISWA" ? "/student/profile" : user?.role === "PEMBINA" ? "/pembina/profile" : "/admin/profile"}>
+              <Link
+                href={
+                  user?.role === "SISWA"
+                    ? "/student/profile"
+                    : user?.role === "PEMBINA"
+                    ? "/pembina/profile"
+                    : "/admin/profile"
+                }
+              >
                 <User className="mr-2 h-4 w-4" />
                 Profil Saya
               </Link>
@@ -172,6 +176,5 @@ export function TopNavbar({ user, onMenuClick, showSearch = true }: TopNavbarPro
     </div>
   );
 }
-
 
 export default TopNavbar;
