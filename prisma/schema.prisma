@@ -69,12 +69,13 @@ model User {
 
 /// Student profile - One-to-One with User
 model StudentProfile {
-  id           String  @id @default(cuid())
-  user_id      String  @unique
-  nis          String  @unique // Nomor Induk Siswa
-  class_name   String  // e.g., "XII IPA 1"
-  major        String  // e.g., "IPA", "IPS"
-  phone_number String?
+  id            String  @id @default(cuid())
+  user_id       String  @unique
+  nis           String  @unique // Nomor Induk Siswa
+  class_name    String  // e.g., "XII IPA 1"
+  major         String  // e.g., "IPA", "IPS"
+  phone_number  String?
+  academic_year String? // e.g., "2024/2025" — exclusive source for Tahun Akademik
 
   // Relations
   user        User         @relation(fields: [user_id], references: [id], onDelete: Cascade)
