@@ -2,9 +2,9 @@
 
 /**
  * Student Dashboard Layout
- * 
+ *
  * Layout for Student (SISWA) role with appropriate navigation menu.
- * 
+ *
  * @module app/(dashboard)/student/layout
  */
 
@@ -61,7 +61,7 @@ const studentMenuItems: NavItem[] = [
     icon: Megaphone,
   },
   {
-    label: "Riwayat & Nilai",
+    label: "Riwayat Saya (History)",
     href: "/student/history",
     icon: History,
   },
@@ -86,10 +86,10 @@ export default function StudentLayout({
 
   // Get user data from Clerk
   const { user, isLoaded } = useUser();
-  
+
   // Sync user to Prisma database (JIT)
   const { isSyncing } = useAuthSync();
-  
+
   const userData = {
     name: user?.fullName || user?.username || "Student User",
     email: user?.primaryEmailAddress?.emailAddress || "",
@@ -109,23 +109,27 @@ export default function StudentLayout({
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
       {/* Sidebar */}
-      <Sidebar 
-        menuItems={studentMenuItems} 
+      <Sidebar
+        menuItems={studentMenuItems}
         user={userData}
         isCollapsed={isSidebarCollapsed}
         onCollapseChange={setIsSidebarCollapsed}
       />
 
       {/* Main Content Area - responsive to sidebar state */}
-      <div className={cn(
-        "transition-all duration-300",
-        isSidebarCollapsed ? "md:ml-20" : "md:ml-64"
-      )}>
+      <div
+        className={cn(
+          "transition-all duration-300",
+          isSidebarCollapsed ? "md:ml-20" : "md:ml-64"
+        )}
+      >
         {/* Top Navigation - also responsive to sidebar state */}
-        <header className={cn(
-          "fixed top-0 right-0 z-30 h-16 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-all duration-300",
-          isSidebarCollapsed ? "left-0 md:left-20" : "left-0 md:left-64"
-        )}>
+        <header
+          className={cn(
+            "fixed top-0 right-0 z-30 h-16 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-all duration-300",
+            isSidebarCollapsed ? "left-0 md:left-20" : "left-0 md:left-64"
+          )}
+        >
           <TopNavbar user={userData} />
         </header>
 
