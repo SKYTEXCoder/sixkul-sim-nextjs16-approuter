@@ -3,6 +3,7 @@
  *
  * Server Component that displays all future sessions from ACTIVE enrollments.
  * Uses Prisma directly for data fetching (no API routes).
+ * Respects StudentPreferences for default filters.
  *
  * @module app/(dashboard)/student/schedule/page
  */
@@ -13,6 +14,7 @@ import Link from "next/link";
 import { Calendar, AlertCircle, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { getStudentSessions, groupSessionsByDate } from "@/lib/session-data";
+import { getStudentPreferences } from "@/lib/preferences-data";
 import {
   ScheduleHeader,
   ScheduleFilters,
@@ -111,11 +113,23 @@ export default async function StudentSchedulePage({ searchParams }: PageProps) {
   // Await searchParams (Next.js 15 async params)
   const params = await searchParams;
 
-  // Parse filter params
+  // Fetch student preferences for default filters
+  const prefsResult = await getStudentPreferences();
+  const defaultRangeDays =
+    prefsResult.success && prefsResult.data
+      ? prefsResult.data.scheduleRangeDays
+      : 7; // Fallback to 7 days
+
+  // Calculate default end date based on preferences
+  const today = new Date();
+  const defaultEndDate = new Date(today);
+  defaultEndDate.setDate(defaultEndDate.getDate() + defaultRangeDays);
+
+  // Parse filter params - use preference defaults if not specified
   const filters = {
     extracurricularId: params.ekskul || undefined,
-    startDate: params.start ? new Date(params.start) : undefined,
-    endDate: params.end ? new Date(params.end) : undefined,
+    startDate: params.start ? new Date(params.start) : today,
+    endDate: params.end ? new Date(params.end) : defaultEndDate,
   };
 
   // Fetch sessions using server-side data layer

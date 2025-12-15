@@ -78,8 +78,9 @@ model StudentProfile {
   academic_year String? // e.g., "2024/2025" — exclusive source for Tahun Akademik
 
   // Relations
-  user        User         @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user        User                 @relation(fields: [user_id], references: [id], onDelete: Cascade)
   enrollments Enrollment[]
+  preferences StudentPreferences?
 
   @@map("student_profiles")
 }
@@ -226,4 +227,30 @@ model Notification {
   user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
 
   @@map("notifications")
+}
+
+/// Student preferences for UI and notifications
+model StudentPreferences {
+  id                      String   @id @default(cuid())
+  student_id              String   @unique
+
+  // Appearance (NO language - Indonesian only)
+  theme                   String   @default("system") // light | dark | system
+
+  // Notifications
+  notify_announcements    Boolean  @default(true)
+  notify_schedule_changes Boolean  @default(true)
+  notify_attendance       Boolean  @default(true)
+
+  // Schedule Preferences
+  schedule_default_view   String   @default("date") // date | extracurricular
+  schedule_range_days     Int      @default(7)
+
+  created_at              DateTime @default(now())
+  updated_at              DateTime @updatedAt
+
+  // Relations
+  student StudentProfile @relation(fields: [student_id], references: [id], onDelete: Cascade)
+
+  @@map("student_preferences")
 }

@@ -2,9 +2,9 @@
 
 /**
  * Ekskul Grid Component (Client Component)
- * 
+ *
  * Displays a grid of extracurricular cards with reactive search filtering.
- * 
+ *
  * @module components/ekskul/EkskulGrid
  */
 
@@ -46,36 +46,70 @@ import type { ExtracurricularCardData } from "@/types/ekskul";
 
 const categoryColors: Record<string, string> = {
   Teknologi: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
-  Olahraga: "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400",
+  Olahraga:
+    "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400",
   Seni: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400",
-  Akademik: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
-  Kepanduan: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
+  Akademik:
+    "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
+  Kepanduan:
+    "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
   Sosial: "bg-pink-100 text-pink-700 dark:bg-pink-900/30 dark:text-pink-400",
-  default: "bg-slate-100 text-slate-700 dark:bg-slate-900/30 dark:text-slate-400",
+  default:
+    "bg-slate-100 text-slate-700 dark:bg-slate-900/30 dark:text-slate-400",
 };
 
 // Icon mapping for categories and common keywords
 const getCategoryIcon = (category: string, name: string) => {
   const nameLower = name.toLowerCase();
-  
+
   // Check name for specific keywords first
-  if (nameLower.includes("game") || nameLower.includes("video")) return Gamepad2;
-  if (nameLower.includes("musik") || nameLower.includes("band") || nameLower.includes("drum")) return Music;
-  if (nameLower.includes("basket") || nameLower.includes("futsal") || nameLower.includes("voli")) return Trophy;
-  if (nameLower.includes("tenis") || nameLower.includes("bulutangkis")) return Dumbbell;
-  if (nameLower.includes("robotik") || nameLower.includes("komputer") || nameLower.includes("programming")) return Monitor;
-  if (nameLower.includes("pramuka") || nameLower.includes("paskibra")) return Compass;
-  if (nameLower.includes("lukis") || nameLower.includes("seni") || nameLower.includes("tari")) return Palette;
-  
+  if (nameLower.includes("game") || nameLower.includes("video"))
+    return Gamepad2;
+  if (
+    nameLower.includes("musik") ||
+    nameLower.includes("band") ||
+    nameLower.includes("drum")
+  )
+    return Music;
+  if (
+    nameLower.includes("basket") ||
+    nameLower.includes("futsal") ||
+    nameLower.includes("voli")
+  )
+    return Trophy;
+  if (nameLower.includes("tenis") || nameLower.includes("bulutangkis"))
+    return Dumbbell;
+  if (
+    nameLower.includes("robotik") ||
+    nameLower.includes("komputer") ||
+    nameLower.includes("programming")
+  )
+    return Monitor;
+  if (nameLower.includes("pramuka") || nameLower.includes("paskibra"))
+    return Compass;
+  if (
+    nameLower.includes("lukis") ||
+    nameLower.includes("seni") ||
+    nameLower.includes("tari")
+  )
+    return Palette;
+
   // Fall back to category
   switch (category) {
-    case "Teknologi": return Monitor;
-    case "Olahraga": return Trophy;
-    case "Seni": return Palette;
-    case "Akademik": return GraduationCap;
-    case "Kepanduan": return Compass;
-    case "Sosial": return Heart;
-    default: return BookOpen;
+    case "Teknologi":
+      return Monitor;
+    case "Olahraga":
+      return Trophy;
+    case "Seni":
+      return Palette;
+    case "Akademik":
+      return GraduationCap;
+    case "Kepanduan":
+      return Compass;
+    case "Sosial":
+      return Heart;
+    default:
+      return BookOpen;
   }
 };
 
@@ -110,13 +144,14 @@ export function EkskulGrid({ extracurriculars }: EkskulGridProps) {
     if (!searchQuery.trim()) {
       return extracurriculars;
     }
-    
+
     const query = searchQuery.toLowerCase();
-    return extracurriculars.filter((ekskul) => 
-      ekskul.name.toLowerCase().includes(query) ||
-      ekskul.category.toLowerCase().includes(query) ||
-      (ekskul.description?.toLowerCase().includes(query) ?? false) ||
-      ekskul.pembina.user.full_name.toLowerCase().includes(query)
+    return extracurriculars.filter(
+      (ekskul) =>
+        ekskul.name.toLowerCase().includes(query) ||
+        ekskul.category.toLowerCase().includes(query) ||
+        (ekskul.description?.toLowerCase().includes(query) ?? false) ||
+        ekskul.pembina.user.full_name.toLowerCase().includes(query)
     );
   }, [extracurriculars, searchQuery]);
 
@@ -152,16 +187,14 @@ export function EkskulGrid({ extracurriculars }: EkskulGridProps) {
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
             <h2 className="text-xl font-semibold">
-              {filteredExtracurriculars.length === extracurriculars.length 
+              {filteredExtracurriculars.length === extracurriculars.length
                 ? `${extracurriculars.length} Ekstrakurikuler Tersedia`
-                : `${filteredExtracurriculars.length} dari ${extracurriculars.length} Ekstrakurikuler`
-              }
+                : `${filteredExtracurriculars.length} dari ${extracurriculars.length} Ekstrakurikuler`}
             </h2>
             <p className="text-blue-100 mt-1">
-              {searchQuery 
+              {searchQuery
                 ? `Hasil pencarian untuk "${searchQuery}"`
-                : "Pilih yang sesuai dengan minat dan bakatmu!"
-              }
+                : "Pilih yang sesuai dengan minat dan bakatmu!"}
             </p>
           </div>
           <div className="flex items-center gap-2 text-sm">
@@ -177,20 +210,18 @@ export function EkskulGrid({ extracurriculars }: EkskulGridProps) {
           <CardContent>
             <Search className="h-12 w-12 text-slate-300 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-slate-900 dark:text-white">
-              {searchQuery 
+              {searchQuery
                 ? "Tidak ada hasil ditemukan"
-                : "Belum ada ekstrakurikuler"
-              }
+                : "Belum ada ekstrakurikuler"}
             </h3>
             <p className="text-slate-500 mt-1">
-              {searchQuery 
+              {searchQuery
                 ? `Coba cari dengan kata kunci lain selain "${searchQuery}"`
-                : "Ekstrakurikuler akan ditampilkan di sini setelah ditambahkan oleh admin."
-              }
+                : "Ekstrakurikuler akan ditampilkan di sini setelah ditambahkan oleh admin."}
             </p>
             {searchQuery && (
-              <Button 
-                variant="outline" 
+              <Button
+                variant="outline"
                 className="mt-4"
                 onClick={() => setSearchQuery("")}
               >
@@ -204,17 +235,22 @@ export function EkskulGrid({ extracurriculars }: EkskulGridProps) {
           {filteredExtracurriculars.map((ekskul) => {
             const categoryColor =
               categoryColors[ekskul.category] || categoryColors.default;
-            const memberCount = ekskul.enrollments.filter(e => e.status === "ACTIVE").length;
+            const memberCount = ekskul.enrollments.filter(
+              (e) => e.status === "ACTIVE"
+            ).length;
             const CategoryIcon = getCategoryIcon(ekskul.category, ekskul.name);
-            const gradient = categoryGradients[ekskul.category] || categoryGradients.default;
+            const gradient =
+              categoryGradients[ekskul.category] || categoryGradients.default;
 
             return (
               <Card
                 key={ekskul.id}
-                className="group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 overflow-hidden"
+                className="group hover:shadow-lg transition-all duration-300 hover:-translate-y-1 overflow-hidden cursor-pointer"
               >
                 {/* Card Header with Gradient and Icon */}
-                <div className={`h-32 bg-gradient-to-br ${gradient} relative flex items-center justify-center`}>
+                <div
+                  className={`h-32 bg-gradient-to-br ${gradient} relative flex items-center justify-center`}
+                >
                   <EkskulLogo
                     logoUrl={ekskul.logo_url}
                     name={ekskul.name}
@@ -222,9 +258,7 @@ export function EkskulGrid({ extracurriculars }: EkskulGridProps) {
                     size="md"
                   />
                   {/* Category Badge */}
-                  <Badge
-                    className={`absolute top-3 right-3 ${categoryColor}`}
-                  >
+                  <Badge className={`absolute top-3 right-3 ${categoryColor}`}>
                     {ekskul.category}
                   </Badge>
                 </div>
@@ -251,7 +285,10 @@ export function EkskulGrid({ extracurriculars }: EkskulGridProps) {
                 </CardContent>
 
                 <CardFooter>
-                  <Link href={`/student/ekstrakurikuler/${ekskul.id}`} className="w-full">
+                  <Link
+                    href={`/student/ekstrakurikuler/${ekskul.id}`}
+                    className="w-full"
+                  >
                     <Button
                       variant="outline"
                       className="w-full group-hover:bg-blue-600 group-hover:text-white group-hover:border-blue-600 transition-all"
