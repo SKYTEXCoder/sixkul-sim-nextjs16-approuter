@@ -1,9 +1,9 @@
 /**
  * Enrollment Attendance Component
- * 
+ *
  * Displays a read-only table of attendance records.
  * Server Component - no client-side interactivity needed.
- * 
+ *
  * @module components/enrollment-detail/EnrollmentAttendance
  */
 
@@ -32,40 +32,50 @@ interface EnrollmentAttendanceProps {
 // Status Badge Component
 // ============================================
 
-function AttendanceStatusBadge({ status }: { status: EnrollmentDetailViewModel["attendances"][0]["status"] }) {
+function AttendanceStatusBadge({
+  status,
+}: {
+  status: EnrollmentDetailViewModel["attendances"][0]["status"];
+}) {
   const statusConfig = {
     PRESENT: {
       label: "HADIR",
-      className: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
+      className:
+        "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
     },
     PERMISSION: {
       label: "IZIN",
-      className: "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
+      className:
+        "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
     },
     SICK: {
       label: "SAKIT",
-      className: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
+      className:
+        "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400",
     },
     ALPHA: {
       label: "ALPHA",
       className: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400",
     },
+    LATE: {
+      label: "TERLAMBAT",
+      className:
+        "bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400",
+    },
   };
 
   const config = statusConfig[status] || statusConfig.ALPHA;
 
-  return (
-    <Badge className={config.className}>
-      {config.label}
-    </Badge>
-  );
+  return <Badge className={config.className}>{config.label}</Badge>;
 }
 
 // ============================================
 // Main Component
 // ============================================
 
-export function EnrollmentAttendance({ attendances }: EnrollmentAttendanceProps) {
+export function EnrollmentAttendance({
+  attendances,
+}: EnrollmentAttendanceProps) {
   return (
     <Card>
       <CardHeader>

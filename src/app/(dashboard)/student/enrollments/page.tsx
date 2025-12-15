@@ -1,9 +1,9 @@
 /**
  * Student Enrollments Page (Ekstrakurikuler Saya)
- * 
+ *
  * Server Component that displays all extracurriculars the student is enrolled in.
  * Uses Prisma directly for data fetching (no API routes).
- * 
+ *
  * @module app/(dashboard)/student/enrollments/page
  */
 
@@ -13,6 +13,9 @@ import { Button } from "@/components/ui/button";
 import { getStudentEnrollments } from "@/lib/enrollments-data";
 import { EnrollmentCard } from "@/components/enrollment/EnrollmentCard";
 import { EmptyEnrollments } from "@/components/enrollment/EmptyEnrollments";
+
+// Force dynamic rendering since this page uses Clerk auth (reads headers)
+export const dynamic = "force-dynamic";
 
 // ============================================
 // Error Display Component
@@ -57,7 +60,11 @@ export default async function StudentEnrollmentsPage() {
 
   // Handle errors
   if (!result.success || !result.data) {
-    return <ErrorDisplay message={result.error || "Gagal memuat data ekstrakurikuler."} />;
+    return (
+      <ErrorDisplay
+        message={result.error || "Gagal memuat data ekstrakurikuler."}
+      />
+    );
   }
 
   const enrollments = result.data;

@@ -1,9 +1,9 @@
 /**
  * Student Attendance Page (Absensi Saya)
- * 
+ *
  * Server Component that displays attendance history across all ACTIVE enrollments.
  * Uses Prisma directly for data fetching (no API routes).
- * 
+ *
  * @module app/(dashboard)/student/attendance/page
  */
 
@@ -17,6 +17,9 @@ import {
   AttendanceSummaryCards,
   AttendanceList,
 } from "@/components/student-attendance";
+
+// Force dynamic rendering since this page uses Clerk auth (reads headers)
+export const dynamic = "force-dynamic";
 
 // ============================================
 // Error Display Component
@@ -87,7 +90,9 @@ export default async function StudentAttendancePage() {
 
   // Handle errors
   if (!result.success || !result.data) {
-    return <ErrorDisplay message={result.error || "Gagal memuat data absensi."} />;
+    return (
+      <ErrorDisplay message={result.error || "Gagal memuat data absensi."} />
+    );
   }
 
   const { records, summary } = result.data;

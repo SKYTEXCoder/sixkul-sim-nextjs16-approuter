@@ -1,9 +1,9 @@
 /**
  * Student Schedule Page (Jadwal Saya)
- * 
+ *
  * Server Component that displays all future sessions from ACTIVE enrollments.
  * Uses Prisma directly for data fetching (no API routes).
- * 
+ *
  * @module app/(dashboard)/student/schedule/page
  */
 
@@ -18,6 +18,9 @@ import {
   ScheduleFilters,
   SessionDateGroup,
 } from "@/components/student-schedule";
+
+// Force dynamic rendering since this page uses Clerk auth (reads headers)
+export const dynamic = "force-dynamic";
 
 // ============================================
 // Error Display Component
@@ -107,7 +110,7 @@ interface PageProps {
 export default async function StudentSchedulePage({ searchParams }: PageProps) {
   // Await searchParams (Next.js 15 async params)
   const params = await searchParams;
-  
+
   // Parse filter params
   const filters = {
     extracurricularId: params.ekskul || undefined,
@@ -146,14 +149,22 @@ export default async function StudentSchedulePage({ searchParams }: PageProps) {
 
       {/* Filters */}
       {extracurriculars.length > 0 && (
-        <Suspense fallback={<div className="h-24 bg-slate-100 dark:bg-slate-800 rounded-xl animate-pulse" />}>
+        <Suspense
+          fallback={
+            <div className="h-24 bg-slate-100 dark:bg-slate-800 rounded-xl animate-pulse" />
+          }
+        >
           <ScheduleFilters extracurriculars={extracurriculars} />
         </Suspense>
       )}
 
       {/* Content */}
       {sessions.length === 0 ? (
-        hasFilters ? <NoResultsState /> : <EmptyState />
+        hasFilters ? (
+          <NoResultsState />
+        ) : (
+          <EmptyState />
+        )
       ) : (
         <div className="space-y-6">
           {dateGroups.map((group) => (

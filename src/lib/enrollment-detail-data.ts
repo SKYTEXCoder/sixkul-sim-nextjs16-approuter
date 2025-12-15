@@ -1,14 +1,14 @@
 /**
  * Server-side data fetching for Student Enrollment Detail
- * 
+ *
  * Uses Prisma directly to fetch a single enrollment with all related data.
  * No API routes - data is fetched server-side for RSC.
- * 
+ *
  * @module lib/enrollment-detail-data
  */
 
-import prisma from '@/lib/prisma';
-import { auth } from '@clerk/nextjs/server';
+import prisma from "@/lib/prisma";
+import { auth } from "@clerk/nextjs/server";
 
 // ============================================
 // Types
@@ -16,7 +16,7 @@ import { auth } from '@clerk/nextjs/server';
 
 export interface EnrollmentDetailViewModel {
   id: string;
-  status: 'PENDING' | 'ACTIVE' | 'REJECTED' | 'ALUMNI' | 'CANCELLED';
+  status: "PENDING" | "ACTIVE" | "REJECTED" | "ALUMNI" | "CANCELLED";
   joinedAt: Date;
   academicYear: string;
   extracurricular: {
@@ -40,7 +40,7 @@ export interface EnrollmentDetailViewModel {
   attendances: Array<{
     id: string;
     date: Date;
-    status: 'PRESENT' | 'SICK' | 'PERMISSION' | 'ALPHA';
+    status: "PRESENT" | "SICK" | "PERMISSION" | "ALPHA" | "LATE";
     notes: string | null;
   }>;
   announcements: Array<{
@@ -56,7 +56,7 @@ export interface EnrollmentDetailResult {
   success: boolean;
   data?: EnrollmentDetailViewModel;
   error?: string;
-  errorCode?: 'UNAUTHORIZED' | 'FORBIDDEN' | 'NOT_FOUND' | 'SERVER_ERROR';
+  errorCode?: "UNAUTHORIZED" | "FORBIDDEN" | "NOT_FOUND" | "SERVER_ERROR";
 }
 
 // ============================================
@@ -65,11 +65,13 @@ export interface EnrollmentDetailResult {
 
 /**
  * Fetch a single enrollment with all related data for the detail page
- * 
+ *
  * This function is designed to be called from Server Components.
  * It handles authentication, authorization, and data fetching.
  */
-export async function getEnrollmentDetail(enrollmentId: string): Promise<EnrollmentDetailResult> {
+export async function getEnrollmentDetail(
+  enrollmentId: string
+): Promise<EnrollmentDetailResult> {
   try {
     // Step 1: Authenticate using Clerk
     const { userId, sessionClaims } = await auth();
@@ -77,19 +79,20 @@ export async function getEnrollmentDetail(enrollmentId: string): Promise<Enrollm
     if (!userId) {
       return {
         success: false,
-        error: 'Authentication required. Please login.',
-        errorCode: 'UNAUTHORIZED',
+        error: "Authentication required. Please login.",
+        errorCode: "UNAUTHORIZED",
       };
     }
 
     // Step 2: Verify role is SISWA
-    const userRole = (sessionClaims?.public_metadata as { role?: string })?.role;
-    
-    if (userRole !== 'SISWA') {
+    const userRole = (sessionClaims?.public_metadata as { role?: string })
+      ?.role;
+
+    if (userRole !== "SISWA") {
       return {
         success: false,
-        error: 'Access denied. This page is only available for students.',
-        errorCode: 'FORBIDDEN',
+        error: "Access denied. This page is only available for students.",
+        errorCode: "FORBIDDEN",
       };
     }
 
@@ -104,8 +107,8 @@ export async function getEnrollmentDetail(enrollmentId: string): Promise<Enrollm
     if (!user || !user.studentProfile) {
       return {
         success: false,
-        error: 'Student profile not found. Please contact administrator.',
-        errorCode: 'NOT_FOUND',
+        error: "Student profile not found. Please contact administrator.",
+        errorCode: "NOT_FOUND",
       };
     }
 
@@ -131,13 +134,13 @@ export async function getEnrollmentDetail(enrollmentId: string): Promise<Enrollm
                 date: { gte: new Date() },
               },
               orderBy: {
-                date: 'asc',
+                date: "asc",
               },
               take: 10, // Show next 10 upcoming sessions
             },
             announcements: {
               orderBy: {
-                created_at: 'desc',
+                created_at: "desc",
               },
               include: {
                 author: {
@@ -151,7 +154,7 @@ export async function getEnrollmentDetail(enrollmentId: string): Promise<Enrollm
         },
         attendances: {
           orderBy: {
-            date: 'desc',
+            date: "desc",
           },
         },
       },
@@ -161,8 +164,8 @@ export async function getEnrollmentDetail(enrollmentId: string): Promise<Enrollm
     if (!enrollment) {
       return {
         success: false,
-        error: 'Data keikutsertaan tidak ditemukan.',
-        errorCode: 'NOT_FOUND',
+        error: "Data keikutsertaan tidak ditemukan.",
+        errorCode: "NOT_FOUND",
       };
     }
 
@@ -170,8 +173,8 @@ export async function getEnrollmentDetail(enrollmentId: string): Promise<Enrollm
     if (enrollment.student_id !== user.studentProfile.id) {
       return {
         success: false,
-        error: 'Kamu tidak memiliki akses ke data ini.',
-        errorCode: 'FORBIDDEN',
+        error: "Kamu tidak memiliki akses ke data ini.",
+        errorCode: "FORBIDDEN",
       };
     }
 
@@ -205,13 +208,15 @@ export async function getEnrollmentDetail(enrollmentId: string): Promise<Enrollm
         status: attendance.status,
         notes: attendance.notes,
       })),
-      announcements: enrollment.extracurricular.announcements.map((announcement) => ({
-        id: announcement.id,
-        title: announcement.title,
-        content: announcement.content,
-        createdAt: announcement.created_at,
-        authorName: announcement.author.full_name,
-      })),
+      announcements: enrollment.extracurricular.announcements.map(
+        (announcement) => ({
+          id: announcement.id,
+          title: announcement.title,
+          content: announcement.content,
+          createdAt: announcement.created_at,
+          authorName: announcement.author.full_name,
+        })
+      ),
     };
 
     return {
@@ -219,11 +224,11 @@ export async function getEnrollmentDetail(enrollmentId: string): Promise<Enrollm
       data: viewModel,
     };
   } catch (error) {
-    console.error('[ENROLLMENT DETAIL DATA ERROR]', error);
+    console.error("[ENROLLMENT DETAIL DATA ERROR]", error);
     return {
       success: false,
-      error: 'An unexpected error occurred. Please try again later.',
-      errorCode: 'SERVER_ERROR',
+      error: "An unexpected error occurred. Please try again later.",
+      errorCode: "SERVER_ERROR",
     };
   }
 }

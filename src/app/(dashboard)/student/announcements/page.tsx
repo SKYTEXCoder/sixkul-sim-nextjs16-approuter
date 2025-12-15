@@ -1,12 +1,12 @@
 /**
  * Student Announcements Page
- * 
+ *
  * Displays announcements from all extracurriculars with ACTIVE enrollments.
  * Uses React Server Components with Prisma for data fetching.
- * 
+ *
  * Route: /student/announcements
  * Role: SISWA only
- * 
+ *
  * @module app/(dashboard)/student/announcements/page
  */
 
@@ -17,6 +17,9 @@ import { Button } from "@/components/ui/button";
 import { AnnouncementsHeader } from "@/components/announcements/AnnouncementsHeader";
 import { AnnouncementsClientWrapper } from "@/components/announcements/AnnouncementsClientWrapper";
 import { getStudentAnnouncements } from "@/lib/announcements-data";
+
+// Force dynamic rendering since this page uses Clerk auth (reads headers)
+export const dynamic = "force-dynamic";
 
 // ============================================
 // Error Components
@@ -53,9 +56,7 @@ function ServerError() {
       <p className="text-slate-500 dark:text-slate-400 mb-6 max-w-md">
         Terjadi kesalahan saat memuat data. Silakan coba lagi.
       </p>
-      <Button onClick={() => window.location.reload()}>
-        Coba Lagi
-      </Button>
+      <Button onClick={() => window.location.reload()}>Coba Lagi</Button>
     </div>
   );
 }
