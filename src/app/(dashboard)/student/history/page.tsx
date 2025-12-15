@@ -1,71 +1,132 @@
 /**
- * Student History Page (Placeholder)
- * 
- * Placeholder page for the "Riwayat & Nilai" feature.
- * This feature is planned for future implementation.
- * 
+ * Student History Page (Riwayat Saya)
+ *
+ * Displays a read-only historical record of extracurricular participations.
+ * Includes summary statistics and a chronological list of enrollments.
+ *
  * @module app/(dashboard)/student/history/page
  */
 
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
+import { redirect } from "next/navigation";
+import { History, AlertCircle, BookOpen, Search } from "lucide-react";
 import Link from "next/link";
-import { History, ArrowLeft, Construction } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { getStudentHistory } from "@/lib/history-data";
+import { HistorySummary } from "@/components/student/history/HistorySummary";
+import { HistoryList } from "@/components/student/history/HistoryList";
 
-export default function StudentHistoryPage() {
+// Force dynamic rendering since this page uses Clerk auth headers
+export const dynamic = "force-dynamic";
+
+// ============================================
+// Error Display Component
+// ============================================
+
+function ErrorDisplay({ message }: { message: string }) {
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col items-center justify-center min-h-[400px] text-center px-4">
+      <div className="w-16 h-16 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center mb-4">
+        <AlertCircle className="w-8 h-8 text-red-500" />
+      </div>
+      <h2 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">
+        Terjadi Kesalahan
+      </h2>
+      <p className="text-slate-500 dark:text-slate-400 mb-4 max-w-md">
+        {message}
+      </p>
+      <Button asChild>
+        <a href="/student/history">Coba Lagi</a>
+      </Button>
+    </div>
+  );
+}
+
+// ============================================
+// Empty History Component
+// ============================================
+
+function EmptyHistory() {
+  return (
+    <div className="flex flex-col items-center justify-center py-16 px-4">
+      <div className="relative mb-6">
+        <div className="w-24 h-24 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center">
+          <History className="w-12 h-12 text-slate-400" />
+        </div>
+      </div>
+
+      <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2 text-center">
+        Kamu belum memiliki riwayat ekstrakurikuler.
+      </h3>
+      <p className="text-slate-500 dark:text-slate-400 text-center max-w-md mb-6">
+        Mulai perjalananmu dengan bergabung ke ekstrakurikuler yang tersedia.
+      </p>
+
+      <Button asChild size="lg" className="gap-2">
+        <Link href="/student/ekstrakurikuler">
+          <Search className="w-4 h-4" />
+          Jelajahi Ekstrakurikuler
+        </Link>
+      </Button>
+    </div>
+  );
+}
+
+// ============================================
+// Main Page Component
+// ============================================
+
+export default async function StudentHistoryPage() {
+  // Fetch history data using server-side data layer
+  const result = await getStudentHistory();
+
+  // Handle unauthorized - redirect to sign-in
+  if (result.errorCode === "UNAUTHORIZED") {
+    redirect("/sign-in");
+  }
+
+  // Handle forbidden - redirect to home
+  if (result.errorCode === "FORBIDDEN") {
+    redirect("/");
+  }
+
+  // Handle server errors
+  if (!result.success || !result.data) {
+    return (
+      <ErrorDisplay
+        message={result.error || "Gagal memuat riwayat ekstrakurikuler."}
+      />
+    );
+  }
+
+  const { records, summary } = result.data;
+
+  return (
+    <div className="space-y-8">
       {/* Page Header */}
       <div>
-        <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">
-          Riwayat & Nilai
+        <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center">
+            <History className="w-5 h-5 text-white" />
+          </div>
+          Riwayat Saya
         </h1>
-        <p className="text-slate-500 dark:text-slate-400 mt-1">
-          Riwayat keikutsertaan dan penilaian ekstrakurikuler.
+        <p className="text-slate-500 dark:text-slate-400 mt-2">
+          Riwayat keikutsertaan ekstrakurikuler yang pernah kamu ikuti
         </p>
       </div>
 
-      {/* Coming Soon Card */}
-      <Card className="border-dashed border-2 border-slate-300 dark:border-slate-700">
-        <CardContent className="flex flex-col items-center justify-center py-16 text-center">
-          <div className="w-20 h-20 rounded-full bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center mb-6">
-            <Construction className="w-10 h-10 text-amber-500" />
-          </div>
-          
-          <h2 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">
-            Fitur Dalam Pengembangan
-          </h2>
-          
-          <p className="text-slate-500 dark:text-slate-400 max-w-md mb-6">
-            Halaman Riwayat & Nilai sedang dalam tahap pengembangan. 
-            Fitur ini akan menampilkan riwayat keikutsertaan ekstrakurikuler 
-            dan penilaian yang kamu terima dari pembina.
-          </p>
+      {/* Content */}
+      {records.length === 0 ? (
+        <EmptyHistory />
+      ) : (
+        <>
+          {/* Summary Stats */}
+          <HistorySummary stats={summary} />
 
-          <div className="flex flex-col sm:flex-row gap-3">
-            <Button variant="outline" asChild>
-              <Link href="/student/dashboard">
-                <ArrowLeft className="w-4 h-4 mr-2" />
-                Kembali ke Dashboard
-              </Link>
-            </Button>
-            <Button variant="secondary" asChild>
-              <Link href="/student/enrollments">
-                <History className="w-4 h-4 mr-2" />
-                Lihat Ekskul Saya
-              </Link>
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Info section */}
-      <div className="text-center text-sm text-slate-400 dark:text-slate-500">
-        <p>
-          Fitur yang akan tersedia: Daftar ekstrakurikuler yang pernah diikuti, 
-          penilaian dari pembina, dan sertifikat keikutsertaan.
-        </p>
-      </div>
+          {/* History List */}
+          <HistoryList enrollments={records} />
+        </>
+      )}
     </div>
   );
 }
