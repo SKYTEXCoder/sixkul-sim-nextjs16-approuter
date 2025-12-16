@@ -1,13 +1,15 @@
 /**
  * PEMBINA Settings Page
  *
- * Account settings with Clerk integration for password management.
+ * Account settings with theme preferences and Clerk integration for password management.
+ * Theme is persisted via next-themes (localStorage/system preference).
  * No password data stored in Prisma.
  *
  * @module app/(dashboard)/pembina/settings/page
  */
 
 import { Settings } from "lucide-react";
+import { AppearanceSection } from "./_components/AppearanceSection";
 import { SecuritySection } from "./_components/SecuritySection";
 
 // Force dynamic rendering since this page uses Clerk auth
@@ -27,12 +29,18 @@ export default function PembinaSettingsPage() {
           Pengaturan
         </h1>
         <p className="text-slate-500 dark:text-slate-400 mt-1">
-          Kelola pengaturan akun dan keamanan Anda
+          Kelola pengaturan akun, tampilan, dan keamanan Anda
         </p>
       </div>
 
-      {/* Security Section */}
-      <SecuritySection />
+      {/* Settings Sections */}
+      <div className="grid gap-6">
+        {/* Appearance Section - Theme Settings */}
+        <AppearanceSection />
+
+        {/* Security Section - Password Management */}
+        <SecuritySection />
+      </div>
     </div>
   );
 }

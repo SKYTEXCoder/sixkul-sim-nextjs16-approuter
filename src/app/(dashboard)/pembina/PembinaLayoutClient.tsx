@@ -14,6 +14,7 @@ import { useUser } from "@clerk/nextjs";
 import { useAuthSync } from "@/hooks/useAuthSync";
 import { Sidebar, NavItem } from "@/components/layout/Sidebar";
 import { TopNavbar } from "@/components/layout/TopNavbar";
+import { PembinaProviders } from "./providers";
 import { cn } from "@/lib/utils";
 import { LayoutDashboard, BookOpen, UserCircle, Settings } from "lucide-react";
 import type { PembinaNotification } from "@/lib/pembina-notification-data";
@@ -90,43 +91,45 @@ export function PembinaLayoutClient({
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
-      {/* Sidebar - pass collapse state */}
-      <Sidebar
-        menuItems={pembinaMenuItems}
-        user={userData}
-        isCollapsed={isSidebarCollapsed}
-        onCollapseChange={setIsSidebarCollapsed}
-      />
+    <PembinaProviders>
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+        {/* Sidebar - pass collapse state */}
+        <Sidebar
+          menuItems={pembinaMenuItems}
+          user={userData}
+          isCollapsed={isSidebarCollapsed}
+          onCollapseChange={setIsSidebarCollapsed}
+        />
 
-      {/* Main Content Area - responds to sidebar collapse */}
-      <div
-        className={cn(
-          "transition-all duration-300",
-          isSidebarCollapsed ? "md:ml-20" : "md:ml-64"
-        )}
-      >
-        {/* Top Navigation with divider and padding */}
-        <header className="sticky top-0 z-30 bg-white dark:bg-slate-900">
-          {/* Navbar content */}
-          <div className="h-14">
-            <TopNavbar
-              user={userData}
-              unreadNotificationCount={unreadNotificationCount}
-              pembinaNotifications={notifications}
-            />
-          </div>
+        {/* Main Content Area - responds to sidebar collapse */}
+        <div
+          className={cn(
+            "transition-all duration-300",
+            isSidebarCollapsed ? "md:ml-20" : "md:ml-64"
+          )}
+        >
+          {/* Top Navigation with divider and padding */}
+          <header className="sticky top-0 z-30 bg-white dark:bg-slate-900">
+            {/* Navbar content */}
+            <div className="h-14">
+              <TopNavbar
+                user={userData}
+                unreadNotificationCount={unreadNotificationCount}
+                pembinaNotifications={notifications}
+              />
+            </div>
 
-          {/* Clean divider */}
-          <div className="h-px bg-gradient-to-r from-transparent via-slate-200 dark:via-slate-700 to-transparent mx-4" />
-        </header>
+            {/* Clean divider */}
+            <div className="h-px bg-gradient-to-r from-transparent via-slate-200 dark:via-slate-700 to-transparent mx-4" />
+          </header>
 
-        {/* Page Content */}
-        <main className="pt-6 px-4 md:px-6 pb-8">
-          <div className="max-w-7xl mx-auto">{children}</div>
-        </main>
+          {/* Page Content */}
+          <main className="pt-6 px-4 md:px-6 pb-8">
+            <div className="max-w-7xl mx-auto">{children}</div>
+          </main>
+        </div>
       </div>
-    </div>
+    </PembinaProviders>
   );
 }
 

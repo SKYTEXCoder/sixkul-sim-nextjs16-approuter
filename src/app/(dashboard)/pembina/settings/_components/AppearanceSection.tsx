@@ -1,12 +1,12 @@
 "use client";
 
 /**
- * Appearance Section - Theme selector with descriptions
+ * Appearance Section - Theme selector for PEMBINA settings
  *
- * Provides Light / Dark / System theme options with helpful descriptions.
+ * Provides Light / Dark / System theme options.
  * Uses next-themes for actual theme switching.
  *
- * @module app/(dashboard)/student/settings/_components/AppearanceSection
+ * @module app/(dashboard)/pembina/settings/_components/AppearanceSection
  */
 
 import { useTheme } from "next-themes";
@@ -19,11 +19,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-
-interface AppearanceSectionProps {
-  currentTheme: string;
-  onThemeChange: (theme: string) => void;
-}
 
 // ============================================
 // Theme Options Configuration
@@ -54,26 +49,18 @@ const themeOptions = [
 // Component
 // ============================================
 
-export function AppearanceSection({
-  currentTheme,
-  onThemeChange,
-}: AppearanceSectionProps) {
-  const { setTheme, resolvedTheme } = useTheme();
-
-  const handleThemeChange = (theme: string) => {
-    setTheme(theme);
-    onThemeChange(theme);
-  };
+export function AppearanceSection() {
+  const { theme, setTheme, resolvedTheme } = useTheme();
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2 text-lg">
+        <CardTitle className="flex items-center gap-2">
           <Palette className="h-5 w-5" />
           Tampilan
         </CardTitle>
         <CardDescription>
-          Sesuaikan tema dan tampilan aplikasi sesuai preferensi kamu
+          Sesuaikan tema dan tampilan aplikasi sesuai preferensi Anda
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -86,18 +73,18 @@ export function AppearanceSection({
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
               {themeOptions.map((option) => {
                 const Icon = option.icon;
-                const isSelected = currentTheme === option.value;
+                const isSelected = theme === option.value;
 
                 return (
                   <button
                     type="button"
                     key={option.value}
-                    onClick={() => handleThemeChange(option.value)}
+                    onClick={() => setTheme(option.value)}
                     className={cn(
                       "flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all cursor-pointer",
                       "hover:scale-[1.02] active:scale-[0.98]",
                       isSelected
-                        ? "border-violet-500 bg-violet-50 dark:bg-violet-950/30 shadow-sm"
+                        ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-950/30 shadow-sm"
                         : "border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600"
                     )}
                   >
@@ -105,7 +92,7 @@ export function AppearanceSection({
                       className={cn(
                         "w-8 h-8 mb-2",
                         isSelected
-                          ? "text-violet-500"
+                          ? "text-emerald-500"
                           : "text-slate-400 dark:text-slate-500"
                       )}
                     />
@@ -113,7 +100,7 @@ export function AppearanceSection({
                       className={cn(
                         "text-sm font-medium",
                         isSelected
-                          ? "text-violet-600 dark:text-violet-400"
+                          ? "text-emerald-600 dark:text-emerald-400"
                           : "text-slate-600 dark:text-slate-400"
                       )}
                     >
@@ -123,7 +110,7 @@ export function AppearanceSection({
                       className={cn(
                         "text-xs mt-1 text-center",
                         isSelected
-                          ? "text-violet-500/70 dark:text-violet-400/70"
+                          ? "text-emerald-500/70 dark:text-emerald-400/70"
                           : "text-slate-400 dark:text-slate-500"
                       )}
                     >
@@ -156,3 +143,5 @@ export function AppearanceSection({
     </Card>
   );
 }
+
+export default AppearanceSection;
