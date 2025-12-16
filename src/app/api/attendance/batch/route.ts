@@ -14,6 +14,7 @@ import prisma from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
 import { AttendanceStatus } from "@/generated/prisma";
 import { getOrCreateUser } from "@/lib/sync-user";
+import { createAttendanceNotification } from "@/lib/notification-triggers";
 
 // ============================================
 // Type Definitions
@@ -293,8 +294,18 @@ export async function POST(
     const enrollmentIds = records.map((r) => r.enrollmentId);
     const existingEnrollments = await prisma.enrollment.findMany({
       where: { id: { in: enrollmentIds } },
-      select: { id: true },
+      select: {
+        id: true,
+        extracurricular: {
+          select: { name: true },
+        },
+      },
     });
+
+    // Build map for quick lookup of extracurricular names
+    const enrollmentExtracurricularMap = new Map(
+      existingEnrollments.map((e) => [e.id, e.extracurricular.name])
+    );
 
     const existingIds = new Set(existingEnrollments.map((e) => e.id));
     const missingIds = enrollmentIds.filter((id) => !existingIds.has(id));
@@ -364,6 +375,27 @@ export async function POST(
     console.log(
       `[ATTENDANCE BATCH] Processed ${records.length} records for ${date} - Created: ${createdCount}, Updated: ${updatedCount}`
     );
+
+    // ----------------------------------------
+    // Step 6: Create notifications for each attendance record
+    // Non-blocking - notifications are created after transaction completes
+    // ----------------------------------------
+    for (const record of records) {
+      const extracurricularName =
+        enrollmentExtracurricularMap.get(record.enrollmentId) ||
+        "Ekstrakurikuler";
+      // Fire and forget - don't await to avoid blocking response
+      createAttendanceNotification(
+        record.enrollmentId,
+        record.status,
+        attendanceDate,
+        extracurricularName
+      ).catch((err) => {
+        console.error(
+          `[NOTIFICATION] Failed to create attendance notification: ${err}`
+        );
+      });
+    }
 
     // ----------------------------------------
     // Step 5: Return 200 OK with count

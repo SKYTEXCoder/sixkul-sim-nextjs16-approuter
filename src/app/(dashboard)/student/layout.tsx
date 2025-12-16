@@ -1,153 +1,33 @@
-"use client";
-
 /**
- * Student Dashboard Layout
+ * Student Dashboard Layout - Server Component
  *
- * Layout for Student (SISWA) role with appropriate navigation menu.
- * Includes ThemeProvider scoped to student pages only.
+ * Server-side layout for Student (SISWA) role that fetches
+ * unread notification count and passes it to the client layout.
  *
  * @module app/(dashboard)/student/layout
  */
 
-import { useState } from "react";
-import { useUser } from "@clerk/nextjs";
-import { useAuthSync } from "@/hooks/useAuthSync";
-import { Sidebar, NavItem } from "@/components/layout/Sidebar";
-import { TopNavbar } from "@/components/layout/TopNavbar";
-import { StudentProviders } from "./providers";
-import { cn } from "@/lib/utils";
-import {
-  LayoutDashboard,
-  BookOpen,
-  Calendar,
-  History,
-  Trophy,
-  ClipboardCheck,
-  Megaphone,
-  UserCircle,
-  Settings,
-} from "lucide-react";
+import { getUnreadNotificationCount } from "@/lib/notification-data";
+import { StudentLayoutClient } from "./StudentLayoutClient";
+
+// Force dynamic rendering since this uses Clerk auth
+export const dynamic = "force-dynamic";
 
 // ============================================
-// Student Menu Configuration
+// Server Layout Component
 // ============================================
 
-const studentMenuItems: NavItem[] = [
-  {
-    label: "Dashboard",
-    href: "/student/dashboard",
-    icon: LayoutDashboard,
-  },
-  {
-    label: "Jelajahi Ekskul",
-    href: "/student/ekstrakurikuler",
-    icon: BookOpen,
-  },
-  {
-    label: "Ekstrakurikuler Saya",
-    href: "/student/enrollments",
-    icon: Trophy,
-  },
-  {
-    label: "Jadwal Saya",
-    href: "/student/schedule",
-    icon: Calendar,
-  },
-  {
-    label: "Absensi Saya",
-    href: "/student/attendance",
-    icon: ClipboardCheck,
-  },
-  {
-    label: "Pengumuman",
-    href: "/student/announcements",
-    icon: Megaphone,
-  },
-  {
-    label: "Riwayat Saya (History)",
-    href: "/student/history",
-    icon: History,
-  },
-  {
-    label: "Profil Saya",
-    href: "/student/profile",
-    icon: UserCircle,
-  },
-  {
-    label: "Pengaturan / Settings",
-    href: "/student/settings",
-    icon: Settings,
-  },
-];
-
-// ============================================
-// Layout Component
-// ============================================
-
-export default function StudentLayout({
+export default async function StudentLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  // Sidebar collapse state - managed here to make content responsive
-  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
-
-  // Get user data from Clerk
-  const { user, isLoaded } = useUser();
-
-  // Sync user to Prisma database (JIT)
-  const { isSyncing } = useAuthSync();
-
-  const userData = {
-    name: user?.fullName || user?.username || "Student User",
-    email: user?.primaryEmailAddress?.emailAddress || "",
-    role: "SISWA",
-    avatarUrl: user?.imageUrl,
-  };
-
-  // Show loading state while Clerk is loading or syncing
-  if (!isLoaded || isSyncing) {
-    return (
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-950 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
-      </div>
-    );
-  }
+  // Fetch unread notification count server-side
+  const unreadNotificationCount = await getUnreadNotificationCount();
 
   return (
-    <StudentProviders>
-      <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
-        {/* Sidebar */}
-        <Sidebar
-          menuItems={studentMenuItems}
-          user={userData}
-          isCollapsed={isSidebarCollapsed}
-          onCollapseChange={setIsSidebarCollapsed}
-        />
-
-        {/* Main Content Area - responsive to sidebar state */}
-        <div
-          className={cn(
-            "transition-all duration-300",
-            isSidebarCollapsed ? "md:ml-20" : "md:ml-64"
-          )}
-        >
-          {/* Top Navigation - also responsive to sidebar state */}
-          <header
-            className={cn(
-              "fixed top-0 right-0 z-30 h-16 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-all duration-300",
-              isSidebarCollapsed ? "left-0 md:left-20" : "left-0 md:left-64"
-            )}
-          >
-            <TopNavbar user={userData} />
-          </header>
-
-          {/* Page Content */}
-          <main className="pt-20 px-4 md:px-6 pb-8">
-            <div className="max-w-7xl mx-auto">{children}</div>
-          </main>
-        </div>
-      </div>
-    </StudentProviders>
+    <StudentLayoutClient unreadNotificationCount={unreadNotificationCount}>
+      {children}
+    </StudentLayoutClient>
   );
 }

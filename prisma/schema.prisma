@@ -42,6 +42,13 @@ enum AttendanceStatus {
   LATE
 }
 
+enum NotificationType {
+  ANNOUNCEMENT
+  ATTENDANCE
+  SCHEDULE
+  ENROLLMENT
+}
+
 // ============================================
 // MODELS
 // ============================================
@@ -136,6 +143,7 @@ model Enrollment {
   student         StudentProfile  @relation(fields: [student_id], references: [id], onDelete: Cascade)
   extracurricular Extracurricular @relation(fields: [extracurricular_id], references: [id], onDelete: Cascade)
   attendances     Attendance[]
+  notifications   Notification[]
 
   // Prevent duplicate enrollments
   @@unique([student_id, extracurricular_id])
@@ -216,15 +224,18 @@ model Announcement {
 
 /// Notifications for users
 model Notification {
-  id         String   @id @default(cuid())
-  user_id    String
-  title      String
-  message    String
-  is_read    Boolean  @default(false)
-  created_at DateTime @default(now())
+  id            String           @id @default(cuid())
+  user_id       String
+  enrollment_id String?          // Context anchor - links to enrollment for navigation
+  type          NotificationType // Notification category
+  title         String
+  message       String
+  is_read       Boolean          @default(false)
+  created_at    DateTime         @default(now())
 
   // Relations
-  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  user       User        @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  enrollment Enrollment? @relation(fields: [enrollment_id], references: [id], onDelete: SetNull)
 
   @@map("notifications")
 }

@@ -39,6 +39,7 @@ interface TopNavbarProps {
   };
   onMenuClick?: () => void;
   showSearch?: boolean;
+  unreadNotificationCount?: number;
 }
 
 // ============================================
@@ -49,6 +50,7 @@ export function TopNavbar({
   user,
   onMenuClick,
   showSearch = true,
+  unreadNotificationCount = 0,
 }: TopNavbarProps) {
   const router = useRouter();
   const { signOut } = useClerk();
@@ -96,15 +98,16 @@ export function TopNavbar({
       {/* Right Section */}
       <div className="flex items-center gap-3">
         {/* Notification Bell */}
-        <Button
-          variant="ghost"
-          size="icon"
-          className="relative text-slate-600 dark:text-slate-400"
+        <Link
+          href={user?.role === "SISWA" ? "/student/notifications" : "#"}
+          className="relative p-2 rounded-md text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
         >
           <Bell className="h-5 w-5" />
-          {/* Notification badge - always show for now */}
-          <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-red-500" />
-        </Button>
+          {/* Notification badge - show only when unread count > 0 */}
+          {unreadNotificationCount > 0 && (
+            <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-red-500" />
+          )}
+        </Link>
 
         {/* User Profile Dropdown */}
         <DropdownMenu>
