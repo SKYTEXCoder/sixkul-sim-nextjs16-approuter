@@ -2,9 +2,9 @@
 
 /**
  * Pembina Dashboard Layout
- * 
+ *
  * Layout for Pembina role with appropriate navigation menu.
- * 
+ *
  * @module app/(dashboard)/pembina/layout
  */
 
@@ -12,14 +12,7 @@ import { useUser } from "@clerk/nextjs";
 import { useAuthSync } from "@/hooks/useAuthSync";
 import { Sidebar, NavItem } from "@/components/layout/Sidebar";
 import { TopNavbar } from "@/components/layout/TopNavbar";
-import {
-  LayoutDashboard,
-  Users,
-  ClipboardCheck,
-  Calendar,
-  BookOpen,
-  BarChart3,
-} from "lucide-react";
+import { LayoutDashboard, BookOpen } from "lucide-react";
 
 // ============================================
 // Pembina Menu Configuration
@@ -33,28 +26,8 @@ const pembinaMenuItems: NavItem[] = [
   },
   {
     label: "Ekstrakurikuler Saya",
-    href: "/pembina/my-ekskul",
+    href: "/pembina/ekstrakurikuler",
     icon: BookOpen,
-  },
-  {
-    label: "Daftar Anggota",
-    href: "/pembina/members",
-    icon: Users,
-  },
-  {
-    label: "Input Absensi",
-    href: "/pembina/attendance",
-    icon: ClipboardCheck,
-  },
-  {
-    label: "Kelola Jadwal",
-    href: "/pembina/schedule",
-    icon: Calendar,
-  },
-  {
-    label: "Laporan",
-    href: "/pembina/reports",
-    icon: BarChart3,
   },
 ];
 
@@ -69,10 +42,10 @@ export default function PembinaLayout({
 }) {
   // Get user data from Clerk
   const { user, isLoaded } = useUser();
-  
+
   // Sync user to Prisma database (JIT)
   const { isSyncing } = useAuthSync();
-  
+
   const userData = {
     name: user?.fullName || user?.username || "Pembina User",
     email: user?.primaryEmailAddress?.emailAddress || "",
