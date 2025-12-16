@@ -32,6 +32,28 @@ import {
 } from "@/components/ui/alert-dialog";
 import { deleteScheduleAction } from "../actions";
 
+// ============================================
+// Day Label Helper (client-side)
+// ============================================
+
+const DAY_LABELS: Record<string, string> = {
+  MONDAY: "Senin",
+  TUESDAY: "Selasa",
+  WEDNESDAY: "Rabu",
+  THURSDAY: "Kamis",
+  FRIDAY: "Jumat",
+  SATURDAY: "Sabtu",
+  SUNDAY: "Minggu",
+};
+
+function getDayLabel(day: string): string {
+  return DAY_LABELS[day] || day;
+}
+
+// ============================================
+// Types
+// ============================================
+
 interface Schedule {
   id: string;
   day_of_week: string;
@@ -44,13 +66,11 @@ interface Schedule {
 interface ScheduleListProps {
   schedules: Schedule[];
   extracurricularId: string;
-  getDayLabel: (day: string) => string;
 }
 
 export function ScheduleList({
   schedules,
   extracurricularId,
-  getDayLabel,
 }: ScheduleListProps) {
   const router = useRouter();
   const [deletingId, setDeletingId] = useState<string | null>(null);

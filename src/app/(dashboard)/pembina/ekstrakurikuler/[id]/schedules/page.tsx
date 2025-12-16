@@ -10,10 +10,7 @@ import { auth } from "@clerk/nextjs/server";
 import { redirect, notFound } from "next/navigation";
 
 import { validatePembinaOwnership } from "@/lib/pembina-ekstrakurikuler-data";
-import {
-  getSchedulesByExtracurricular,
-  getDayLabel,
-} from "@/lib/pembina-schedule-data";
+import { getSchedulesByExtracurricular } from "@/lib/pembina-schedule-data";
 import {
   Card,
   CardContent,
@@ -86,11 +83,7 @@ export default async function SchedulesPage({ params }: PageProps) {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <ScheduleList
-            schedules={schedules}
-            extracurricularId={id}
-            getDayLabel={getDayLabel}
-          />
+          <ScheduleList schedules={schedules} extracurricularId={id} />
         </CardContent>
       </Card>
     </div>
