@@ -2,21 +2,16 @@
 
 /**
  * Attendance List Component
- * 
+ *
  * Client Component that displays attendance records with grouping toggle.
  * Supports Date-first and Extracurricular-first grouping modes.
- * 
+ *
  * @module components/student-attendance/AttendanceList
  */
 
 import { useState } from "react";
 import Link from "next/link";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -31,15 +26,15 @@ import {
   Thermometer,
 } from "lucide-react";
 // Import from client-safe types module (no server-only code)
-import type { 
-  AttendanceViewModel, 
-  AttendanceDateGroup, 
+import type {
+  AttendanceViewModel,
+  AttendanceDateGroup,
   AttendanceEkskulGroup,
   AttendanceStatus,
 } from "@/lib/attendance-types";
-import { 
-  groupByDate, 
-  groupByExtracurricular, 
+import {
+  groupByDate,
+  groupByExtracurricular,
   formatDateIndonesian,
   statusLabels,
   statusColors,
@@ -86,9 +81,13 @@ interface AttendanceRowProps {
   showEkskul?: boolean;
 }
 
-function AttendanceRow({ record, showDate = true, showEkskul = true }: AttendanceRowProps) {
+function AttendanceRow({
+  record,
+  showDate = true,
+  showEkskul = true,
+}: AttendanceRowProps) {
   const colors = statusColors[record.status];
-  
+
   return (
     <Link href={`/student/enrollments/${record.enrollmentId}`}>
       <div className="flex items-center justify-between p-4 rounded-lg bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer group">
@@ -99,7 +98,9 @@ function AttendanceRow({ record, showDate = true, showEkskul = true }: Attendanc
             </p>
           )}
           {showDate && (
-            <p className={`text-sm text-slate-500 ${showEkskul ? '' : 'font-medium text-slate-900 dark:text-white'}`}>
+            <p
+              className={`text-sm text-slate-500 ${showEkskul ? "" : "font-medium text-slate-900 dark:text-white"}`}
+            >
               {formatDateIndonesian(record.date)}
             </p>
           )}
@@ -115,7 +116,9 @@ function AttendanceRow({ record, showDate = true, showEkskul = true }: Attendanc
           )}
         </div>
         <div className="flex items-center gap-2">
-          <Badge className={`${colors.bg} ${colors.text} flex items-center gap-1`}>
+          <Badge
+            className={`${colors.bg} ${colors.text} flex items-center gap-1`}
+          >
             {getStatusIcon(record.status)}
             {statusLabels[record.status]}
           </Badge>
@@ -144,9 +147,9 @@ function DateGroupView({ group }: { group: AttendanceDateGroup }) {
       </div>
       <div className="space-y-2 pl-6">
         {group.records.map((record) => (
-          <AttendanceRow 
-            key={record.id} 
-            record={record} 
+          <AttendanceRow
+            key={record.id}
+            record={record}
             showDate={false}
             showEkskul={true}
           />
@@ -177,9 +180,9 @@ function EkskulGroupView({ group }: { group: AttendanceEkskulGroup }) {
       </div>
       <div className="space-y-2 pl-6">
         {group.records.map((record) => (
-          <AttendanceRow 
-            key={record.id} 
-            record={record} 
+          <AttendanceRow
+            key={record.id}
+            record={record}
             showDate={true}
             showEkskul={false}
           />
@@ -207,14 +210,18 @@ export function AttendanceList({ records }: AttendanceListProps) {
             <ClipboardCheck className="h-5 w-5 text-violet-500" />
             Riwayat Kehadiran
           </CardTitle>
-          
+
           {/* Grouping Toggle */}
           <div className="flex items-center gap-2 bg-slate-100 dark:bg-slate-800 rounded-lg p-1">
             <Button
               variant={groupingMode === "date" ? "default" : "ghost"}
               size="sm"
               onClick={() => setGroupingMode("date")}
-              className={groupingMode === "date" ? "" : "text-slate-600 dark:text-slate-400"}
+              className={
+                groupingMode === "date"
+                  ? ""
+                  : "text-slate-600 dark:text-slate-400"
+              }
             >
               <Calendar className="w-4 h-4 mr-1.5" />
               Tanggal
@@ -223,7 +230,11 @@ export function AttendanceList({ records }: AttendanceListProps) {
               variant={groupingMode === "extracurricular" ? "default" : "ghost"}
               size="sm"
               onClick={() => setGroupingMode("extracurricular")}
-              className={groupingMode === "extracurricular" ? "" : "text-slate-600 dark:text-slate-400"}
+              className={
+                groupingMode === "extracurricular"
+                  ? ""
+                  : "text-slate-600 dark:text-slate-400"
+              }
             >
               <Layers className="w-4 h-4 mr-1.5" />
               Ekstrakurikuler
@@ -233,15 +244,13 @@ export function AttendanceList({ records }: AttendanceListProps) {
       </CardHeader>
       <CardContent>
         <div className="space-y-6">
-          {groupingMode === "date" ? (
-            dateGroups.map((group) => (
-              <DateGroupView key={group.dateString} group={group} />
-            ))
-          ) : (
-            ekskulGroups.map((group) => (
-              <EkskulGroupView key={group.extracurricular.id} group={group} />
-            ))
-          )}
+          {groupingMode === "date"
+            ? dateGroups.map((group) => (
+                <DateGroupView key={group.dateString} group={group} />
+              ))
+            : ekskulGroups.map((group) => (
+                <EkskulGroupView key={group.extracurricular.id} group={group} />
+              ))}
         </div>
       </CardContent>
     </Card>

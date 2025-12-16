@@ -1,14 +1,14 @@
 /**
  * Server-side data fetching for Student Enrollments
- * 
+ *
  * Uses Prisma directly to fetch enrollment data for Server Components.
  * No API routes - data is fetched server-side.
- * 
+ *
  * @module lib/enrollments-data
  */
 
-import prisma from '@/lib/prisma';
-import { auth } from '@clerk/nextjs/server';
+import prisma from "@/lib/prisma";
+import { auth } from "@clerk/nextjs/server";
 
 // ============================================
 // Types
@@ -16,7 +16,7 @@ import { auth } from '@clerk/nextjs/server';
 
 export interface EnrollmentViewModel {
   id: string;
-  status: 'PENDING' | 'ACTIVE' | 'REJECTED' | 'ALUMNI' | 'CANCELLED';
+  status: "PENDING" | "ACTIVE" | "REJECTED" | "ALUMNI" | "CANCELLED";
   joinedAt: Date;
   academicYear: string;
   extracurricular: {
@@ -36,7 +36,7 @@ export interface EnrollmentsResult {
   success: boolean;
   data?: EnrollmentViewModel[];
   error?: string;
-  errorCode?: 'UNAUTHORIZED' | 'FORBIDDEN' | 'NOT_FOUND' | 'SERVER_ERROR';
+  errorCode?: "UNAUTHORIZED" | "FORBIDDEN" | "NOT_FOUND" | "SERVER_ERROR";
 }
 
 // ============================================
@@ -45,7 +45,7 @@ export interface EnrollmentsResult {
 
 /**
  * Fetch all enrollments for the currently authenticated student
- * 
+ *
  * This function is designed to be called from Server Components.
  * It handles authentication, authorization, and data fetching.
  */
@@ -57,19 +57,20 @@ export async function getStudentEnrollments(): Promise<EnrollmentsResult> {
     if (!userId) {
       return {
         success: false,
-        error: 'Authentication required. Please login.',
-        errorCode: 'UNAUTHORIZED',
+        error: "Authentication required. Please login.",
+        errorCode: "UNAUTHORIZED",
       };
     }
 
     // Step 2: Verify role is SISWA
-    const userRole = (sessionClaims?.public_metadata as { role?: string })?.role;
-    
-    if (userRole !== 'SISWA') {
+    const userRole = (sessionClaims?.public_metadata as { role?: string })
+      ?.role;
+
+    if (userRole !== "SISWA") {
       return {
         success: false,
-        error: 'Access denied. This page is only available for students.',
-        errorCode: 'FORBIDDEN',
+        error: "Access denied. This page is only available for students.",
+        errorCode: "FORBIDDEN",
       };
     }
 
@@ -84,8 +85,8 @@ export async function getStudentEnrollments(): Promise<EnrollmentsResult> {
     if (!user || !user.studentProfile) {
       return {
         success: false,
-        error: 'Student profile not found. Please contact administrator.',
-        errorCode: 'NOT_FOUND',
+        error: "Student profile not found. Please contact administrator.",
+        errorCode: "NOT_FOUND",
       };
     }
 
@@ -115,7 +116,7 @@ export async function getStudentEnrollments(): Promise<EnrollmentsResult> {
         },
       },
       orderBy: {
-        joined_at: 'desc',
+        joined_at: "desc",
       },
     });
 
@@ -143,11 +144,11 @@ export async function getStudentEnrollments(): Promise<EnrollmentsResult> {
       data: viewModels,
     };
   } catch (error) {
-    console.error('[ENROLLMENTS DATA ERROR]', error);
+    console.error("[ENROLLMENTS DATA ERROR]", error);
     return {
       success: false,
-      error: 'An unexpected error occurred. Please try again later.',
-      errorCode: 'SERVER_ERROR',
+      error: "An unexpected error occurred. Please try again later.",
+      errorCode: "SERVER_ERROR",
     };
   }
 }

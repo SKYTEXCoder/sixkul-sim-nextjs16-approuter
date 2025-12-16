@@ -1,8 +1,8 @@
 /**
  * Attendance Page Header Component
- * 
+ *
  * Server Component displaying the page title and subtitle.
- * 
+ *
  * @module components/student-attendance/AttendanceHeader
  */
 

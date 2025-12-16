@@ -2,13 +2,13 @@
 
 /**
  * Announcements Client Wrapper Component
- * 
+ *
  * Client component that provides:
  * 1. View mode toggle (Global Feed / Grouped by Ekstrakurikuler)
  * 2. Client-side search filtering
- * 
+ *
  * No additional Prisma queries - filters pre-fetched data only.
- * 
+ *
  * @module components/announcements/AnnouncementsClientWrapper
  */
 

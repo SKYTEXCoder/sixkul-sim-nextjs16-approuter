@@ -57,7 +57,7 @@ export function AppearanceSection({
                       "flex flex-col items-center justify-center p-4 rounded-xl border-2 transition-all cursor-pointer",
                       isSelected
                         ? "border-violet-500 bg-violet-50 dark:bg-violet-950/30"
-                        : "border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600"
+                        : "border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600",
                     )}
                   >
                     <Icon
@@ -65,7 +65,7 @@ export function AppearanceSection({
                         "w-6 h-6 mb-2",
                         isSelected
                           ? "text-violet-500"
-                          : "text-slate-400 dark:text-slate-500"
+                          : "text-slate-400 dark:text-slate-500",
                       )}
                     />
                     <span
@@ -73,7 +73,7 @@ export function AppearanceSection({
                         "text-sm font-medium",
                         isSelected
                           ? "text-violet-600 dark:text-violet-400"
-                          : "text-slate-600 dark:text-slate-400"
+                          : "text-slate-600 dark:text-slate-400",
                       )}
                     >
                       {option.label}

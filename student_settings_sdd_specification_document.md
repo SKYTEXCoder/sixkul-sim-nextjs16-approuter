@@ -371,7 +371,6 @@ Required changes:
 Even though notifications are not yet implemented:
 
 - All future notification logic MUST consult:
-
   - `notify_announcements`
   - `notify_schedule_changes`
   - `notify_attendance`

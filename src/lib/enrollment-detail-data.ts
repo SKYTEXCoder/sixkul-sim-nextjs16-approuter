@@ -70,7 +70,7 @@ export interface EnrollmentDetailResult {
  * It handles authentication, authorization, and data fetching.
  */
 export async function getEnrollmentDetail(
-  enrollmentId: string
+  enrollmentId: string,
 ): Promise<EnrollmentDetailResult> {
   try {
     // Step 1: Authenticate using Clerk
@@ -215,7 +215,7 @@ export async function getEnrollmentDetail(
           content: announcement.content,
           createdAt: announcement.created_at,
           authorName: announcement.author.full_name,
-        })
+        }),
       ),
     };
 

@@ -1,23 +1,29 @@
 /**
  * Server-side data fetching for Student Attendance
- * 
+ *
  * Uses Prisma directly to fetch attendance data for Server Components.
  * No API routes - data is fetched server-side.
- * 
+ *
  * For client-safe types and helpers, import from './attendance-types'.
- * 
+ *
  * @module lib/attendance-data
  */
 
-import prisma from '@/lib/prisma';
-import { auth } from '@clerk/nextjs/server';
-import type { AttendanceViewModel, AttendanceSummary } from './attendance-types';
+import prisma from "@/lib/prisma";
+import { auth } from "@clerk/nextjs/server";
+import type {
+  AttendanceViewModel,
+  AttendanceSummary,
+} from "./attendance-types";
 
 // ============================================
 // Re-export client-safe types for server component usage
 // ============================================
 
-export type { AttendanceViewModel, AttendanceSummary } from './attendance-types';
+export type {
+  AttendanceViewModel,
+  AttendanceSummary,
+} from "./attendance-types";
 
 // ============================================
 // Result Type (server-only)
@@ -31,7 +37,7 @@ export interface AttendanceResult {
     extracurriculars: Array<{ id: string; name: string }>;
   };
   error?: string;
-  errorCode?: 'UNAUTHORIZED' | 'FORBIDDEN' | 'NOT_FOUND' | 'SERVER_ERROR';
+  errorCode?: "UNAUTHORIZED" | "FORBIDDEN" | "NOT_FOUND" | "SERVER_ERROR";
 }
 
 // ============================================
@@ -40,7 +46,7 @@ export interface AttendanceResult {
 
 /**
  * Fetch all attendance records for the currently authenticated student
- * 
+ *
  * This function is designed to be called from Server Components.
  * It handles authentication, authorization, and data fetching.
  */
@@ -52,19 +58,20 @@ export async function getStudentAttendance(): Promise<AttendanceResult> {
     if (!userId) {
       return {
         success: false,
-        error: 'Authentication required. Please login.',
-        errorCode: 'UNAUTHORIZED',
+        error: "Authentication required. Please login.",
+        errorCode: "UNAUTHORIZED",
       };
     }
 
     // Step 2: Verify role is SISWA
-    const userRole = (sessionClaims?.public_metadata as { role?: string })?.role;
-    
-    if (userRole !== 'SISWA') {
+    const userRole = (sessionClaims?.public_metadata as { role?: string })
+      ?.role;
+
+    if (userRole !== "SISWA") {
       return {
         success: false,
-        error: 'Access denied. This page is only available for students.',
-        errorCode: 'FORBIDDEN',
+        error: "Access denied. This page is only available for students.",
+        errorCode: "FORBIDDEN",
       };
     }
 
@@ -79,8 +86,8 @@ export async function getStudentAttendance(): Promise<AttendanceResult> {
     if (!user || !user.studentProfile) {
       return {
         success: false,
-        error: 'Student profile not found. Please contact administrator.',
-        errorCode: 'NOT_FOUND',
+        error: "Student profile not found. Please contact administrator.",
+        errorCode: "NOT_FOUND",
       };
     }
 
@@ -88,7 +95,7 @@ export async function getStudentAttendance(): Promise<AttendanceResult> {
     const enrollments = await prisma.enrollment.findMany({
       where: {
         student_id: user.studentProfile.id,
-        status: 'ACTIVE',
+        status: "ACTIVE",
       },
       select: {
         id: true,
@@ -120,15 +127,13 @@ export async function getStudentAttendance(): Promise<AttendanceResult> {
     }
 
     // Create enrollment ID list
-    const enrollmentIds = enrollments.map(e => e.id);
+    const enrollmentIds = enrollments.map((e) => e.id);
 
     // Create maps for enrichment
-    const enrollmentMap = new Map(
-      enrollments.map(e => [e.id, e])
-    );
+    const enrollmentMap = new Map(enrollments.map((e) => [e.id, e]));
 
     // Get unique extracurriculars for potential filtering
-    const extracurriculars = enrollments.map(e => ({
+    const extracurriculars = enrollments.map((e) => ({
       id: e.extracurricular.id,
       name: e.extracurricular.name,
     }));
@@ -150,45 +155,50 @@ export async function getStudentAttendance(): Promise<AttendanceResult> {
         },
       },
       orderBy: {
-        date: 'desc',
+        date: "desc",
       },
     });
 
     // Filter out cancelled sessions after fetch (to avoid complex nested filter)
-    const validAttendances = attendances.filter(a => 
-      !a.session || a.session.is_cancelled === false
+    const validAttendances = attendances.filter(
+      (a) => !a.session || a.session.is_cancelled === false,
     );
 
     // Step 6: Transform to view model
-    const records: AttendanceViewModel[] = validAttendances.map(attendance => {
-      const enrollment = enrollmentMap.get(attendance.enrollment_id)!;
-      return {
-        id: attendance.id,
-        date: attendance.date,
-        status: attendance.status,
-        notes: attendance.notes,
-        enrollmentId: attendance.enrollment_id,
-        session: attendance.session ? {
-          id: attendance.session.id,
-          date: attendance.session.date,
-          startTime: attendance.session.start_time,
-          endTime: attendance.session.end_time,
-        } : null,
-        extracurricular: {
-          id: enrollment.extracurricular.id,
-          name: enrollment.extracurricular.name,
-          category: enrollment.extracurricular.category,
-        },
-      };
-    });
+    const records: AttendanceViewModel[] = validAttendances.map(
+      (attendance) => {
+        const enrollment = enrollmentMap.get(attendance.enrollment_id)!;
+        return {
+          id: attendance.id,
+          date: attendance.date,
+          status: attendance.status,
+          notes: attendance.notes,
+          enrollmentId: attendance.enrollment_id,
+          session: attendance.session
+            ? {
+                id: attendance.session.id,
+                date: attendance.session.date,
+                startTime: attendance.session.start_time,
+                endTime: attendance.session.end_time,
+              }
+            : null,
+          extracurricular: {
+            id: enrollment.extracurricular.id,
+            name: enrollment.extracurricular.name,
+            category: enrollment.extracurricular.category,
+          },
+        };
+      },
+    );
 
     // Step 7: Compute summary statistics
     const totalSessions = records.length;
-    const presentCount = records.filter(r => r.status === 'PRESENT').length;
-    const absentLateCount = records.filter(r => r.status === 'ALPHA' || r.status === 'LATE').length;
-    const attendancePercentage = totalSessions > 0 
-      ? Math.round((presentCount / totalSessions) * 100) 
-      : 0;
+    const presentCount = records.filter((r) => r.status === "PRESENT").length;
+    const absentLateCount = records.filter(
+      (r) => r.status === "ALPHA" || r.status === "LATE",
+    ).length;
+    const attendancePercentage =
+      totalSessions > 0 ? Math.round((presentCount / totalSessions) * 100) : 0;
 
     return {
       success: true,
@@ -204,11 +214,11 @@ export async function getStudentAttendance(): Promise<AttendanceResult> {
       },
     };
   } catch (error) {
-    console.error('[ATTENDANCE DATA ERROR]', error);
+    console.error("[ATTENDANCE DATA ERROR]", error);
     return {
       success: false,
-      error: 'An unexpected error occurred. Please try again later.',
-      errorCode: 'SERVER_ERROR',
+      error: "An unexpected error occurred. Please try again later.",
+      errorCode: "SERVER_ERROR",
     };
   }
 }

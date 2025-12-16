@@ -139,7 +139,7 @@ export function NotificationCard({
         "border-l-4",
         !isRead
           ? "border-l-primary bg-primary/5 dark:bg-primary/10"
-          : "border-l-transparent hover:bg-slate-50 dark:hover:bg-slate-800/50"
+          : "border-l-transparent hover:bg-slate-50 dark:hover:bg-slate-800/50",
       )}
     >
       <CardContent className="p-4">
@@ -161,7 +161,7 @@ export function NotificationCard({
                   "text-sm line-clamp-1",
                   !isRead
                     ? "font-semibold text-slate-900 dark:text-white"
-                    : "font-medium text-slate-700 dark:text-slate-300"
+                    : "font-medium text-slate-700 dark:text-slate-300",
                 )}
               >
                 {title}

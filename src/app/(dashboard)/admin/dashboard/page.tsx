@@ -1,8 +1,8 @@
 /**
  * Admin Dashboard Page
- * 
+ *
  * Main dashboard view for Admin role.
- * 
+ *
  * @module app/(dashboard)/admin/dashboard/page
  */
 
@@ -114,7 +114,9 @@ export default function AdminDashboardPage() {
             <div className="flex items-center justify-between">
               <div>
                 <span className="text-3xl font-bold">89%</span>
-                <p className="text-xs text-amber-200 mt-1">↑ 5% dari bulan lalu</p>
+                <p className="text-xs text-amber-200 mt-1">
+                  ↑ 5% dari bulan lalu
+                </p>
               </div>
               <TrendingUp className="h-8 w-8 text-amber-200" />
             </div>
@@ -209,10 +211,26 @@ export default function AdminDashboardPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             {[
-              { action: "User baru terdaftar", user: "Siti Nurhaliza", time: "2 menit lalu" },
-              { action: "Pendaftaran ekskul", user: "Ahmad Rizki → Robotik", time: "15 menit lalu" },
-              { action: "Absensi diinput", user: "Pembina: Basket", time: "1 jam lalu" },
-              { action: "Ekskul baru dibuat", user: "Admin: English Club", time: "3 jam lalu" },
+              {
+                action: "User baru terdaftar",
+                user: "Siti Nurhaliza",
+                time: "2 menit lalu",
+              },
+              {
+                action: "Pendaftaran ekskul",
+                user: "Ahmad Rizki → Robotik",
+                time: "15 menit lalu",
+              },
+              {
+                action: "Absensi diinput",
+                user: "Pembina: Basket",
+                time: "1 jam lalu",
+              },
+              {
+                action: "Ekskul baru dibuat",
+                user: "Admin: English Club",
+                time: "3 jam lalu",
+              },
             ].map((activity, i) => (
               <div
                 key={i}

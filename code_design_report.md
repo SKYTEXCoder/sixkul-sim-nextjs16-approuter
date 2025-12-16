@@ -1,77 +1,88 @@
 # Perancangan Kode Program
+
 (Source Code Design)
 
 ## Repositori Kode Sumber (Source Code Repository)
+
 Seluruh kode sumber untuk proyek ini tersedia secara publik di GitHub pada tautan berikut:
 **https://github.com/SKYTEXCoder/sixkul-sim-nextjs16-approuter**
 
 ---
 
 ## 1. Stack Teknologi dan Tools-tools Pengembangan (Technology Stack)
-Sistem ini dibangun menggunakan serangkaian teknologi modern (*Tech Stack*) yang dipilih untuk menjamin performa tinggi, keamanan tipe data (*type safety*), skalabilitas, dan pengalaman pengguna yang optimal. Berikut adalah rincian lengkap setiap tools-tools pengembangan yang digunakan:
+
+Sistem ini dibangun menggunakan serangkaian teknologi modern (_Tech Stack_) yang dipilih untuk menjamin performa tinggi, keamanan tipe data (_type safety_), skalabilitas, dan pengalaman pengguna yang optimal. Berikut adalah rincian lengkap setiap tools-tools pengembangan yang digunakan:
 
 ### Core Framework & Language
+
 1.  **Next.js 16 (App Router)**
-    *   **Fungsi**: Framework utama React untuk pengembangan aplikasi web *full-stack*.
-    *   **Alasan Penggunaan**: Verse terbaru (v16) menawarkan fitur *React Server Components (RSC)* yang memungkinkan rendering komponen di server secara default. Ini mengurangi ukuran bundle JavaScript yang dikirim ke klien, meningkatkan kecepatan *First Contentful Paint (FCP)*, dan menyederhanakan pengambilan data (*data fetching*) langsung di komponen tanpa perlu `useEffect`.
+    - **Fungsi**: Framework utama React untuk pengembangan aplikasi web _full-stack_.
+    - **Alasan Penggunaan**: Verse terbaru (v16) menawarkan fitur _React Server Components (RSC)_ yang memungkinkan rendering komponen di server secara default. Ini mengurangi ukuran bundle JavaScript yang dikirim ke klien, meningkatkan kecepatan _First Contentful Paint (FCP)_, dan menyederhanakan pengambilan data (_data fetching_) langsung di komponen tanpa perlu `useEffect`.
 
 2.  **TypeScript**
-    *   **Fungsi**: Bahasa pemrograman *superset* dari JavaScript yang menambahkan *static typing*.
-    *   **Alasan Penggunaan**: Memberikan keamanan kode yang ketat (*strict type safety*). TypeScript mencegah kesalahan umum seperti *undefined is not a function* saat *compile-time* sebelum kode dijalankan. Ini sangat krusial untuk proyek berskala besar guna menjaga konsistensi struktur data antar komponen.
+    - **Fungsi**: Bahasa pemrograman _superset_ dari JavaScript yang menambahkan _static typing_.
+    - **Alasan Penggunaan**: Memberikan keamanan kode yang ketat (_strict type safety_). TypeScript mencegah kesalahan umum seperti _undefined is not a function_ saat _compile-time_ sebelum kode dijalankan. Ini sangat krusial untuk proyek berskala besar guna menjaga konsistensi struktur data antar komponen.
 
 ### Database & Backend
+
 3.  **Prisma ORM**
-    *   **Fungsi**: *Object-Relational Mapper (ORM)* generasi baru untuk Node.js dan TypeScript.
-    *   **Alasan Penggunaan**: Memudahkan interaksi dengan database menggunakan sintaks yang intuitif dan *type-safe*. Prisma secara otomatis menghasilkan tipe TypeScript berdasarkan skema database (`schema.prisma`), sehingga *autocomplete* kode database sangat akurat.
+    - **Fungsi**: _Object-Relational Mapper (ORM)_ generasi baru untuk Node.js dan TypeScript.
+    - **Alasan Penggunaan**: Memudahkan interaksi dengan database menggunakan sintaks yang intuitif dan _type-safe_. Prisma secara otomatis menghasilkan tipe TypeScript berdasarkan skema database (`schema.prisma`), sehingga _autocomplete_ kode database sangat akurat.
 
 4.  **Supabase (PostgreSQL Database)**
-    *   **Fungsi**: Platform *Backend-as-a-Service (BaaS)* yang menyediakan database PostgreSQL terkelola (*cloud-hosted*).
-    *   **Alasan Penggunaan**: Menyediakan infrastruktur database PostgreSQL yang skala produksinya dikelola sepenuhnya di cloud. Supabase dipilih karena kemudahan setup, antarmuka manajemen data (Table Editor) yang intuitif, dan keandalannya yang tinggi. Hal ini menghilangkan beban pemeliharaan server database manual (seperti *patching* atau *backup*) sehingga tim pengembang dapat fokus pada logika aplikasi.
+    - **Fungsi**: Platform _Backend-as-a-Service (BaaS)_ yang menyediakan database PostgreSQL terkelola (_cloud-hosted_).
+    - **Alasan Penggunaan**: Menyediakan infrastruktur database PostgreSQL yang skala produksinya dikelola sepenuhnya di cloud. Supabase dipilih karena kemudahan setup, antarmuka manajemen data (Table Editor) yang intuitif, dan keandalannya yang tinggi. Hal ini menghilangkan beban pemeliharaan server database manual (seperti _patching_ atau _backup_) sehingga tim pengembang dapat fokus pada logika aplikasi.
 
 ### Authentication & Security
+
 5.  **Clerk**
-    *   **Fungsi**: Layanan manajemen identitas dan autentikasi pengguna lengkap.
-    *   **Alasan Penggunaan**: Menangani kompleksitas keamanan seperti enkripsi password, manajemen sesi (JWT), 2FA, dan perlindungan *branding* login. Integrasi *middleware*-nya dengan Next.js sangat mulus untuk proteksi rute berbasis peran.
+    - **Fungsi**: Layanan manajemen identitas dan autentikasi pengguna lengkap.
+    - **Alasan Penggunaan**: Menangani kompleksitas keamanan seperti enkripsi password, manajemen sesi (JWT), 2FA, dan perlindungan _branding_ login. Integrasi _middleware_-nya dengan Next.js sangat mulus untuk proteksi rute berbasis peran.
 
 ### Frontend & UI Components
+
 6.  **Tailwind CSS**
-    *   **Fungsi**: Framework CSS *utility-first*.
-    *   **Alasan Penggunaan**: Mempercepat proses *styling* dengan menyediakan kelas-kelas utilitas siap pakai langsung di HTML. Memungkinkan pembuatan desain responsif yang konsisten tanpa perlu menulis file CSS terpisah yang membengkak.
+    - **Fungsi**: Framework CSS _utility-first_.
+    - **Alasan Penggunaan**: Mempercepat proses _styling_ dengan menyediakan kelas-kelas utilitas siap pakai langsung di HTML. Memungkinkan pembuatan desain responsif yang konsisten tanpa perlu menulis file CSS terpisah yang membengkak.
 
 7.  **Shadcn/UI & Radix UI**
-    *   **Fungsi**: Koleksi komponen UI yang *reusable* dan *accessible*.
-    *   **Alasan Penggunaan**: Shadcn/UI bukan library komponen biasa, melainkan koleksi kode yang bisa di-copy ke dalam proyek (*Headless UI*). Dibangun di atas Radix UI yang menjamin aksesibilitas (WAI-ARIA compliant) untuk komponen interaktif seperti Modal, Dropdown, dan Tabs.
+    - **Fungsi**: Koleksi komponen UI yang _reusable_ dan _accessible_.
+    - **Alasan Penggunaan**: Shadcn/UI bukan library komponen biasa, melainkan koleksi kode yang bisa di-copy ke dalam proyek (_Headless UI_). Dibangun di atas Radix UI yang menjamin aksesibilitas (WAI-ARIA compliant) untuk komponen interaktif seperti Modal, Dropdown, dan Tabs.
 
 8.  **Lucide React**
-    *   **Fungsi**: Library ikon vektor yang ringan.
-    *   **Alasan Penggunaan**: Menyediakan ikon visual yang konsisten dan modern dengan ukuran file SVG yang teroptimasi.
+    - **Fungsi**: Library ikon vektor yang ringan.
+    - **Alasan Penggunaan**: Menyediakan ikon visual yang konsisten dan modern dengan ukuran file SVG yang teroptimasi.
 
 ### Form & Data Validation
+
 9.  **React Hook Form**
-    *   **Fungsi**: Library pengelola state form untuk React.
-    *   **Alasan Penggunaan**: Mengurangi jumlah render ulang (*re-renders*) yang tidak perlu saat pengguna mengetik di form, meningkatkan performa halaman pendaftaran atau input data yang kompleks.
+    - **Fungsi**: Library pengelola state form untuk React.
+    - **Alasan Penggunaan**: Mengurangi jumlah render ulang (_re-renders_) yang tidak perlu saat pengguna mengetik di form, meningkatkan performa halaman pendaftaran atau input data yang kompleks.
 
 10. **Zod**
-    *   **Fungsi**: Library validasi skema berbasis TypeScript.
-    *   **Alasan Penggunaan**: Digunakan bersama React Hook Form untuk memvalidasi input pengguna baik di sisi klien maupun server. Zod memastikan data yang dikirim ke API sesuai dengan format yang diharapkan.
+    - **Fungsi**: Library validasi skema berbasis TypeScript.
+    - **Alasan Penggunaan**: Digunakan bersama React Hook Form untuk memvalidasi input pengguna baik di sisi klien maupun server. Zod memastikan data yang dikirim ke API sesuai dengan format yang diharapkan.
 
 ### Utilities
+
 11. **Sonner**
-    *   **Fungsi**: Komponen *Toast notification*.
-    *   **Alasan Penggunaan**: Memberikan umpan balik visual (*feedback*) kepada pengguna (sukses/gagal) dengan desain yang elegan dan dukungan *stacking*.
+    - **Fungsi**: Komponen _Toast notification_.
+    - **Alasan Penggunaan**: Memberikan umpan balik visual (_feedback_) kepada pengguna (sukses/gagal) dengan desain yang elegan dan dukungan _stacking_.
 
 12. **date-fns**
-    *   **Fungsi**: Library manipulasi tanggal.
-    *   **Alasan Penggunaan**: Memudahkan format tanggal (misalnya: "Senin, 14 Agustus 2024") dan perhitungan selisih waktu untuk fitur jadwal dan absensi.
+    - **Fungsi**: Library manipulasi tanggal.
+    - **Alasan Penggunaan**: Memudahkan format tanggal (misalnya: "Senin, 14 Agustus 2024") dan perhitungan selisih waktu untuk fitur jadwal dan absensi.
 
 ---
 
 ## 2. Arsitektur Umum Aplikasi
-Aplikasi SIXKUL dibangun menggunakan framework **Next.js 16** dengan arsitektur **App Router**. Pemilihan ini didasarkan pada kemampuan rendering hibrida yang memisahkan antara *Server Components* (untuk performa dan keamanan data) dan *Client Components* (untuk interaktivitas antarmuka).
+
+Aplikasi SIXKUL dibangun menggunakan framework **Next.js 16** dengan arsitektur **App Router**. Pemilihan ini didasarkan pada kemampuan rendering hibrida yang memisahkan antara _Server Components_ (untuk performa dan keamanan data) dan _Client Components_ (untuk interaktivitas antarmuka).
 
 Bahasa pemrograman utama yang digunakan adalah **TypeScript**, yang memberikan keamanan tipe (type safety) untuk mengurangi bug saat pengembangan.
 
 ### Struktur Direktori Utama
+
 - `src/app`: Berisi routing halaman dan API endpoints (File-system based routing).
 - `src/proxy.ts`: Middleware utama untuk autentikasi dan proteksi rute.
 - `src/components`: Komponen UI modular (menggunakan Shadcn/UI dan Tailwind CSS).
@@ -79,16 +90,19 @@ Bahasa pemrograman utama yang digunakan adalah **TypeScript**, yang memberikan k
 - `prisma`: Definisi skema database dan konfigurasi ORM.
 
 ## 3. Perancangan Database (Prisma ORM)
+
 Database dikelola menggunakan **Prisma ORM** dengan database relasional (PostgreSQL). Skema didefinisikan dalam file `prisma/schema.prisma` yang menjadi kontrak utama data.
 
 ### Model Data Utama
+
 1.  **User**: Entitas pusat yang terhubung dengan layanan autentikasi eksternal (Clerk). Menyimpan data dasar seperti `username`, `email`, dan `role` (ADMIN, PEMBINA, SISWA).
-2.  **Profile Models** (`StudentProfile`, `PembinaProfile`): Mengimplementasikan pola *One-to-One* dengan model User. Memisahkan data spesifik peran (seperti NIS untuk siswa atau NIP untuk pembina) dari data autentikasi.
-3.  **Extracurricular**: Menyimpan data kegiatan ekstrakurikuler. Memiliki relasi *One-to-Many* dengan Pembina (satu ekskul dibina satu pembina) dan relasi *Many-to-Many* dengan Siswa melalui tabel perantara.
-4.  **Enrollment**: Tabel perantara (*Joint Table*) yang menghubungkan `StudentProfile` dan `Extracurricular`. Tabel ini tidak hanya mencatat relasi, tetapi juga menyimpan status pendaftaran (`PENDING`, `ACTIVE`, `REJECTED`) dan riwayat akademik.
+2.  **Profile Models** (`StudentProfile`, `PembinaProfile`): Mengimplementasikan pola _One-to-One_ dengan model User. Memisahkan data spesifik peran (seperti NIS untuk siswa atau NIP untuk pembina) dari data autentikasi.
+3.  **Extracurricular**: Menyimpan data kegiatan ekstrakurikuler. Memiliki relasi _One-to-Many_ dengan Pembina (satu ekskul dibina satu pembina) dan relasi _Many-to-Many_ dengan Siswa melalui tabel perantara.
+4.  **Enrollment**: Tabel perantara (_Joint Table_) yang menghubungkan `StudentProfile` dan `Extracurricular`. Tabel ini tidak hanya mencatat relasi, tetapi juga menyimpan status pendaftaran (`PENDING`, `ACTIVE`, `REJECTED`) dan riwayat akademik.
 5.  **Attendance**: Mencatat kehadiran yang terhubung langsung ke `Enrollment` dan `Schedule`, memungkinkan pelacakan historis kehadiran siswa per pertemuan.
 
 **Kode Lengkap: `prisma/schema.prisma`**
+
 ```prisma
 // SIXKUL - Sistem Informasi Ekstrakurikuler
 // Prisma Schema for High School Extracurriculars Management System
@@ -298,56 +312,57 @@ model Notification {
 ```
 
 ## 4. Sistem Otentikasi dan Middleware Keamanan
+
 Implementasi keamanan aplikasi berpusat pada dua komponen utama: **Middleware Terpusat** dan **Sinkronisasi Just-in-Time**.
 
 ### Middleware Autentikasi (`src/proxy.ts`)
+
 Alih-alih menggunakan file `middleware.ts` standar yang terpisah-pisah, proyek ini memusatkan logika perlindungan rute dalam file `src/proxy.ts`. Middleware ini bertindak sebagai gerbang utama (gatekeeper) untuk setiap permintaan yang masuk ke server.
 
 **Fungsi Utama:**
+
 1.  **Integrasi Clerk**: Menggunakan `clerkMiddleware` untuk memvalidasi sesi pengguna secara otomatis.
 2.  **Route Matching**: Mendefinisikan pola rute menggunakan helper `createRouteMatcher` untuk:
-    *   Rute Publik: `/sign-in`, `/unauthorized`.
-    *   Rute Role-Based: `/admin/*`, `/pembina/*`, `/student/*`.
+    - Rute Publik: `/sign-in`, `/unauthorized`.
+    - Rute Role-Based: `/admin/*`, `/pembina/*`, `/student/*`.
 3.  **Role-Based Access Control (RBAC)**:
     Middleware secara aktif memeriksa metadata peran pengguna (`sessionClaims.public_metadata.role`) dan menegakkan aturan akses yang ketat:
-    *   Jika pengguna `SISWA` mencoba mengakses `/admin/*`, mereka langsung dialihkan ke halaman `/unauthorized`.
-    *   Mencegah *Horizontal Privilege Escalation* antar tipe pengguna.
+    - Jika pengguna `SISWA` mencoba mengakses `/admin/*`, mereka langsung dialihkan ke halaman `/unauthorized`.
+    - Mencegah _Horizontal Privilege Escalation_ antar tipe pengguna.
 4.  **Redirection Logic**: Menangani logika pengalihan cerdas, misalnya pengguna yang sudah login namun mengakses halaman login akan otomatis diarahkan ke dashboard yang sesuai dengan peran mereka.
 
 **Kode Lengkap: `src/proxy.ts`**
+
 ```typescript
 /**
  * SIXKUL Clerk Authentication Middleware
- * 
+ *
  * Handles authentication and role-based access control using Clerk.
- * 
+ *
  * Route Protection Rules:
  * - "/" → Unauthenticated: redirect to /sign-in | Authenticated: redirect to role dashboard
  * - "/sign-in" → Unauthenticated: allow | Authenticated: redirect to role dashboard
  * - "/admin/*" → Requires authentication + ADMIN role
  * - "/pembina/*" → Requires authentication + PEMBINA role
  * - "/student/*" → Requires authentication + SISWA role
- * 
+ *
  * @module middleware
  */
 
-import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server'
-import { NextResponse } from 'next/server'
+import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { NextResponse } from "next/server";
 
 // ============================================
 // Route Matchers
 // ============================================
 
 // Public routes - only sign-in and unauthorized pages
-const isPublicRoute = createRouteMatcher([
-  '/sign-in(.*)',
-  '/unauthorized',
-])
+const isPublicRoute = createRouteMatcher(["/sign-in(.*)", "/unauthorized"]);
 
 // Define role-specific routes
-const isAdminRoute = createRouteMatcher(['/admin(.*)'])
-const isPembinaRoute = createRouteMatcher(['/pembina(.*)'])
-const isStudentRoute = createRouteMatcher(['/student(.*)'])
+const isAdminRoute = createRouteMatcher(["/admin(.*)"]);
+const isPembinaRoute = createRouteMatcher(["/pembina(.*)"]);
+const isStudentRoute = createRouteMatcher(["/student(.*)"]);
 
 // ============================================
 // Helper Functions
@@ -358,14 +373,14 @@ const isStudentRoute = createRouteMatcher(['/student(.*)'])
  */
 function getDashboardPath(role: string | undefined): string {
   switch (role) {
-    case 'ADMIN':
-      return '/admin/dashboard'
-    case 'PEMBINA':
-      return '/pembina/dashboard'
-    case 'SISWA':
-      return '/student/dashboard'
+    case "ADMIN":
+      return "/admin/dashboard";
+    case "PEMBINA":
+      return "/pembina/dashboard";
+    case "SISWA":
+      return "/student/dashboard";
     default:
-      return '/sign-in'
+      return "/sign-in";
   }
 }
 
@@ -374,68 +389,81 @@ function getDashboardPath(role: string | undefined): string {
 // ============================================
 
 export default clerkMiddleware(async (auth, req) => {
-  const { userId, sessionClaims } = await auth()
-  const pathname = req.nextUrl.pathname
+  const { userId, sessionClaims } = await auth();
+  const pathname = req.nextUrl.pathname;
 
   // Debug logging
-  console.log(`[MIDDLEWARE] Path: ${pathname}, UserId: ${userId || 'none'}`)
+  console.log(`[MIDDLEWARE] Path: ${pathname}, UserId: ${userId || "none"}`);
 
   // Get user role from session claims (public_metadata.role)
   // Note: We use "public_metadata" key as configured in Clerk Dashboard
-  const userRole = (sessionClaims?.public_metadata as { role?: string })?.role
+  const userRole = (sessionClaims?.public_metadata as { role?: string })?.role;
 
   // ----------------------------------------
   // CASE 1: Unauthenticated user visiting "/" → redirect to sign-in
   // ----------------------------------------
-  if (!userId && pathname === '/') {
-    console.log('[MIDDLEWARE] CASE 1: Unauthenticated on "/" - redirecting to /sign-in')
-    return NextResponse.redirect(new URL('/sign-in', req.url))
+  if (!userId && pathname === "/") {
+    console.log(
+      '[MIDDLEWARE] CASE 1: Unauthenticated on "/" - redirecting to /sign-in',
+    );
+    return NextResponse.redirect(new URL("/sign-in", req.url));
   }
 
   // ----------------------------------------
   // CASE 2: Authenticated user visiting "/" or "/login" → redirect to their dashboard
   // ----------------------------------------
-  if (userId && (pathname === '/' || pathname === '/login' || pathname.startsWith('/sign-in'))) {
-    return NextResponse.redirect(new URL(getDashboardPath(userRole), req.url))
+  if (
+    userId &&
+    (pathname === "/" ||
+      pathname === "/login" ||
+      pathname.startsWith("/sign-in"))
+  ) {
+    return NextResponse.redirect(new URL(getDashboardPath(userRole), req.url));
   }
 
   // ----------------------------------------
   // Allow public routes (sign-in, unauthorized)
   // ----------------------------------------
   if (isPublicRoute(req)) {
-    return NextResponse.next()
+    return NextResponse.next();
   }
 
   // ----------------------------------------
   // CASE 3: Unauthenticated user trying to access protected routes → redirect to sign-in
   // ----------------------------------------
   if (!userId) {
-    return NextResponse.redirect(new URL('/sign-in', req.url))
+    return NextResponse.redirect(new URL("/sign-in", req.url));
   }
 
   // ----------------------------------------
   // CASE 4: Role-based access control - prevent cross-role access
   // ----------------------------------------
-  if (isAdminRoute(req) && userRole !== 'ADMIN') {
-    console.log(`[MIDDLEWARE] Role mismatch - User role: ${userRole}, required: ADMIN`)
-    return NextResponse.redirect(new URL('/unauthorized', req.url))
+  if (isAdminRoute(req) && userRole !== "ADMIN") {
+    console.log(
+      `[MIDDLEWARE] Role mismatch - User role: ${userRole}, required: ADMIN`,
+    );
+    return NextResponse.redirect(new URL("/unauthorized", req.url));
   }
-  
-  if (isPembinaRoute(req) && userRole !== 'PEMBINA') {
-    console.log(`[MIDDLEWARE] Role mismatch - User role: ${userRole}, required: PEMBINA`)
-    return NextResponse.redirect(new URL('/unauthorized', req.url))
+
+  if (isPembinaRoute(req) && userRole !== "PEMBINA") {
+    console.log(
+      `[MIDDLEWARE] Role mismatch - User role: ${userRole}, required: PEMBINA`,
+    );
+    return NextResponse.redirect(new URL("/unauthorized", req.url));
   }
-  
-  if (isStudentRoute(req) && userRole !== 'SISWA') {
-    console.log(`[MIDDLEWARE] Role mismatch - User role: ${userRole}, required: SISWA`)
-    return NextResponse.redirect(new URL('/unauthorized', req.url))
+
+  if (isStudentRoute(req) && userRole !== "SISWA") {
+    console.log(
+      `[MIDDLEWARE] Role mismatch - User role: ${userRole}, required: SISWA`,
+    );
+    return NextResponse.redirect(new URL("/unauthorized", req.url));
   }
 
   // ----------------------------------------
   // Allow the request to proceed
   // ----------------------------------------
-  return NextResponse.next()
-})
+  return NextResponse.next();
+});
 
 // ============================================
 // Middleware Config
@@ -444,31 +472,38 @@ export default clerkMiddleware(async (auth, req) => {
 export const config = {
   matcher: [
     // Explicitly match root
-    '/',
+    "/",
     // Skip Next.js internals and all static files, unless found in search params
-    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
+    "/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)",
     // Always run for API routes
-    '/(api|trpc)(.*)',
+    "/(api|trpc)(.*)",
   ],
-}
+};
 ```
 
 ### Sinkronisasi Pengguna (`src/lib/sync-user.ts`)
+
 Sistem menggunakan mekanisme **"Just-in-Time (JIT) Synchronization"** untuk menjaga konsistensi data antara Clerk (Auth Provider) dan Database Lokal.
 
 **Kode Lengkap: `src/lib/sync-user.ts`**
+
 ```typescript
 /**
  * SIXKUL Just-in-Time User Sync Utility
- * 
+ *
  * Automatically creates Prisma database records for Clerk users
  * on their first access to the application.
- * 
+ *
  * @module lib/sync-user
  */
 
-import prisma from '@/lib/prisma';
-import { User, UserRole, StudentProfile, PembinaProfile } from '@/generated/prisma';
+import prisma from "@/lib/prisma";
+import {
+  User,
+  UserRole,
+  StudentProfile,
+  PembinaProfile,
+} from "@/generated/prisma";
 
 // ============================================
 // Types
@@ -500,9 +535,7 @@ interface SyncError {
   statusCode: number;
 }
 
-type SyncResponse = 
-  | { success: true; data: SyncResult }
-  | SyncError;
+type SyncResponse = { success: true; data: SyncResult } | SyncError;
 
 // ============================================
 // Helper Functions
@@ -513,18 +546,18 @@ type SyncResponse =
  */
 function generateUsername(
   clerkUserId: string,
-  sessionClaims: ClerkSessionClaims
+  sessionClaims: ClerkSessionClaims,
 ): string {
   // Priority: Clerk username > email prefix > clerk_id short
   if (sessionClaims.username) {
     return sessionClaims.username;
   }
-  
+
   if (sessionClaims.email) {
-    const emailPrefix = sessionClaims.email.split('@')[0];
-    return emailPrefix.toLowerCase().replace(/[^a-z0-9_]/g, '_');
+    const emailPrefix = sessionClaims.email.split("@")[0];
+    return emailPrefix.toLowerCase().replace(/[^a-z0-9_]/g, "_");
   }
-  
+
   // Fallback: use last 8 chars of Clerk user ID
   return `user_${clerkUserId.slice(-8)}`;
 }
@@ -536,22 +569,22 @@ function generateFullName(sessionClaims: ClerkSessionClaims): string {
   if (sessionClaims.full_name) {
     return sessionClaims.full_name;
   }
-  
+
   if (sessionClaims.first_name || sessionClaims.last_name) {
     return [sessionClaims.first_name, sessionClaims.last_name]
       .filter(Boolean)
-      .join(' ');
+      .join(" ");
   }
-  
+
   if (sessionClaims.username) {
     return sessionClaims.username;
   }
-  
+
   if (sessionClaims.email) {
-    return sessionClaims.email.split('@')[0];
+    return sessionClaims.email.split("@")[0];
   }
-  
-  return 'User';
+
+  return "User";
 }
 
 /**
@@ -559,15 +592,15 @@ function generateFullName(sessionClaims: ClerkSessionClaims): string {
  */
 function mapRole(roleString?: string): UserRole {
   const normalizedRole = roleString?.toUpperCase();
-  
+
   switch (normalizedRole) {
-    case 'ADMIN':
-      return 'ADMIN';
-    case 'PEMBINA':
-      return 'PEMBINA';
-    case 'SISWA':
+    case "ADMIN":
+      return "ADMIN";
+    case "PEMBINA":
+      return "PEMBINA";
+    case "SISWA":
     default:
-      return 'SISWA'; // Default to SISWA if no role specified
+      return "SISWA"; // Default to SISWA if no role specified
   }
 }
 
@@ -577,14 +610,14 @@ function mapRole(roleString?: string): UserRole {
 
 /**
  * Get existing user or create new one from Clerk data
- * 
+ *
  * This is the main JIT sync function. Call this whenever you need
  * a local database user from a Clerk session.
- * 
+ *
  * @param clerkUserId - The Clerk user ID (from auth().userId)
  * @param sessionClaims - The session claims (from auth().sessionClaims)
  * @returns SyncResponse with user, profile, and isNewUser flag
- * 
+ *
  * @example
  * const { userId, sessionClaims } = await auth();
  * const result = await getOrCreateUser(userId, sessionClaims);
@@ -595,7 +628,7 @@ function mapRole(roleString?: string): UserRole {
  */
 export async function getOrCreateUser(
   clerkUserId: string,
-  sessionClaims: ClerkSessionClaims | null | undefined
+  sessionClaims: ClerkSessionClaims | null | undefined,
 ): Promise<SyncResponse> {
   try {
     // ----------------------------------------
@@ -611,13 +644,14 @@ export async function getOrCreateUser(
 
     if (existingUser) {
       // User exists - return with existing profile
-      const profile = existingUser.studentProfile || existingUser.pembinaProfile;
+      const profile =
+        existingUser.studentProfile || existingUser.pembinaProfile;
       return {
         success: true,
         data: {
           user: existingUser,
           profile,
-           isNewUser: false,
+          isNewUser: false,
         },
       };
     }
@@ -630,7 +664,9 @@ export async function getOrCreateUser(
     const username = generateUsername(clerkUserId, claims);
     const fullName = generateFullName(claims);
 
-    console.log(`[JIT SYNC] Creating new user: ${username} (${role}) - Clerk ID: ${clerkUserId}`);
+    console.log(
+      `[JIT SYNC] Creating new user: ${username} (${role}) - Clerk ID: ${clerkUserId}`,
+    );
 
     // Create user with role-specific profile in a transaction
     const result = await prisma.$transaction(async (tx) => {
@@ -649,18 +685,18 @@ export async function getOrCreateUser(
       let profile: StudentProfile | PembinaProfile | null = null;
 
       // Create role-specific profile
-      if (role === 'SISWA') {
+      if (role === "SISWA") {
         profile = await tx.studentProfile.create({
           data: {
             user_id: newUser.id,
             nis: `PLACEHOLDER_${clerkUserId.slice(-6)}`,
-            class_name: 'Belum diatur',
-            major: 'Belum diatur',
+            class_name: "Belum diatur",
+            major: "Belum diatur",
             phone_number: null,
           },
         });
         console.log(`[JIT SYNC] Created StudentProfile for ${username}`);
-      } else if (role === 'PEMBINA') {
+      } else if (role === "PEMBINA") {
         profile = await tx.pembinaProfile.create({
           data: {
             user_id: newUser.id,
@@ -686,12 +722,11 @@ export async function getOrCreateUser(
         isNewUser: true,
       },
     };
-
   } catch (error) {
-    console.error('[JIT SYNC ERROR]', error);
-    
+    console.error("[JIT SYNC ERROR]", error);
+
     // Handle unique constraint violations (race condition)
-    if (error instanceof Error && error.message.includes('Unique constraint')) {
+    if (error instanceof Error && error.message.includes("Unique constraint")) {
       // Another request already created the user - try to fetch them
       const existingUser = await prisma.user.findUnique({
         where: { clerk_id: clerkUserId },
@@ -715,7 +750,7 @@ export async function getOrCreateUser(
 
     return {
       success: false,
-      error: 'Failed to sync user. Please try again.',
+      error: "Failed to sync user. Please try again.",
       statusCode: 500,
     };
   }
@@ -731,7 +766,7 @@ export async function getOrCreateUser(
  */
 export async function getOrCreateUserId(
   clerkUserId: string,
-  sessionClaims: ClerkSessionClaims | null | undefined
+  sessionClaims: ClerkSessionClaims | null | undefined,
 ): Promise<string | null> {
   const result = await getOrCreateUser(clerkUserId, sessionClaims);
   if (!result.success) {
@@ -746,8 +781,11 @@ export async function getOrCreateUserId(
  */
 export async function getOrCreateProfile(
   clerkUserId: string,
-  sessionClaims: ClerkSessionClaims | null | undefined
-): Promise<{ profile: StudentProfile | PembinaProfile | null; userId: string } | null> {
+  sessionClaims: ClerkSessionClaims | null | undefined,
+): Promise<{
+  profile: StudentProfile | PembinaProfile | null;
+  userId: string;
+} | null> {
   const result = await getOrCreateUser(clerkUserId, sessionClaims);
   if (!result.success) {
     return null;
@@ -764,17 +802,17 @@ export async function getOrCreateProfile(
  */
 export async function getOrCreateStudentProfile(
   clerkUserId: string,
-  sessionClaims: ClerkSessionClaims | null | undefined
+  sessionClaims: ClerkSessionClaims | null | undefined,
 ): Promise<{ studentProfile: StudentProfile; userId: string } | null> {
   const result = await getOrCreateUser(clerkUserId, sessionClaims);
   if (!result.success) {
     return null;
   }
-  
-  if (result.data.user.role !== 'SISWA' || !result.data.profile) {
+
+  if (result.data.user.role !== "SISWA" || !result.data.profile) {
     return null;
   }
-  
+
   return {
     studentProfile: result.data.profile as StudentProfile,
     userId: result.data.user.id,
@@ -787,17 +825,17 @@ export async function getOrCreateStudentProfile(
  */
 export async function getOrCreatePembinaProfile(
   clerkUserId: string,
-  sessionClaims: ClerkSessionClaims | null | undefined
+  sessionClaims: ClerkSessionClaims | null | undefined,
 ): Promise<{ pembinaProfile: PembinaProfile; userId: string } | null> {
   const result = await getOrCreateUser(clerkUserId, sessionClaims);
   if (!result.success) {
     return null;
   }
-  
-  if (result.data.user.role !== 'PEMBINA' || !result.data.profile) {
+
+  if (result.data.user.role !== "PEMBINA" || !result.data.profile) {
     return null;
   }
-  
+
   return {
     pembinaProfile: result.data.profile as PembinaProfile,
     userId: result.data.user.id,
@@ -806,20 +844,22 @@ export async function getOrCreatePembinaProfile(
 ```
 
 ## 5. Implementasi Fitur Utama: Manajemen Pendaftaran (Enrollment)
+
 Salah satu fitur inti adalah kemampuan siswa melihat status keikutsertaan ekstrakurikuler mereka. Fitur ini diimplementasikan di halaman `src/app/(dashboard)/student/enrollments/page.tsx`.
 
 ### Alur Data Server-Side Rendering (SSR)
+
 Halaman ini menggunakan pola **React Server Component (RSC)**:
 
 1.  **Data Fetching di Server**:
     Halaman bersifat `async` dan memanggil fungsi `getStudentEnrollments()` langsung di level komponen. Fungsi ini berjalan di server, mengakses database via Prisma untuk mengambil data enrollments siswa yang sedang login.
 
 2.  **Optimasi Database Query**:
-    Query Prisma dioptimalkan untuk mengambil data relasional sekaligus (Eager Loading): enrollment beserta detail ekstrakurikuler, jadwal, dan pembina dalam satu *round-trip* database.
+    Query Prisma dioptimalkan untuk mengambil data relasional sekaligus (Eager Loading): enrollment beserta detail ekstrakurikuler, jadwal, dan pembina dalam satu _round-trip_ database.
 
 3.  **Conditional Rendering**:
-    *   Jika siswa belum mendaftar apapun, komponen `EmptyEnrollments` ditampilkan dengan ilustrasi dan tombol ajakan (Call-to-Action) untuk mendaftar.
-    *   Jika ada data, daftar `EnrollmentCard` dirender dalam layout Grid responsif.
+    - Jika siswa belum mendaftar apapun, komponen `EmptyEnrollments` ditampilkan dengan ilustrasi dan tombol ajakan (Call-to-Action) untuk mendaftar.
+    - Jika ada data, daftar `EnrollmentCard` dirender dalam layout Grid responsif.
 
 4.  **Keamanan**:
     Karena proses fetching terjadi di server, logika bisnis dan struktur query database tidak pernah terekspos ke klien (browser), meningkatkan keamanan aplikasi secara signifikan.
@@ -829,10 +869,10 @@ Halaman ini menggunakan pola **React Server Component (RSC)**:
 ```tsx
 /**
  * Student Enrollments Page (Ekstrakurikuler Saya)
- * 
+ *
  * Server Component that displays all extracurriculars the student is enrolled in.
  * Uses Prisma directly for data fetching (no API routes).
- * 
+ *
  * @module app/(dashboard)/student/enrollments/page
  */
 
@@ -886,7 +926,11 @@ export default async function StudentEnrollmentsPage() {
 
   // Handle errors
   if (!result.success || !result.data) {
-    return <ErrorDisplay message={result.error || "Gagal memuat data ekstrakurikuler."} />;
+    return (
+      <ErrorDisplay
+        message={result.error || "Gagal memuat data ekstrakurikuler."}
+      />
+    );
   }
 
   const enrollments = result.data;

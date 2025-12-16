@@ -1,6 +1,6 @@
 /**
  * Shadcn UI Test Page
- * 
+ *
  * Test page to verify all Shadcn UI components are working correctly.
  * Visit: http://localhost:3000/test-ui
  */

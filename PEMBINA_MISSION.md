@@ -26,7 +26,6 @@ This mission is designed for **Agentic IDE execution** with human approval gates
 Tasks:
 
 - Remove all non-contract PEMBINA routes from navigation:
-
   - `/pembina/my-ekskul`
   - `/pembina/members`
   - `/pembina/schedule`
@@ -37,7 +36,6 @@ Acceptance Criteria:
 
 - No PEMBINA link points to a non-contract route
 - Sidebar contains only:
-
   - Dashboard
   - Ekstrakurikuler Saya → `/pembina/ekstrakurikuler`
 
@@ -206,7 +204,6 @@ Tasks:
 
 - Provide navigation walkthrough
 - Demonstrate:
-
   - Schedule → Session → Attendance
   - Enrollment approval
 

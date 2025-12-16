@@ -14,21 +14,21 @@ You are an **Agentic AI Software Development & Engineering Agent** tasked with *
 
 You **MUST**:
 
-* Treat this document as a **binding, authoritative specification**
-* Implement **frontend, server-side data access, and integration**
-* Use **Prisma ORM directly** (NO REST API routes)
-* Use **React Server Components (RSC)** by default
-* Use **Clerk Authentication** for auth & ownership validation
-* Integrate with the existing **Session-based model**
-* Preserve all existing student features and navigation contracts
+- Treat this document as a **binding, authoritative specification**
+- Implement **frontend, server-side data access, and integration**
+- Use **Prisma ORM directly** (NO REST API routes)
+- Use **React Server Components (RSC)** by default
+- Use **Clerk Authentication** for auth & ownership validation
+- Integrate with the existing **Session-based model**
+- Preserve all existing student features and navigation contracts
 
 You **MUST NOT**:
 
-* Guess requirements
-* Invent features not specified here
-* Expose raw database internals to the UI
-* Break existing `/student/enrollments` or `/student/schedule` behavior
-* Introduce new routes without explicit instruction
+- Guess requirements
+- Invent features not specified here
+- Expose raw database internals to the UI
+- Break existing `/student/enrollments` or `/student/schedule` behavior
+- Introduce new routes without explicit instruction
 
 ### Mandatory Consultation Rule
 
@@ -61,11 +61,11 @@ Student → Enrollment (ACTIVE) → Session → Attendance
 
 Attendance.status MUST be one of:
 
-* `HADIR`
-* `IZIN`
-* `SAKIT`
-* `ALPHA`
-* `TERLAMBAT` (optional but supported)
+- `HADIR`
+- `IZIN`
+- `SAKIT`
+- `ALPHA`
+- `TERLAMBAT` (optional but supported)
 
 ---
 
@@ -99,22 +99,22 @@ This page is a **global, read-only attendance history** across **ALL ACTIVE enro
 
 ### Authentication
 
-* Use **Clerk Authentication**
-* Resolve authenticated user → StudentProfile
+- Use **Clerk Authentication**
+- Resolve authenticated user → StudentProfile
 
 ### Authorization Rules
 
 Only include Attendance records that:
 
-* belong to the authenticated student
-* belong to an Enrollment with status `ACTIVE`
-* are linked to valid Sessions
-* sessions are NOT cancelled (`is_cancelled = false`)
+- belong to the authenticated student
+- belong to an Enrollment with status `ACTIVE`
+- are linked to valid Sessions
+- sessions are NOT cancelled (`is_cancelled = false`)
 
 No student may ever see:
 
-* other students’ attendance
-* attendance for inactive enrollments
+- other students’ attendance
+- attendance for inactive enrollments
 
 ---
 
@@ -130,15 +130,15 @@ Student → Enrollment (ACTIVE) → Attendance → Session → Extracurricular
 
 Each attendance row MUST include:
 
-* `attendance.id`
-* `attendance.status`
-* `attendance.notes`
-* `session.date`
-* `session.start_time`
-* `session.end_time`
-* `extracurricular.name`
-* `extracurricular.category`
-* `enrollment_id`
+- `attendance.id`
+- `attendance.status`
+- `attendance.notes`
+- `session.date`
+- `session.start_time`
+- `session.end_time`
+- `extracurricular.name`
+- `extracurricular.category`
+- `enrollment_id`
 
 ---
 
@@ -172,8 +172,8 @@ Ekstrakurikuler
 
 A **clear UI control** MUST exist allowing the student to switch between:
 
-* `Kelompokkan berdasarkan Tanggal`
-* `Kelompokkan berdasarkan Ekstrakurikuler`
+- `Kelompokkan berdasarkan Tanggal`
+- `Kelompokkan berdasarkan Ekstrakurikuler`
 
 The toggle MUST NOT cause navigation or page reload.
 
@@ -236,19 +236,19 @@ For the STUDENT role:
 
 ✅ **Allowed canonical routes**:
 
-* `/student/dashboard`
-* `/student/ekstrakurikuler`
-* `/student/enrollments`
-* `/student/enrollments/[enrollment_id]`
-* `/student/schedule`
-* `/student/attendance`
+- `/student/dashboard`
+- `/student/ekstrakurikuler`
+- `/student/enrollments`
+- `/student/enrollments/[enrollment_id]`
+- `/student/schedule`
+- `/student/attendance`
 
 ❌ **Forbidden routes (MUST NEVER be introduced)**:
 
-* `/student/schedule/[id]`
-* `/student/session/[id]`
-* `/student/attendance/[id]`
-* Any route that bypasses enrollment context
+- `/student/schedule/[id]`
+- `/student/session/[id]`
+- `/student/attendance/[id]`
+- Any route that bypasses enrollment context
 
 ---
 
@@ -263,9 +263,9 @@ ALWAYS route through:
 
 This ensures:
 
-* enrollment context is preserved
-* authorization is enforceable
-* future Pembina/Admin extensions remain consistent
+- enrollment context is preserved
+- authorization is enforceable
+- future Pembina/Admin extensions remain consistent
 
 ---
 
@@ -273,9 +273,9 @@ This ensures:
 
 While implementing **Absensi Saya**, you MUST:
 
-* Audit all links, buttons, and click handlers
-* Ensure no accidental deep-linking to forbidden routes
-* Ensure dashboard widgets, tables, or cards reuse the SAME navigation destination
+- Audit all links, buttons, and click handlers
+- Ensure no accidental deep-linking to forbidden routes
+- Ensure dashboard widgets, tables, or cards reuse the SAME navigation destination
 
 If you encounter ANY uncertainty about where a click should navigate:
 
@@ -303,9 +303,9 @@ Attendance rows MAY be clickable (optional), but if clickable MUST route to:
 
 ❌ No links to:
 
-* `/student/session/[id]`
-* `/student/schedule/[id]`
-* `/student/attendance/[id]`
+- `/student/session/[id]`
+- `/student/schedule/[id]`
+- `/student/attendance/[id]`
 
 ---
 
@@ -349,7 +349,7 @@ src/app/(dashboard)/student/attendance/page.tsx
 
 ### Component Type
 
-* React Server Component (RSC)
+- React Server Component (RSC)
 
 ### Data Fetch Flow
 
@@ -367,15 +367,15 @@ src/app/(dashboard)/student/attendance/page.tsx
 
 The AI is **AUTHORIZED** to:
 
-* replace any mock attendance data
-* refactor existing UI-only attendance code
-* align dashboard attendance stats to Session-based logic
+- replace any mock attendance data
+- refactor existing UI-only attendance code
+- align dashboard attendance stats to Session-based logic
 
 The AI is **NOT AUTHORIZED** to:
 
-* change Attendance semantics
-* change Enrollment lifecycle
-* add student editing capabilities
+- change Attendance semantics
+- change Enrollment lifecycle
+- add student editing capabilities
 
 ---
 
@@ -383,15 +383,15 @@ The AI is **NOT AUTHORIZED** to:
 
 This feature is COMPLETE only if:
 
-* `/student/attendance` renders without 404
-* Data is fetched via Prisma (no mocks)
-* Only ACTIVE enrollment attendance is shown
-* Group by Date works
-* Group by Extracurricular works
-* Summary cards compute correctly
-* Navigation respects Global Navigation Contract
-* No raw Schedule templates are exposed
-* Empty states render correctly
+- `/student/attendance` renders without 404
+- Data is fetched via Prisma (no mocks)
+- Only ACTIVE enrollment attendance is shown
+- Group by Date works
+- Group by Extracurricular works
+- Summary cards compute correctly
+- Navigation respects Global Navigation Contract
+- No raw Schedule templates are exposed
+- Empty states render correctly
 
 ---
 

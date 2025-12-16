@@ -41,7 +41,7 @@ export interface ExtracurricularDetail extends ExtracurricularSummary {
  * Returns summary data for list display.
  */
 export async function getPembinaExtracurriculars(
-  clerkUserId: string
+  clerkUserId: string,
 ): Promise<ExtracurricularSummary[]> {
   // First, get the PEMBINA profile from the User
   const user = await prisma.user.findUnique({
@@ -101,7 +101,7 @@ export async function getPembinaExtracurriculars(
  */
 export async function getExtracurricularById(
   id: string,
-  clerkUserId: string
+  clerkUserId: string,
 ): Promise<ExtracurricularDetail | null> {
   // First, get the PEMBINA profile from the User
   const user = await prisma.user.findUnique({
@@ -177,7 +177,7 @@ export async function getExtracurricularById(
  */
 export async function validatePembinaOwnership(
   extracurricularId: string,
-  clerkUserId: string
+  clerkUserId: string,
 ): Promise<boolean> {
   // First, get the PEMBINA profile from the User
   const user = await prisma.user.findUnique({

@@ -22,7 +22,7 @@ import { validatePembinaOwnership } from "@/lib/pembina-ekstrakurikuler-data";
 
 export async function approveEnrollmentAction(
   enrollmentId: string,
-  extracurricularId: string
+  extracurricularId: string,
 ): Promise<{ success: boolean; error?: string }> {
   const { userId } = await auth();
 
@@ -41,7 +41,7 @@ export async function approveEnrollmentAction(
 
 export async function rejectEnrollmentAction(
   enrollmentId: string,
-  extracurricularId: string
+  extracurricularId: string,
 ): Promise<{ success: boolean; error?: string }> {
   const { userId } = await auth();
 

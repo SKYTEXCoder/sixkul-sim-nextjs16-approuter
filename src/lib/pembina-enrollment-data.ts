@@ -35,7 +35,7 @@ export interface PendingEnrollment {
  * Get all PENDING enrollments for an extracurricular.
  */
 export async function getPendingEnrollments(
-  extracurricularId: string
+  extracurricularId: string,
 ): Promise<PendingEnrollment[]> {
   const enrollments = await prisma.enrollment.findMany({
     where: {
@@ -78,7 +78,7 @@ export async function getPendingEnrollments(
  */
 export async function approveEnrollment(
   enrollmentId: string,
-  extracurricularId: string
+  extracurricularId: string,
 ): Promise<{ success: boolean; error?: string }> {
   try {
     // Verify enrollment exists and is PENDING
@@ -135,7 +135,7 @@ export async function approveEnrollment(
  */
 export async function rejectEnrollment(
   enrollmentId: string,
-  extracurricularId: string
+  extracurricularId: string,
 ): Promise<{ success: boolean; error?: string }> {
   try {
     // Verify enrollment exists and is PENDING

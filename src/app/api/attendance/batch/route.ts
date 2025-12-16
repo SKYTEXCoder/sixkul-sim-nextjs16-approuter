@@ -199,8 +199,8 @@ function validateBatchAttendanceInput(body: unknown): {
       ) {
         errors.push(
           `records[${index}].status must be one of: ${VALID_STATUS_VALUES.join(
-            ", "
-          )}`
+            ", ",
+          )}`,
         );
       }
     });
@@ -239,7 +239,7 @@ function validateBatchAttendanceInput(body: unknown): {
  * 5. Return 200 OK with count of processed records
  */
 export async function POST(
-  request: NextRequest
+  request: NextRequest,
 ): Promise<
   NextResponse<BatchAttendanceSuccessResponse | BatchAttendanceErrorResponse>
 > {
@@ -252,7 +252,7 @@ export async function POST(
     if (!authResult.success) {
       return NextResponse.json(
         { success: false, message: authResult.error! },
-        { status: authResult.statusCode }
+        { status: authResult.statusCode },
       );
     }
 
@@ -265,7 +265,7 @@ export async function POST(
     } catch {
       return NextResponse.json(
         { success: false, message: "Invalid JSON in request body" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -278,7 +278,7 @@ export async function POST(
           message: "Validation failed",
           errors: validation.errors,
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -304,7 +304,7 @@ export async function POST(
 
     // Build map for quick lookup of extracurricular names
     const enrollmentExtracurricularMap = new Map(
-      existingEnrollments.map((e) => [e.id, e.extracurricular.name])
+      existingEnrollments.map((e) => [e.id, e.extracurricular.name]),
     );
 
     const existingIds = new Set(existingEnrollments.map((e) => e.id));
@@ -317,7 +317,7 @@ export async function POST(
           message: "Some enrollment IDs do not exist",
           errors: missingIds.map((id) => `Enrollment not found: ${id}`),
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -373,7 +373,7 @@ export async function POST(
     });
 
     console.log(
-      `[ATTENDANCE BATCH] Processed ${records.length} records for ${date} - Created: ${createdCount}, Updated: ${updatedCount}`
+      `[ATTENDANCE BATCH] Processed ${records.length} records for ${date} - Created: ${createdCount}, Updated: ${updatedCount}`,
     );
 
     // ----------------------------------------
@@ -389,10 +389,10 @@ export async function POST(
         record.enrollmentId,
         record.status,
         attendanceDate,
-        extracurricularName
+        extracurricularName,
       ).catch((err) => {
         console.error(
-          `[NOTIFICATION] Failed to create attendance notification: ${err}`
+          `[NOTIFICATION] Failed to create attendance notification: ${err}`,
         );
       });
     }
@@ -425,7 +425,7 @@ export async function POST(
             success: false,
             message: "One or more enrollment IDs are invalid.",
           },
-          { status: 400 }
+          { status: 400 },
         );
       }
     }
@@ -435,7 +435,7 @@ export async function POST(
         success: false,
         message: "Terjadi kesalahan pada server. Silakan coba lagi.",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -453,7 +453,7 @@ export async function GET(): Promise<
       message:
         "Method GET not allowed. Use /api/attendance with query params instead.",
     },
-    { status: 405 }
+    { status: 405 },
   );
 }
 
@@ -465,7 +465,7 @@ export async function PUT(): Promise<
       success: false,
       message: "Method PUT not allowed. Use POST for batch operations.",
     },
-    { status: 405 }
+    { status: 405 },
   );
 }
 
@@ -477,6 +477,6 @@ export async function DELETE(): Promise<
       success: false,
       message: "Method DELETE not allowed on batch endpoint.",
     },
-    { status: 405 }
+    { status: 405 },
   );
 }

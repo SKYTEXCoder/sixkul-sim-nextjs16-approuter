@@ -140,7 +140,7 @@ export async function getStudentPreferences(): Promise<PreferencesResult> {
  */
 export async function updateStudentPreference(
   field: keyof Omit<StudentPreferencesViewModel, "id">,
-  value: string | boolean | number
+  value: string | boolean | number,
 ): Promise<PreferencesResult> {
   try {
     const { userId, sessionClaims } = await auth();

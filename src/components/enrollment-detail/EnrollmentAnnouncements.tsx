@@ -1,9 +1,9 @@
 /**
  * Enrollment Announcements Component
- * 
+ *
  * Displays announcements for the extracurricular activity.
  * Server Component - no client-side interactivity needed.
- * 
+ *
  * @module components/enrollment-detail/EnrollmentAnnouncements
  */
 
@@ -23,7 +23,9 @@ interface EnrollmentAnnouncementsProps {
 // Main Component
 // ============================================
 
-export function EnrollmentAnnouncements({ announcements }: EnrollmentAnnouncementsProps) {
+export function EnrollmentAnnouncements({
+  announcements,
+}: EnrollmentAnnouncementsProps) {
   return (
     <Card>
       <CardHeader>
@@ -66,11 +68,14 @@ export function EnrollmentAnnouncements({ announcements }: EnrollmentAnnouncemen
                   <div className="flex items-center gap-1.5">
                     <Clock className="h-3.5 w-3.5" />
                     <span>
-                      {new Date(announcement.createdAt).toLocaleDateString("id-ID", {
-                        day: "numeric",
-                        month: "long",
-                        year: "numeric",
-                      })}
+                      {new Date(announcement.createdAt).toLocaleDateString(
+                        "id-ID",
+                        {
+                          day: "numeric",
+                          month: "long",
+                          year: "numeric",
+                        },
+                      )}
                     </span>
                   </div>
                 </div>

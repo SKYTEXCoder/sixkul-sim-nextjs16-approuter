@@ -64,7 +64,7 @@ export function getDayLabel(day: string): string {
  * Fetch all schedule templates for an extracurricular.
  */
 export async function getSchedulesByExtracurricular(
-  extracurricularId: string
+  extracurricularId: string,
 ): Promise<ScheduleTemplate[]> {
   const schedules = await prisma.schedule.findMany({
     where: {
@@ -119,7 +119,7 @@ export async function canDeleteSchedule(scheduleId: string): Promise<boolean> {
  */
 export async function createSchedule(
   data: CreateScheduleInput,
-  extracurricularId: string
+  extracurricularId: string,
 ): Promise<{ success: boolean; error?: string }> {
   try {
     await prisma.schedule.create({
@@ -148,7 +148,7 @@ export async function createSchedule(
 export async function updateSchedule(
   scheduleId: string,
   data: UpdateScheduleInput,
-  extracurricularId: string
+  extracurricularId: string,
 ): Promise<{ success: boolean; error?: string }> {
   try {
     await prisma.schedule.update({
@@ -171,7 +171,7 @@ export async function updateSchedule(
  */
 export async function deleteSchedule(
   scheduleId: string,
-  extracurricularId: string
+  extracurricularId: string,
 ): Promise<{ success: boolean; error?: string }> {
   try {
     // Check if can delete

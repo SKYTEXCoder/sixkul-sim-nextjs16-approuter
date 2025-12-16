@@ -1,19 +1,19 @@
 /**
  * SIXKUL Enrollment API Routes
- * 
+ *
  * POST /api/enrollment - Create a new enrollment (Student only)
  * GET /api/enrollment - Get all enrollments for current user
- * 
+ *
  * This route handles student registration to extracurricular activities
  * following the sequence diagram flow.
- * 
+ *
  * @module api/enrollment
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
-import { auth } from '@clerk/nextjs/server';
-import { getOrCreateStudentProfile } from '@/lib/sync-user';
+import { NextRequest, NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
+import { auth } from "@clerk/nextjs/server";
+import { getOrCreateStudentProfile } from "@/lib/sync-user";
 
 // ============================================
 // Type Definitions
@@ -75,7 +75,7 @@ function getCurrentAcademicYear(): string {
   const now = new Date();
   const year = now.getFullYear();
   const month = now.getMonth() + 1; // 0-indexed
-  
+
   // Academic year typically starts in July/August
   // If before July, we're in previous year's academic year
   if (month < 7) {
@@ -96,33 +96,34 @@ async function authenticateStudent(): Promise<{
 }> {
   try {
     const { userId, sessionClaims } = await auth();
-    
+
     if (!userId) {
       return {
         success: false,
-        error: 'Authentication required. Please login.',
+        error: "Authentication required. Please login.",
         statusCode: 401,
       };
     }
 
-    const userRole = (sessionClaims?.public_metadata as { role?: string })?.role;
-    
+    const userRole = (sessionClaims?.public_metadata as { role?: string })
+      ?.role;
+
     // Check if user has SISWA role
-    if (userRole !== 'SISWA') {
+    if (userRole !== "SISWA") {
       return {
         success: false,
-        error: 'Only students can enroll in extracurriculars.',
+        error: "Only students can enroll in extracurriculars.",
         statusCode: 403,
       };
     }
 
     // Use JIT sync to get or create student profile
     const result = await getOrCreateStudentProfile(userId, sessionClaims);
-    
+
     if (!result) {
       return {
         success: false,
-        error: 'Student profile not found or could not be created.',
+        error: "Student profile not found or could not be created.",
         statusCode: 404,
       };
     }
@@ -133,10 +134,10 @@ async function authenticateStudent(): Promise<{
       studentProfileId: result.studentProfile.id,
     };
   } catch (error) {
-    console.error('[ENROLLMENT AUTH ERROR]', error);
+    console.error("[ENROLLMENT AUTH ERROR]", error);
     return {
       success: false,
-      error: 'Authentication failed. Please login again.',
+      error: "Authentication failed. Please login again.",
       statusCode: 401,
     };
   }
@@ -152,18 +153,18 @@ function validateEnrollmentInput(body: unknown): {
 } {
   const errors: string[] = [];
 
-  if (!body || typeof body !== 'object') {
-    return { valid: false, errors: ['Request body is required'] };
+  if (!body || typeof body !== "object") {
+    return { valid: false, errors: ["Request body is required"] };
   }
 
   const { extracurricularId } = body as Partial<EnrollmentRequestBody>;
 
   if (!extracurricularId) {
-    errors.push('extracurricularId is required');
-  } else if (typeof extracurricularId !== 'string') {
-    errors.push('extracurricularId must be a string');
+    errors.push("extracurricularId is required");
+  } else if (typeof extracurricularId !== "string") {
+    errors.push("extracurricularId must be a string");
   } else if (extracurricularId.trim().length === 0) {
-    errors.push('extracurricularId cannot be empty');
+    errors.push("extracurricularId cannot be empty");
   }
 
   if (errors.length > 0) {
@@ -182,7 +183,7 @@ function validateEnrollmentInput(body: unknown): {
 
 /**
  * Handle POST request to create a new enrollment
- * 
+ *
  * Flow (per sequence diagram):
  * 1. Authenticate user and verify SISWA role
  * 2. Validate request body (extracurricularId)
@@ -193,18 +194,18 @@ function validateEnrollmentInput(body: unknown): {
  * 7. Return 201 Created with enrollment data
  */
 export async function POST(
-  request: NextRequest
+  request: NextRequest,
 ): Promise<NextResponse<EnrollmentSuccessResponse | EnrollmentErrorResponse>> {
   try {
     // ----------------------------------------
     // Step 1: Authenticate user and verify SISWA role
     // ----------------------------------------
     const authResult = await authenticateStudent();
-    
+
     if (!authResult.success) {
       return NextResponse.json(
         { success: false, message: authResult.error! },
-        { status: authResult.statusCode }
+        { status: authResult.statusCode },
       );
     }
 
@@ -218,21 +219,21 @@ export async function POST(
       body = await request.json();
     } catch {
       return NextResponse.json(
-        { success: false, message: 'Invalid JSON in request body' },
-        { status: 400 }
+        { success: false, message: "Invalid JSON in request body" },
+        { status: 400 },
       );
     }
 
     const validation = validateEnrollmentInput(body);
-    
+
     if (!validation.valid || !validation.data) {
       return NextResponse.json(
         {
           success: false,
-          message: 'Validation failed',
+          message: "Validation failed",
           errors: validation.errors,
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -255,19 +256,20 @@ export async function POST(
       return NextResponse.json(
         {
           success: false,
-          message: 'Ekstrakurikuler tidak ditemukan.',
+          message: "Ekstrakurikuler tidak ditemukan.",
         },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
-    if (extracurricular.status !== 'ACTIVE') {
+    if (extracurricular.status !== "ACTIVE") {
       return NextResponse.json(
         {
           success: false,
-          message: 'Ekstrakurikuler ini tidak aktif dan tidak menerima pendaftaran.',
+          message:
+            "Ekstrakurikuler ini tidak aktif dan tidak menerima pendaftaran.",
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -287,15 +289,15 @@ export async function POST(
     // ----------------------------------------
     if (existingEnrollment) {
       console.log(
-        `[ENROLLMENT] Duplicate enrollment attempt - Student: ${studentProfileId}, Ekstrakurikuler: ${extracurricularId}`
+        `[ENROLLMENT] Duplicate enrollment attempt - Student: ${studentProfileId}, Ekstrakurikuler: ${extracurricularId}`,
       );
-      
+
       return NextResponse.json(
         {
           success: false,
-          message: 'Anda sudah terdaftar di ekstrakurikuler ini.',
+          message: "Anda sudah terdaftar di ekstrakurikuler ini.",
         },
-        { status: 409 }
+        { status: 409 },
       );
     }
 
@@ -309,7 +311,7 @@ export async function POST(
       data: {
         student_id: studentProfileId,
         extracurricular_id: extracurricularId,
-        status: 'PENDING', // Requires approval from Pembina
+        status: "PENDING", // Requires approval from Pembina
         academic_year: academicYear,
       },
       include: {
@@ -324,7 +326,7 @@ export async function POST(
     });
 
     console.log(
-      `[ENROLLMENT] New enrollment created - ID: ${newEnrollment.id}, Student: ${studentProfileId}, Ekstrakurikuler: ${extracurricular.name}`
+      `[ENROLLMENT] New enrollment created - ID: ${newEnrollment.id}, Student: ${studentProfileId}, Ekstrakurikuler: ${extracurricular.name}`,
     );
 
     // ----------------------------------------
@@ -334,7 +336,7 @@ export async function POST(
     return NextResponse.json(
       {
         success: true,
-        message: 'Pendaftaran berhasil! Menunggu persetujuan pembina.',
+        message: "Pendaftaran berhasil! Menunggu persetujuan pembina.",
         data: {
           id: newEnrollment.id,
           student_id: newEnrollment.student_id,
@@ -345,21 +347,20 @@ export async function POST(
           extracurricular: newEnrollment.extracurricular,
         },
       },
-      { status: 201 }
+      { status: 201 },
     );
-
   } catch (error) {
     // ----------------------------------------
     // Error Handling - Return 500 Internal Server Error
     // ----------------------------------------
-    console.error('[ENROLLMENT ERROR]', error);
+    console.error("[ENROLLMENT ERROR]", error);
 
     return NextResponse.json(
       {
         success: false,
-        message: 'Terjadi kesalahan pada server. Silakan coba lagi.',
+        message: "Terjadi kesalahan pada server. Silakan coba lagi.",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -370,21 +371,21 @@ export async function POST(
 
 /**
  * Handle GET request to list all enrollments for current user
- * 
+ *
  * For SISWA: Returns their own enrollments
  * Can be extended for PEMBINA/ADMIN to see all enrollments
  */
 export async function GET(
-  request: NextRequest
+  request: NextRequest,
 ): Promise<NextResponse<EnrollmentListResponse | EnrollmentErrorResponse>> {
   try {
     // Authenticate user
     const authResult = await authenticateStudent();
-    
+
     if (!authResult.success) {
       return NextResponse.json(
         { success: false, message: authResult.error! },
-        { status: authResult.statusCode }
+        { status: authResult.statusCode },
       );
     }
 
@@ -403,12 +404,12 @@ export async function GET(
           },
         },
       },
-      orderBy: { joined_at: 'desc' },
+      orderBy: { joined_at: "desc" },
     });
 
     return NextResponse.json({
       success: true,
-      message: 'Enrollments retrieved successfully',
+      message: "Enrollments retrieved successfully",
       data: enrollments.map((e) => ({
         id: e.id,
         status: e.status,
@@ -417,16 +418,15 @@ export async function GET(
         extracurricular: e.extracurricular,
       })),
     });
-
   } catch (error) {
-    console.error('[ENROLLMENT GET ERROR]', error);
+    console.error("[ENROLLMENT GET ERROR]", error);
 
     return NextResponse.json(
       {
         success: false,
-        message: 'Terjadi kesalahan pada server. Silakan coba lagi.',
+        message: "Terjadi kesalahan pada server. Silakan coba lagi.",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -439,9 +439,9 @@ export async function PUT(): Promise<NextResponse<EnrollmentErrorResponse>> {
   return NextResponse.json(
     {
       success: false,
-      message: 'Method PUT not allowed on this endpoint.',
+      message: "Method PUT not allowed on this endpoint.",
     },
-    { status: 405 }
+    { status: 405 },
   );
 }
 
@@ -449,8 +449,9 @@ export async function DELETE(): Promise<NextResponse<EnrollmentErrorResponse>> {
   return NextResponse.json(
     {
       success: false,
-      message: 'Method DELETE not allowed on this endpoint. Use /api/enrollment/[id] instead.',
+      message:
+        "Method DELETE not allowed on this endpoint. Use /api/enrollment/[id] instead.",
     },
-    { status: 405 }
+    { status: 405 },
   );
 }

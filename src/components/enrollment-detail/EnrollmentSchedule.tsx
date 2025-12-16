@@ -1,9 +1,9 @@
 /**
  * Enrollment Schedule Component
- * 
+ *
  * Displays upcoming sessions for the extracurricular activity.
  * Server Component - no client-side interactivity needed.
- * 
+ *
  * @module components/enrollment-detail/EnrollmentSchedule
  */
 
@@ -24,18 +24,36 @@ interface EnrollmentScheduleProps {
 // ============================================
 
 function formatDate(date: Date): string {
-  const dayNames = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-  const monthNames = [
-    'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-    'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+  const dayNames = [
+    "Minggu",
+    "Senin",
+    "Selasa",
+    "Rabu",
+    "Kamis",
+    "Jumat",
+    "Sabtu",
   ];
-  
+  const monthNames = [
+    "Januari",
+    "Februari",
+    "Maret",
+    "April",
+    "Mei",
+    "Juni",
+    "Juli",
+    "Agustus",
+    "September",
+    "Oktober",
+    "November",
+    "Desember",
+  ];
+
   const d = new Date(date);
   const dayName = dayNames[d.getDay()];
   const day = d.getDate();
   const month = monthNames[d.getMonth()];
   const year = d.getFullYear();
-  
+
   return `${dayName}, ${day} ${month} ${year}`;
 }
 

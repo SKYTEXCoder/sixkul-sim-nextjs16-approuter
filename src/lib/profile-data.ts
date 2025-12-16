@@ -165,10 +165,10 @@ export async function getStudentProfile(): Promise<ProfileResult> {
     const enrollments = user.studentProfile.enrollments;
     const totalEnrollments = enrollments.length;
     const activeEnrollments = enrollments.filter(
-      (e) => e.status === "ACTIVE"
+      (e) => e.status === "ACTIVE",
     ).length;
     const pendingEnrollments = enrollments.filter(
-      (e) => e.status === "PENDING"
+      (e) => e.status === "PENDING",
     ).length;
 
     // Step 7: Build view model with full data

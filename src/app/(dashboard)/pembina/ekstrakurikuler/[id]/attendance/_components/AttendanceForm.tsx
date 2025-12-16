@@ -144,7 +144,7 @@ export function AttendanceForm({
   // Handle status change
   const handleStatusChange = (
     enrollmentId: string,
-    status: AttendanceStatus
+    status: AttendanceStatus,
   ) => {
     setAttendanceMap((prev) => ({
       ...prev,
@@ -165,13 +165,13 @@ export function AttendanceForm({
         ([enrollmentId, status]) => ({
           enrollmentId,
           status,
-        })
+        }),
       );
 
       const result = await saveAttendanceAction(
         selectedSessionId,
         extracurricularId,
-        records
+        records,
       );
 
       if (result.success) {
@@ -328,7 +328,7 @@ export function AttendanceForm({
                           onValueChange={(value) =>
                             handleStatusChange(
                               enrollment.enrollmentId,
-                              value as AttendanceStatus
+                              value as AttendanceStatus,
                             )
                           }
                           className="flex flex-wrap gap-3 justify-center"

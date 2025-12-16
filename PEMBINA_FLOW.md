@@ -60,7 +60,6 @@ Flow:
 1. System validates ownership (pembina_id match)
 2. Hub page loads metadata + summary counts
 3. Internal navigation becomes available:
-
    - Schedules
    - Sessions
    - Attendance
@@ -83,7 +82,6 @@ Flow:
 
 1. PEMBINA views existing schedule templates
 2. PEMBINA creates or edits a schedule template
-
    - day_of_week
    - start_time
    - end_time
@@ -104,7 +102,6 @@ Guards:
 Flow:
 
 1. PEMBINA views list of sessions
-
    - upcoming
    - past
 
@@ -157,7 +154,6 @@ Flow:
 1. PEMBINA selects Approve or Reject
 2. System validates ownership
 3. Enrollment status transitions:
-
    - `PENDING → ACTIVE`
    - `PENDING → REJECTED`
 

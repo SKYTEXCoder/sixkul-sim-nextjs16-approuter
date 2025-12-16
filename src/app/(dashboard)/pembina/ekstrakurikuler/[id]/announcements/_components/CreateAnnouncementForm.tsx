@@ -31,7 +31,7 @@ export function CreateAnnouncementForm({
     try {
       const result = await createAnnouncementAction(
         extracurricularId,
-        formData
+        formData,
       );
 
       if (result.success) {

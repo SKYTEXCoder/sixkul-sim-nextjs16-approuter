@@ -1,16 +1,16 @@
 /**
  * SIXKUL Pembina Extracurricular Students API Route
- * 
+ *
  * GET /api/pembina/extracurriculars/[id]/students - Fetch students enrolled in extracurricular
  * Also returns schedule data for date validation
- * 
+ *
  * @module api/pembina/extracurriculars/[id]/students
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
-import { auth } from '@clerk/nextjs/server';
-import { getOrCreatePembinaProfile } from '@/lib/sync-user';
+import { NextRequest, NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
+import { auth } from "@clerk/nextjs/server";
+import { getOrCreatePembinaProfile } from "@/lib/sync-user";
 
 // ============================================
 // Type Definitions
@@ -63,32 +63,33 @@ async function authenticatePembina(): Promise<{
 }> {
   try {
     const { userId, sessionClaims } = await auth();
-    
+
     if (!userId) {
       return {
         success: false,
-        error: 'Authentication required. Please login.',
+        error: "Authentication required. Please login.",
         statusCode: 401,
       };
     }
 
-    const userRole = (sessionClaims?.public_metadata as { role?: string })?.role;
-    
-    if (userRole !== 'PEMBINA' && userRole !== 'ADMIN') {
+    const userRole = (sessionClaims?.public_metadata as { role?: string })
+      ?.role;
+
+    if (userRole !== "PEMBINA" && userRole !== "ADMIN") {
       return {
         success: false,
-        error: 'Only Pembina can access this resource.',
+        error: "Only Pembina can access this resource.",
         statusCode: 403,
       };
     }
 
     // Use JIT sync to get or create pembina profile
     const result = await getOrCreatePembinaProfile(userId, sessionClaims);
-    
+
     if (!result) {
       return {
         success: false,
-        error: 'Pembina profile not found or could not be created.',
+        error: "Pembina profile not found or could not be created.",
         statusCode: 404,
       };
     }
@@ -98,10 +99,10 @@ async function authenticatePembina(): Promise<{
       pembinaProfileId: result.pembinaProfile.id,
     };
   } catch (error) {
-    console.error('[PEMBINA AUTH ERROR]', error);
+    console.error("[PEMBINA AUTH ERROR]", error);
     return {
       success: false,
-      error: 'Authentication failed. Please login again.',
+      error: "Authentication failed. Please login again.",
       statusCode: 401,
     };
   }
@@ -113,18 +114,18 @@ async function authenticatePembina(): Promise<{
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ id: string }> },
 ): Promise<NextResponse<SuccessResponse | ErrorResponse>> {
   try {
     const { id: extracurricularId } = await params;
 
     // Authenticate pembina
     const authResult = await authenticatePembina();
-    
+
     if (!authResult.success || !authResult.pembinaProfileId) {
       return NextResponse.json(
         { success: false, message: authResult.error! },
-        { status: authResult.statusCode }
+        { status: authResult.statusCode },
       );
     }
 
@@ -139,8 +140,11 @@ export async function GET(
 
     if (!extracurricular) {
       return NextResponse.json(
-        { success: false, message: 'Extracurricular not found or not authorized.' },
-        { status: 404 }
+        {
+          success: false,
+          message: "Extracurricular not found or not authorized.",
+        },
+        { status: 404 },
       );
     }
 
@@ -157,7 +161,7 @@ export async function GET(
         location: true,
       },
       orderBy: {
-        day_of_week: 'asc',
+        day_of_week: "asc",
       },
     });
 
@@ -165,7 +169,7 @@ export async function GET(
     const enrollments = await prisma.enrollment.findMany({
       where: {
         extracurricular_id: extracurricularId,
-        status: 'ACTIVE',
+        status: "ACTIVE",
       },
       select: {
         id: true,
@@ -185,7 +189,7 @@ export async function GET(
       orderBy: {
         student: {
           user: {
-            full_name: 'asc',
+            full_name: "asc",
           },
         },
       },
@@ -204,21 +208,20 @@ export async function GET(
 
     return NextResponse.json({
       success: true,
-      message: 'Students and schedules fetched successfully',
+      message: "Students and schedules fetched successfully",
       data: {
         schedules,
         students,
       },
     });
-
   } catch (error) {
-    console.error('[PEMBINA STUDENTS ERROR]', error);
+    console.error("[PEMBINA STUDENTS ERROR]", error);
     return NextResponse.json(
       {
         success: false,
-        message: 'Terjadi kesalahan pada server. Silakan coba lagi.',
+        message: "Terjadi kesalahan pada server. Silakan coba lagi.",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

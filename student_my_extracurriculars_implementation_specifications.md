@@ -14,16 +14,16 @@ This document is a **command‑level implementation specification**.
 
 The Agentic AI IDE (Claude Opus 4.5 Thinking) MUST:
 
-* design the UI/UX
-* implement all frontend pages
-* implement all backend **data-access logic using Prisma ORM**
-* **MUST NOT create new REST API endpoints for this feature**
-* integrate Clerk Authentication
-* integrate Supabase PostgreSQL **via Prisma Client**
-* strictly use the existing `schema.prisma` models
-* respect the existing `seed.ts` data (DO NOT reseed unless explicitly required)
-* handle RBAC correctly
-* deliver a **fully usable, testable feature** for end users
+- design the UI/UX
+- implement all frontend pages
+- implement all backend **data-access logic using Prisma ORM**
+- **MUST NOT create new REST API endpoints for this feature**
+- integrate Clerk Authentication
+- integrate Supabase PostgreSQL **via Prisma Client**
+- strictly use the existing `schema.prisma` models
+- respect the existing `seed.ts` data (DO NOT reseed unless explicitly required)
+- handle RBAC correctly
+- deliver a **fully usable, testable feature** for end users
 
 This document does **NOT** describe ideas. It describes **required behavior**.
 
@@ -49,9 +49,9 @@ STUDENT (SISWA) ONLY
 
 Allow a student to:
 
-* view all extracurriculars they are enrolled in
-* clearly see enrollment status
-* navigate to related student features (detail, schedule, attendance)
+- view all extracurriculars they are enrolled in
+- clearly see enrollment status
+- navigate to related student features (detail, schedule, attendance)
 
 ---
 
@@ -59,13 +59,13 @@ Allow a student to:
 
 ### Authentication
 
-* Use **Clerk Authentication** exclusively
-* Identify user via `auth()` / `currentUser()`
+- Use **Clerk Authentication** exclusively
+- Identify user via `auth()` / `currentUser()`
 
 ### Role Validation
 
-* User role MUST be stored in Clerk metadata under `role`
-* Access is allowed ONLY if:
+- User role MUST be stored in Clerk metadata under `role`
+- Access is allowed ONLY if:
 
 ```
 role === 'STUDENT' || role === 'SISWA'
@@ -73,8 +73,8 @@ role === 'STUDENT' || role === 'SISWA'
 
 ### Route Protection (Protected Routes Implementation)
 
-* `/student/enrollments` MUST be protected via Clerk middleware
-* Unauthorized users MUST receive `403` or redirect.
+- `/student/enrollments` MUST be protected via Clerk middleware
+- Unauthorized users MUST receive `403` or redirect.
 
 ---
 
@@ -83,11 +83,11 @@ role === 'STUDENT' || role === 'SISWA'
 ### 3.1 users (Prisma model: `User`)
 
 ```ts
-id: uuid (PK)
-clerk_user_id: string (unique)
-name: string
-email: string
-role: 'STUDENT' | 'PEMBINA' | 'ADMIN'
+id: uuid(PK);
+clerk_user_id: string(unique);
+name: string;
+email: string;
+role: "STUDENT" | "PEMBINA" | "ADMIN";
 ```
 
 ### 3.2 extracurriculars (Prisma model: `Extracurricular`)
@@ -115,12 +115,12 @@ created_at: timestamp
 ### 3.4 schedules (Prisma model: `Schedule`, READ-ONLY) (READ‑ONLY)
 
 ```ts
-id: uuid
-extracurricular_id: uuid
-day: string
-time_start: time
-time_end: time
-location: string
+id: uuid;
+extracurricular_id: uuid;
+day: string;
+time_start: time;
+time_end: time;
+location: string;
 ```
 
 ---
@@ -129,16 +129,16 @@ location: string
 
 If **no enrollments exist** for the currently-logged-in STUDENT / SISWA user account:
 
-* FIRST check existing data using Prisma Client
-* DO NOT re-run `seed.ts`
-* DO NOT create duplicate data
-* Only rely on existing seeded data created by `seed.ts`
+- FIRST check existing data using Prisma Client
+- DO NOT re-run `seed.ts`
+- DO NOT create duplicate data
+- Only rely on existing seeded data created by `seed.ts`
 
 Seeding rules:
 
-* `seed.ts` is already executed and considered the source of truth
-* The application MUST gracefully handle empty datasets
-* No runtime seeding logic may mutate production data
+- `seed.ts` is already executed and considered the source of truth
+- The application MUST gracefully handle empty datasets
+- No runtime seeding logic may mutate production data
 
 ---
 
@@ -150,8 +150,8 @@ Data MUST be fetched directly in **Server Components or Server Actions** using P
 
 #### Authorization (REQUIRED)
 
-* Clerk authenticated
-* role === STUDENT
+- Clerk authenticated
+- role === STUDENT
 
 #### Prisma Query (REQUIRED)
 
@@ -171,12 +171,12 @@ const enrollments = await prisma.enrollment.findMany({
     },
   },
   orderBy: {
-    created_at: 'desc',
+    created_at: "desc",
   },
 });
 ```
 
-The data MUST then be mapped into a view model for rendering.      }
+The data MUST then be mapped into a view model for rendering. }
 }
 ]
 }

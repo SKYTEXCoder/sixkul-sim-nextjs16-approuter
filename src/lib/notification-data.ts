@@ -123,7 +123,7 @@ export async function getStudentNotifications(): Promise<NotificationsResult> {
         createdAt: n.created_at,
         enrollmentId: n.enrollment_id,
         extracurricularName: n.enrollment?.extracurricular?.name,
-      })
+      }),
     );
 
     return {
@@ -197,7 +197,7 @@ export async function getUnreadNotificationCount(): Promise<number> {
  * Server Action with revalidatePath for UI refresh.
  */
 export async function markNotificationAsRead(
-  notificationId: string
+  notificationId: string,
 ): Promise<ActionResult> {
   try {
     const { userId, sessionClaims } = await auth();

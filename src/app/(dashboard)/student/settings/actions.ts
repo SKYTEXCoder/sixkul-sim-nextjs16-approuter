@@ -14,7 +14,7 @@ import {
 
 export async function updatePreferenceAction(
   field: keyof Omit<StudentPreferencesViewModel, "id">,
-  value: string | boolean | number
+  value: string | boolean | number,
 ): Promise<PreferencesResult> {
   return updateStudentPreference(field, value);
 }

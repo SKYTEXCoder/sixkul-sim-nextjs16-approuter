@@ -1,19 +1,19 @@
 /**
  * SIXKUL Attendance API Route
- * 
+ *
  * GET /api/attendance - Fetch existing attendance records for date + extracurricular
- * 
+ *
  * Query params:
  * - extracurricularId: string (required)
  * - date: string ISO date (required)
- * 
+ *
  * @module api/attendance
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
-import { auth } from '@clerk/nextjs/server';
-import { getOrCreatePembinaProfile } from '@/lib/sync-user';
+import { NextRequest, NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
+import { auth } from "@clerk/nextjs/server";
+import { getOrCreatePembinaProfile } from "@/lib/sync-user";
 
 // ============================================
 // Type Definitions
@@ -54,32 +54,33 @@ async function authenticatePembina(): Promise<{
 }> {
   try {
     const { userId, sessionClaims } = await auth();
-    
+
     if (!userId) {
       return {
         success: false,
-        error: 'Authentication required. Please login.',
+        error: "Authentication required. Please login.",
         statusCode: 401,
       };
     }
 
-    const userRole = (sessionClaims?.public_metadata as { role?: string })?.role;
-    
-    if (userRole !== 'PEMBINA' && userRole !== 'ADMIN') {
+    const userRole = (sessionClaims?.public_metadata as { role?: string })
+      ?.role;
+
+    if (userRole !== "PEMBINA" && userRole !== "ADMIN") {
       return {
         success: false,
-        error: 'Only Pembina can access this resource.',
+        error: "Only Pembina can access this resource.",
         statusCode: 403,
       };
     }
 
     // Use JIT sync to get or create pembina profile
     const result = await getOrCreatePembinaProfile(userId, sessionClaims);
-    
+
     if (!result) {
       return {
         success: false,
-        error: 'Pembina profile not found or could not be created.',
+        error: "Pembina profile not found or could not be created.",
         statusCode: 404,
       };
     }
@@ -89,10 +90,10 @@ async function authenticatePembina(): Promise<{
       pembinaProfileId: result.pembinaProfile.id,
     };
   } catch (error) {
-    console.error('[ATTENDANCE AUTH ERROR]', error);
+    console.error("[ATTENDANCE AUTH ERROR]", error);
     return {
       success: false,
-      error: 'Authentication failed. Please login again.',
+      error: "Authentication failed. Please login again.",
       statusCode: 401,
     };
   }
@@ -103,35 +104,35 @@ async function authenticatePembina(): Promise<{
 // ============================================
 
 export async function GET(
-  request: NextRequest
+  request: NextRequest,
 ): Promise<NextResponse<SuccessResponse | ErrorResponse>> {
   try {
     // Authenticate pembina
     const authResult = await authenticatePembina();
-    
+
     if (!authResult.success || !authResult.pembinaProfileId) {
       return NextResponse.json(
         { success: false, message: authResult.error! },
-        { status: authResult.statusCode }
+        { status: authResult.statusCode },
       );
     }
 
     // Parse query parameters
     const { searchParams } = new URL(request.url);
-    const extracurricularId = searchParams.get('extracurricularId');
-    const dateStr = searchParams.get('date');
+    const extracurricularId = searchParams.get("extracurricularId");
+    const dateStr = searchParams.get("date");
 
     if (!extracurricularId) {
       return NextResponse.json(
-        { success: false, message: 'extracurricularId is required' },
-        { status: 400 }
+        { success: false, message: "extracurricularId is required" },
+        { status: 400 },
       );
     }
 
     if (!dateStr) {
       return NextResponse.json(
-        { success: false, message: 'date is required' },
-        { status: 400 }
+        { success: false, message: "date is required" },
+        { status: 400 },
       );
     }
 
@@ -139,8 +140,8 @@ export async function GET(
     const date = new Date(dateStr);
     if (isNaN(date.getTime())) {
       return NextResponse.json(
-        { success: false, message: 'Invalid date format' },
-        { status: 400 }
+        { success: false, message: "Invalid date format" },
+        { status: 400 },
       );
     }
 
@@ -158,8 +159,11 @@ export async function GET(
 
     if (!extracurricular) {
       return NextResponse.json(
-        { success: false, message: 'Extracurricular not found or not authorized.' },
-        { status: 404 }
+        {
+          success: false,
+          message: "Extracurricular not found or not authorized.",
+        },
+        { status: 404 },
       );
     }
 
@@ -187,23 +191,23 @@ export async function GET(
 
     return NextResponse.json({
       success: true,
-      message: records.length > 0 
-        ? 'Existing attendance records found' 
-        : 'No existing attendance records',
+      message:
+        records.length > 0
+          ? "Existing attendance records found"
+          : "No existing attendance records",
       data: {
         hasExistingRecords: records.length > 0,
         records,
       },
     });
-
   } catch (error) {
-    console.error('[ATTENDANCE FETCH ERROR]', error);
+    console.error("[ATTENDANCE FETCH ERROR]", error);
     return NextResponse.json(
       {
         success: false,
-        message: 'Terjadi kesalahan pada server. Silakan coba lagi.',
+        message: "Terjadi kesalahan pada server. Silakan coba lagi.",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

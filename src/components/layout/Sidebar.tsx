@@ -129,20 +129,20 @@ export function Sidebar({
     <aside
       className={cn(
         "fixed left-0 top-0 z-40 h-screen bg-slate-900 border-r border-slate-800 transition-all duration-300 flex flex-col",
-        isCollapsed ? "w-20" : "w-64"
+        isCollapsed ? "w-20" : "w-64",
       )}
     >
       {/* Header / Logo */}
       <div
         className={cn(
           "flex items-center gap-3 px-4 py-5 border-b border-slate-800",
-          isCollapsed ? "justify-center" : ""
+          isCollapsed ? "justify-center" : "",
         )}
       >
         <div
           className={cn(
             "flex items-center justify-center w-10 h-10 rounded-xl bg-gradient-to-br",
-            gradientColor
+            gradientColor,
           )}
         >
           <GraduationCap className="w-5 h-5 text-white" />
@@ -171,13 +171,13 @@ export function Sidebar({
                     "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200 group",
                     isActive
                       ? `bg-gradient-to-r ${gradientColor} text-white shadow-lg`
-                      : "text-slate-400 hover:text-white hover:bg-slate-800/50"
+                      : "text-slate-400 hover:text-white hover:bg-slate-800/50",
                   )}
                 >
                   <Icon
                     className={cn(
                       "flex-shrink-0 w-5 h-5 transition-transform",
-                      isActive ? "scale-110" : "group-hover:scale-110"
+                      isActive ? "scale-110" : "group-hover:scale-110",
                     )}
                   />
                   {!isCollapsed && (
@@ -189,7 +189,7 @@ export function Sidebar({
                             "ml-auto text-xs font-semibold px-2 py-0.5 rounded-full",
                             isActive
                               ? "bg-white/20 text-white"
-                              : "bg-slate-700 text-slate-300"
+                              : "bg-slate-700 text-slate-300",
                           )}
                         >
                           {item.badge}
@@ -208,7 +208,7 @@ export function Sidebar({
       <div
         className={cn(
           "border-t border-slate-800 p-4",
-          isCollapsed ? "flex justify-center" : ""
+          isCollapsed ? "flex justify-center" : "",
         )}
       >
         <DropdownMenu>
@@ -217,7 +217,7 @@ export function Sidebar({
               className={cn(
                 "flex items-center gap-3 w-full rounded-lg p-2 -m-2 transition-colors",
                 "hover:bg-slate-800/50 cursor-pointer focus:outline-none focus:ring-2 focus:ring-slate-600",
-                isCollapsed ? "justify-center" : ""
+                isCollapsed ? "justify-center" : "",
               )}
             >
               <Avatar className="h-10 w-10 border-2 border-slate-700">
@@ -256,8 +256,8 @@ export function Sidebar({
                   user.role === "SISWA"
                     ? "/student/profile"
                     : user.role === "PEMBINA"
-                    ? "/pembina/profile"
-                    : "/admin/profile"
+                      ? "/pembina/profile"
+                      : "/admin/profile"
                 }
               >
                 <User className="mr-2 h-4 w-4" />

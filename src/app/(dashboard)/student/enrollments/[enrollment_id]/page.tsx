@@ -1,9 +1,9 @@
 /**
  * Student Enrollment Detail Page (Server Component)
- * 
+ *
  * Shows detailed information about a student's enrollment in an extracurricular.
  * Displays status, schedules, attendance, and announcements.
- * 
+ *
  * @module app/(dashboard)/student/enrollments/[enrollment_id]/page
  */
 
@@ -98,15 +98,18 @@ function NonActiveStatusMessage({ status }: { status: string }) {
   const messages = {
     PENDING: {
       title: "Pendaftaran Sedang Diproses",
-      description: "Pendaftaran kamu sedang menunggu persetujuan dari pembina. Kamu akan dapat mengakses jadwal, absensi, dan pengumuman setelah pendaftaran disetujui.",
+      description:
+        "Pendaftaran kamu sedang menunggu persetujuan dari pembina. Kamu akan dapat mengakses jadwal, absensi, dan pengumuman setelah pendaftaran disetujui.",
     },
     REJECTED: {
       title: "Pendaftaran Ditolak",
-      description: "Maaf, pendaftaran kamu ke ekstrakurikuler ini telah ditolak. Silakan hubungi pembina untuk informasi lebih lanjut.",
+      description:
+        "Maaf, pendaftaran kamu ke ekstrakurikuler ini telah ditolak. Silakan hubungi pembina untuk informasi lebih lanjut.",
     },
     ALUMNI: {
       title: "Status Alumni",
-      description: "Kamu sudah berstatus alumni di ekstrakurikuler ini. Terima kasih atas partisipasimu!",
+      description:
+        "Kamu sudah berstatus alumni di ekstrakurikuler ini. Terima kasih atas partisipasimu!",
     },
     CANCELLED: {
       title: "Pendaftaran Dibatalkan",

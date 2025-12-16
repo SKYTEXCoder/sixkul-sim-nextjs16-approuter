@@ -17,7 +17,7 @@ interface NotificationSectionProps {
   notifyAttendance: boolean;
   onToggle: (
     field: "notifyAnnouncements" | "notifyScheduleChanges" | "notifyAttendance",
-    value: boolean
+    value: boolean,
   ) => void;
 }
 
@@ -75,7 +75,7 @@ export function NotificationSection({
                       "w-10 h-10 rounded-xl flex items-center justify-center",
                       isEnabled
                         ? "bg-violet-100 dark:bg-violet-900/30"
-                        : "bg-slate-200 dark:bg-slate-700"
+                        : "bg-slate-200 dark:bg-slate-700",
                     )}
                   >
                     <Icon
@@ -83,7 +83,7 @@ export function NotificationSection({
                         "w-5 h-5",
                         isEnabled
                           ? "text-violet-500"
-                          : "text-slate-400 dark:text-slate-500"
+                          : "text-slate-400 dark:text-slate-500",
                       )}
                     />
                   </div>

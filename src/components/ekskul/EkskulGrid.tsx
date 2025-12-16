@@ -151,7 +151,7 @@ export function EkskulGrid({ extracurriculars }: EkskulGridProps) {
         ekskul.name.toLowerCase().includes(query) ||
         ekskul.category.toLowerCase().includes(query) ||
         (ekskul.description?.toLowerCase().includes(query) ?? false) ||
-        ekskul.pembina.user.full_name.toLowerCase().includes(query)
+        ekskul.pembina.user.full_name.toLowerCase().includes(query),
     );
   }, [extracurriculars, searchQuery]);
 
@@ -236,7 +236,7 @@ export function EkskulGrid({ extracurriculars }: EkskulGridProps) {
             const categoryColor =
               categoryColors[ekskul.category] || categoryColors.default;
             const memberCount = ekskul.enrollments.filter(
-              (e) => e.status === "ACTIVE"
+              (e) => e.status === "ACTIVE",
             ).length;
             const CategoryIcon = getCategoryIcon(ekskul.category, ekskul.name);
             const gradient =

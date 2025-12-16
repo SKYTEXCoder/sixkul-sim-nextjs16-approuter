@@ -55,7 +55,7 @@ export function EnrollmentList({
     try {
       const result = await approveEnrollmentAction(
         enrollmentId,
-        extracurricularId
+        extracurricularId,
       );
 
       if (result.success) {
@@ -77,7 +77,7 @@ export function EnrollmentList({
     try {
       const result = await rejectEnrollmentAction(
         enrollmentId,
-        extracurricularId
+        extracurricularId,
       );
 
       if (result.success) {

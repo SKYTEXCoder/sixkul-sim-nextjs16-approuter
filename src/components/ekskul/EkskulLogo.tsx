@@ -2,10 +2,10 @@
 
 /**
  * Ekskul Logo Component
- * 
+ *
  * Displays extracurricular logo with fallback to category icon on error.
  * Handles 404 and invalid image URLs gracefully.
- * 
+ *
  * @module components/ekskul/EkskulLogo
  */
 
@@ -42,25 +42,55 @@ interface EkskulLogoProps {
 
 function getCategoryIcon(category: string, name: string): LucideIcon {
   const nameLower = name.toLowerCase();
-  
+
   // Check name for specific keywords first
-  if (nameLower.includes("game") || nameLower.includes("video")) return Gamepad2;
-  if (nameLower.includes("musik") || nameLower.includes("band") || nameLower.includes("drum")) return Music;
-  if (nameLower.includes("basket") || nameLower.includes("futsal") || nameLower.includes("voli")) return Trophy;
-  if (nameLower.includes("tenis") || nameLower.includes("bulutangkis")) return Dumbbell;
-  if (nameLower.includes("robotik") || nameLower.includes("komputer") || nameLower.includes("programming")) return Monitor;
-  if (nameLower.includes("pramuka") || nameLower.includes("paskibra")) return Compass;
-  if (nameLower.includes("lukis") || nameLower.includes("seni") || nameLower.includes("tari")) return Palette;
-  
+  if (nameLower.includes("game") || nameLower.includes("video"))
+    return Gamepad2;
+  if (
+    nameLower.includes("musik") ||
+    nameLower.includes("band") ||
+    nameLower.includes("drum")
+  )
+    return Music;
+  if (
+    nameLower.includes("basket") ||
+    nameLower.includes("futsal") ||
+    nameLower.includes("voli")
+  )
+    return Trophy;
+  if (nameLower.includes("tenis") || nameLower.includes("bulutangkis"))
+    return Dumbbell;
+  if (
+    nameLower.includes("robotik") ||
+    nameLower.includes("komputer") ||
+    nameLower.includes("programming")
+  )
+    return Monitor;
+  if (nameLower.includes("pramuka") || nameLower.includes("paskibra"))
+    return Compass;
+  if (
+    nameLower.includes("lukis") ||
+    nameLower.includes("seni") ||
+    nameLower.includes("tari")
+  )
+    return Palette;
+
   // Fall back to category
   switch (category) {
-    case "Teknologi": return Monitor;
-    case "Olahraga": return Trophy;
-    case "Seni": return Palette;
-    case "Akademik": return GraduationCap;
-    case "Kepanduan": return Compass;
-    case "Sosial": return Heart;
-    default: return BookOpen;
+    case "Teknologi":
+      return Monitor;
+    case "Olahraga":
+      return Trophy;
+    case "Seni":
+      return Palette;
+    case "Akademik":
+      return GraduationCap;
+    case "Kepanduan":
+      return Compass;
+    case "Sosial":
+      return Heart;
+    default:
+      return BookOpen;
   }
 }
 
@@ -106,7 +136,7 @@ export function EkskulLogo({
 
   if (showIcon) {
     return (
-      <div 
+      <div
         className={`${sizes.container} rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-lg ${className}`}
       >
         <Icon className={`${sizes.icon} text-white`} />

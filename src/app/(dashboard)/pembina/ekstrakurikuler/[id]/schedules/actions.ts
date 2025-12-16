@@ -22,7 +22,7 @@ import { validatePembinaOwnership } from "@/lib/pembina-ekstrakurikuler-data";
 
 export async function createScheduleAction(
   extracurricularId: string,
-  formData: FormData
+  formData: FormData,
 ): Promise<{ success: boolean; error?: string }> {
   const { userId } = await auth();
 
@@ -53,14 +53,14 @@ export async function createScheduleAction(
       end_time,
       location,
     },
-    extracurricularId
+    extracurricularId,
   );
 }
 
 export async function updateScheduleAction(
   scheduleId: string,
   extracurricularId: string,
-  formData: FormData
+  formData: FormData,
 ): Promise<{ success: boolean; error?: string }> {
   const { userId } = await auth();
 
@@ -87,13 +87,13 @@ export async function updateScheduleAction(
       end_time,
       location,
     },
-    extracurricularId
+    extracurricularId,
   );
 }
 
 export async function deleteScheduleAction(
   scheduleId: string,
-  extracurricularId: string
+  extracurricularId: string,
 ): Promise<{ success: boolean; error?: string }> {
   const { userId } = await auth();
 

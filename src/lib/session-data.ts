@@ -1,14 +1,14 @@
 /**
  * Server-side data fetching for Student Sessions
- * 
+ *
  * Uses Prisma directly to fetch session data for Server Components.
  * No API routes - data is fetched server-side.
- * 
+ *
  * @module lib/session-data
  */
 
-import prisma from '@/lib/prisma';
-import { auth } from '@clerk/nextjs/server';
+import prisma from "@/lib/prisma";
+import { auth } from "@clerk/nextjs/server";
 
 // ============================================
 // Types
@@ -35,7 +35,7 @@ export interface SessionResult {
     extracurriculars: Array<{ id: string; name: string }>;
   };
   error?: string;
-  errorCode?: 'UNAUTHORIZED' | 'FORBIDDEN' | 'NOT_FOUND' | 'SERVER_ERROR';
+  errorCode?: "UNAUTHORIZED" | "FORBIDDEN" | "NOT_FOUND" | "SERVER_ERROR";
 }
 
 export interface SessionFilters {
@@ -60,11 +60,13 @@ function getStartOfToday(): Date {
 
 /**
  * Fetch all future sessions for the currently authenticated student
- * 
+ *
  * This function is designed to be called from Server Components.
  * It handles authentication, authorization, and data fetching.
  */
-export async function getStudentSessions(filters?: SessionFilters): Promise<SessionResult> {
+export async function getStudentSessions(
+  filters?: SessionFilters,
+): Promise<SessionResult> {
   try {
     // Step 1: Authenticate using Clerk
     const { userId, sessionClaims } = await auth();
@@ -72,19 +74,20 @@ export async function getStudentSessions(filters?: SessionFilters): Promise<Sess
     if (!userId) {
       return {
         success: false,
-        error: 'Authentication required. Please login.',
-        errorCode: 'UNAUTHORIZED',
+        error: "Authentication required. Please login.",
+        errorCode: "UNAUTHORIZED",
       };
     }
 
     // Step 2: Verify role is SISWA
-    const userRole = (sessionClaims?.public_metadata as { role?: string })?.role;
-    
-    if (userRole !== 'SISWA') {
+    const userRole = (sessionClaims?.public_metadata as { role?: string })
+      ?.role;
+
+    if (userRole !== "SISWA") {
       return {
         success: false,
-        error: 'Access denied. This page is only available for students.',
-        errorCode: 'FORBIDDEN',
+        error: "Access denied. This page is only available for students.",
+        errorCode: "FORBIDDEN",
       };
     }
 
@@ -99,8 +102,8 @@ export async function getStudentSessions(filters?: SessionFilters): Promise<Sess
     if (!user || !user.studentProfile) {
       return {
         success: false,
-        error: 'Student profile not found. Please contact administrator.',
-        errorCode: 'NOT_FOUND',
+        error: "Student profile not found. Please contact administrator.",
+        errorCode: "NOT_FOUND",
       };
     }
 
@@ -108,7 +111,7 @@ export async function getStudentSessions(filters?: SessionFilters): Promise<Sess
     const enrollments = await prisma.enrollment.findMany({
       where: {
         student_id: user.studentProfile.id,
-        status: 'ACTIVE',
+        status: "ACTIVE",
       },
       select: {
         id: true,
@@ -135,16 +138,16 @@ export async function getStudentSessions(filters?: SessionFilters): Promise<Sess
 
     // Create a map of extracurricular_id -> enrollment_id for navigation
     const enrollmentMap = new Map(
-      enrollments.map(e => [e.extracurricular_id, e.id])
+      enrollments.map((e) => [e.extracurricular_id, e.id]),
     );
 
     // Get unique extracurriculars for filter dropdown
-    const extracurriculars = enrollments.map(e => ({
+    const extracurriculars = enrollments.map((e) => ({
       id: e.extracurricular.id,
       name: e.extracurricular.name,
     }));
 
-    const extracurricularIds = enrollments.map(e => e.extracurricular_id);
+    const extracurricularIds = enrollments.map((e) => e.extracurricular_id);
 
     // Step 5: Build date filters
     const startOfToday = getStartOfToday();
@@ -160,8 +163,8 @@ export async function getStudentSessions(filters?: SessionFilters): Promise<Sess
       where: {
         is_cancelled: false, // Exclude cancelled sessions
         date: dateFilter,
-        extracurricular_id: filters?.extracurricularId 
-          ? filters.extracurricularId 
+        extracurricular_id: filters?.extracurricularId
+          ? filters.extracurricularId
           : { in: extracurricularIds },
       },
       include: {
@@ -173,20 +176,17 @@ export async function getStudentSessions(filters?: SessionFilters): Promise<Sess
           },
         },
       },
-      orderBy: [
-        { date: 'asc' },
-        { start_time: 'asc' },
-      ],
+      orderBy: [{ date: "asc" }, { start_time: "asc" }],
     });
 
     // Step 7: Transform to view model with enrollmentId
-    const sessionViewModels: SessionViewModel[] = sessions.map(session => ({
+    const sessionViewModels: SessionViewModel[] = sessions.map((session) => ({
       id: session.id,
       date: session.date,
       startTime: session.start_time,
       endTime: session.end_time,
       location: session.location,
-      enrollmentId: enrollmentMap.get(session.extracurricular_id) || '',
+      enrollmentId: enrollmentMap.get(session.extracurricular_id) || "",
       extracurricular: {
         id: session.extracurricular.id,
         name: session.extracurricular.name,
@@ -202,11 +202,11 @@ export async function getStudentSessions(filters?: SessionFilters): Promise<Sess
       },
     };
   } catch (error) {
-    console.error('[SESSION DATA ERROR]', error);
+    console.error("[SESSION DATA ERROR]", error);
     return {
       success: false,
-      error: 'An unexpected error occurred. Please try again later.',
-      errorCode: 'SERVER_ERROR',
+      error: "An unexpected error occurred. Please try again later.",
+      errorCode: "SERVER_ERROR",
     };
   }
 }
@@ -224,18 +224,38 @@ export interface SessionDateGroup {
 /**
  * Group sessions by their date for display
  */
-export function groupSessionsByDate(sessions: SessionViewModel[]): SessionDateGroup[] {
-  const dayNames = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+export function groupSessionsByDate(
+  sessions: SessionViewModel[],
+): SessionDateGroup[] {
+  const dayNames = [
+    "Minggu",
+    "Senin",
+    "Selasa",
+    "Rabu",
+    "Kamis",
+    "Jumat",
+    "Sabtu",
+  ];
   const monthNames = [
-    'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-    'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+    "Januari",
+    "Februari",
+    "Maret",
+    "April",
+    "Mei",
+    "Juni",
+    "Juli",
+    "Agustus",
+    "September",
+    "Oktober",
+    "November",
+    "Desember",
   ];
 
   const groups = new Map<string, SessionDateGroup>();
 
   for (const session of sessions) {
     const date = new Date(session.date);
-    const dateKey = date.toISOString().split('T')[0]; // YYYY-MM-DD
+    const dateKey = date.toISOString().split("T")[0]; // YYYY-MM-DD
 
     if (!groups.has(dateKey)) {
       const dayName = dayNames[date.getDay()];
@@ -256,6 +276,6 @@ export function groupSessionsByDate(sessions: SessionViewModel[]): SessionDateGr
 
   // Convert to array and sort by date
   return Array.from(groups.values()).sort(
-    (a, b) => a.date.getTime() - b.date.getTime()
+    (a, b) => a.date.getTime() - b.date.getTime(),
   );
 }

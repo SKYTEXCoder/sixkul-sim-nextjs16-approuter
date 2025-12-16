@@ -14,21 +14,21 @@ You are an **Agentic AI Software Development & Engineering Agent** tasked with *
 
 You **MUST**:
 
-* Treat this document as a **binding, authoritative specification**
-* Implement **frontend, server-side data access, and integration**
-* Use **Prisma ORM directly** (NO REST API routes)
-* Use **React Server Components (RSC)** by default
-* Use **Clerk Authentication** for auth & ownership validation
-* Respect the **Global Navigation Contract**
-* Preserve all existing student features and routing semantics
+- Treat this document as a **binding, authoritative specification**
+- Implement **frontend, server-side data access, and integration**
+- Use **Prisma ORM directly** (NO REST API routes)
+- Use **React Server Components (RSC)** by default
+- Use **Clerk Authentication** for auth & ownership validation
+- Respect the **Global Navigation Contract**
+- Preserve all existing student features and routing semantics
 
 You **MUST NOT**:
 
-* Guess requirements
-* Invent features not explicitly specified
-* Allow students to create/edit/delete announcements
-* Introduce new routes without instruction
-* Bypass enrollment context
+- Guess requirements
+- Invent features not explicitly specified
+- Allow students to create/edit/delete announcements
+- Introduce new routes without instruction
+- Bypass enrollment context
 
 ### Mandatory Consultation Rule
 
@@ -46,10 +46,10 @@ An **Announcement** represents an official communication from a **Pembina** to m
 
 Announcements are:
 
-* authored by Pembina
-* scoped to an Extracurricular
-* visible only to students with **ACTIVE enrollments**
-* **read-only** for students
+- authored by Pembina
+- scoped to an Extracurricular
+- visible only to students with **ACTIVE enrollments**
+- **read-only** for students
 
 ---
 
@@ -83,23 +83,23 @@ This page is a **global, student-wide announcement feed**, filtered strictly by 
 
 ### Authentication
 
-* Use **Clerk Authentication**
-* Resolve authenticated user → StudentProfile
+- Use **Clerk Authentication**
+- Resolve authenticated user → StudentProfile
 
 ### Authorization Rules (NON-NEGOTIABLE)
 
 Only include announcements that:
 
-* belong to an Extracurricular
-* where the student has an **ACTIVE enrollment**
-* are not soft-deleted (if applicable)
-* are ordered by most recent first
+- belong to an Extracurricular
+- where the student has an **ACTIVE enrollment**
+- are not soft-deleted (if applicable)
+- are ordered by most recent first
 
 A student must **never be able to see**:
 
-* announcements for extracurriculars they are not enrolled in
-* announcements from inactive enrollments
-* announcements authored by other students
+- announcements for extracurriculars they are not enrolled in
+- announcements from inactive enrollments
+- announcements authored by other students
 
 ---
 
@@ -115,15 +115,15 @@ Student → Enrollment (ACTIVE) → Extracurricular → Announcement
 
 Each announcement MUST include:
 
-* `announcement.id`
-* `announcement.title`
-* `announcement.content`
-* `announcement.created_at`
-* `extracurricular.id`
-* `extracurricular.name`
-* `extracurricular.category`
-* `author.name` (Pembina)
-* `enrollment_id` (derived, for navigation context)
+- `announcement.id`
+- `announcement.title`
+- `announcement.content`
+- `announcement.created_at`
+- `extracurricular.id`
+- `extracurricular.name`
+- `extracurricular.category`
+- `author.name` (Pembina)
+- `enrollment_id` (derived, for navigation context)
 
 ---
 
@@ -168,8 +168,8 @@ Ekstrakurikuler
 
 A clear UI toggle MUST exist allowing switching between:
 
-* `Semua Pengumuman`
-* `Kelompokkan per Ekstrakurikuler`
+- `Semua Pengumuman`
+- `Kelompokkan per Ekstrakurikuler`
 
 The toggle MUST NOT cause navigation or full page reload.
 
@@ -203,11 +203,11 @@ Pengumuman
 
 Each announcement card MUST display:
 
-* Judul pengumuman
-* Nama ekstrakurikuler + kategori badge
-* Tanggal diposting (format Indonesia)
-* Preview konten (truncate if long)
-* Visual indicator for unread (optional, MVP-safe)
+- Judul pengumuman
+- Nama ekstrakurikuler + kategori badge
+- Tanggal diposting (format Indonesia)
+- Preview konten (truncate if long)
+- Visual indicator for unread (optional, MVP-safe)
 
 ---
 
@@ -225,9 +225,9 @@ and optionally auto-scroll or highlight the announcement.
 
 ❌ FORBIDDEN ROUTES:
 
-* `/student/announcements/[id]`
-* `/student/extracurricular/[id]`
-* `/student/session/[id]`
+- `/student/announcements/[id]`
+- `/student/extracurricular/[id]`
+- `/student/session/[id]`
 
 Enrollment is the **only valid context**.
 
@@ -273,7 +273,7 @@ src/app/(dashboard)/student/announcements/page.tsx
 
 ### Component Type
 
-* React Server Component (RSC)
+- React Server Component (RSC)
 
 ### Data Fetch Flow
 
@@ -291,15 +291,15 @@ src/app/(dashboard)/student/announcements/page.tsx
 
 The AI is **AUTHORIZED** to:
 
-* replace any mock announcement data
-* refactor UI-only announcement components
-* normalize announcement formatting utilities
+- replace any mock announcement data
+- refactor UI-only announcement components
+- normalize announcement formatting utilities
 
 The AI is **NOT AUTHORIZED** to:
 
-* change announcement ownership
-* allow student mutations
-* create new announcement routes
+- change announcement ownership
+- allow student mutations
+- create new announcement routes
 
 ---
 
@@ -307,14 +307,14 @@ The AI is **NOT AUTHORIZED** to:
 
 This feature is COMPLETE only if:
 
-* `/student/announcements` renders without 404 Not Found
-* Data is fetched via Prisma (no mocks)
-* Only ACTIVE enrollment announcements are shown
-* Global feed works
-* Group by Ekstrakurikuler works
-* Toggle works without page reload
-* Navigation respects Global Navigation Contract
-* Empty states render correctly
+- `/student/announcements` renders without 404 Not Found
+- Data is fetched via Prisma (no mocks)
+- Only ACTIVE enrollment announcements are shown
+- Global feed works
+- Group by Ekstrakurikuler works
+- Toggle works without page reload
+- Navigation respects Global Navigation Contract
+- Empty states render correctly
 
 ---
 

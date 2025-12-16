@@ -55,7 +55,7 @@ export interface AttendanceInput {
  * Get sessions available for attendance input.
  */
 export async function getSessionsForAttendance(
-  extracurricularId: string
+  extracurricularId: string,
 ): Promise<SessionForAttendance[]> {
   const sessions = await prisma.session.findMany({
     where: {
@@ -88,7 +88,7 @@ export async function getSessionsForAttendance(
  * Get ACTIVE enrollments for an extracurricular.
  */
 export async function getActiveEnrollments(
-  extracurricularId: string
+  extracurricularId: string,
 ): Promise<EnrollmentWithStudent[]> {
   const enrollments = await prisma.enrollment.findMany({
     where: {
@@ -126,7 +126,7 @@ export async function getActiveEnrollments(
  * Get existing attendance records for a session.
  */
 export async function getAttendanceBySession(
-  sessionId: string
+  sessionId: string,
 ): Promise<AttendanceRecord[]> {
   const attendances = await prisma.attendance.findMany({
     where: {
@@ -152,7 +152,7 @@ export async function getAttendanceBySession(
 export async function saveSessionAttendance(
   sessionId: string,
   extracurricularId: string,
-  records: AttendanceInput[]
+  records: AttendanceInput[],
 ): Promise<{ success: boolean; error?: string }> {
   try {
     // Validate session exists

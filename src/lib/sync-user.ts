@@ -1,14 +1,19 @@
 /**
  * SIXKUL Just-in-Time User Sync Utility
- * 
+ *
  * Automatically creates Prisma database records for Clerk users
  * on their first access to the application.
- * 
+ *
  * @module lib/sync-user
  */
 
-import prisma from '@/lib/prisma';
-import { User, UserRole, StudentProfile, PembinaProfile } from '@/generated/prisma';
+import prisma from "@/lib/prisma";
+import {
+  User,
+  UserRole,
+  StudentProfile,
+  PembinaProfile,
+} from "@/generated/prisma";
 
 // ============================================
 // Types
@@ -40,9 +45,7 @@ interface SyncError {
   statusCode: number;
 }
 
-type SyncResponse = 
-  | { success: true; data: SyncResult }
-  | SyncError;
+type SyncResponse = { success: true; data: SyncResult } | SyncError;
 
 // ============================================
 // Helper Functions
@@ -53,18 +56,18 @@ type SyncResponse =
  */
 function generateUsername(
   clerkUserId: string,
-  sessionClaims: ClerkSessionClaims
+  sessionClaims: ClerkSessionClaims,
 ): string {
   // Priority: Clerk username > email prefix > clerk_id short
   if (sessionClaims.username) {
     return sessionClaims.username;
   }
-  
+
   if (sessionClaims.email) {
-    const emailPrefix = sessionClaims.email.split('@')[0];
-    return emailPrefix.toLowerCase().replace(/[^a-z0-9_]/g, '_');
+    const emailPrefix = sessionClaims.email.split("@")[0];
+    return emailPrefix.toLowerCase().replace(/[^a-z0-9_]/g, "_");
   }
-  
+
   // Fallback: use last 8 chars of Clerk user ID
   return `user_${clerkUserId.slice(-8)}`;
 }
@@ -76,22 +79,22 @@ function generateFullName(sessionClaims: ClerkSessionClaims): string {
   if (sessionClaims.full_name) {
     return sessionClaims.full_name;
   }
-  
+
   if (sessionClaims.first_name || sessionClaims.last_name) {
     return [sessionClaims.first_name, sessionClaims.last_name]
       .filter(Boolean)
-      .join(' ');
+      .join(" ");
   }
-  
+
   if (sessionClaims.username) {
     return sessionClaims.username;
   }
-  
+
   if (sessionClaims.email) {
-    return sessionClaims.email.split('@')[0];
+    return sessionClaims.email.split("@")[0];
   }
-  
-  return 'User';
+
+  return "User";
 }
 
 /**
@@ -99,15 +102,15 @@ function generateFullName(sessionClaims: ClerkSessionClaims): string {
  */
 function mapRole(roleString?: string): UserRole {
   const normalizedRole = roleString?.toUpperCase();
-  
+
   switch (normalizedRole) {
-    case 'ADMIN':
-      return 'ADMIN';
-    case 'PEMBINA':
-      return 'PEMBINA';
-    case 'SISWA':
+    case "ADMIN":
+      return "ADMIN";
+    case "PEMBINA":
+      return "PEMBINA";
+    case "SISWA":
     default:
-      return 'SISWA'; // Default to SISWA if no role specified
+      return "SISWA"; // Default to SISWA if no role specified
   }
 }
 
@@ -117,14 +120,14 @@ function mapRole(roleString?: string): UserRole {
 
 /**
  * Get existing user or create new one from Clerk data
- * 
+ *
  * This is the main JIT sync function. Call this whenever you need
  * a local database user from a Clerk session.
- * 
+ *
  * @param clerkUserId - The Clerk user ID (from auth().userId)
  * @param sessionClaims - The session claims (from auth().sessionClaims)
  * @returns SyncResponse with user, profile, and isNewUser flag
- * 
+ *
  * @example
  * const { userId, sessionClaims } = await auth();
  * const result = await getOrCreateUser(userId, sessionClaims);
@@ -135,7 +138,7 @@ function mapRole(roleString?: string): UserRole {
  */
 export async function getOrCreateUser(
   clerkUserId: string,
-  sessionClaims: ClerkSessionClaims | null | undefined
+  sessionClaims: ClerkSessionClaims | null | undefined,
 ): Promise<SyncResponse> {
   try {
     // ----------------------------------------
@@ -151,7 +154,8 @@ export async function getOrCreateUser(
 
     if (existingUser) {
       // User exists - return with existing profile
-      const profile = existingUser.studentProfile || existingUser.pembinaProfile;
+      const profile =
+        existingUser.studentProfile || existingUser.pembinaProfile;
       return {
         success: true,
         data: {
@@ -170,7 +174,9 @@ export async function getOrCreateUser(
     const username = generateUsername(clerkUserId, claims);
     const fullName = generateFullName(claims);
 
-    console.log(`[JIT SYNC] Creating new user: ${username} (${role}) - Clerk ID: ${clerkUserId}`);
+    console.log(
+      `[JIT SYNC] Creating new user: ${username} (${role}) - Clerk ID: ${clerkUserId}`,
+    );
 
     // Create user with role-specific profile in a transaction
     const result = await prisma.$transaction(async (tx) => {
@@ -189,18 +195,18 @@ export async function getOrCreateUser(
       let profile: StudentProfile | PembinaProfile | null = null;
 
       // Create role-specific profile
-      if (role === 'SISWA') {
+      if (role === "SISWA") {
         profile = await tx.studentProfile.create({
           data: {
             user_id: newUser.id,
             nis: `PLACEHOLDER_${clerkUserId.slice(-6)}`,
-            class_name: 'Belum diatur',
-            major: 'Belum diatur',
+            class_name: "Belum diatur",
+            major: "Belum diatur",
             phone_number: null,
           },
         });
         console.log(`[JIT SYNC] Created StudentProfile for ${username}`);
-      } else if (role === 'PEMBINA') {
+      } else if (role === "PEMBINA") {
         profile = await tx.pembinaProfile.create({
           data: {
             user_id: newUser.id,
@@ -226,12 +232,11 @@ export async function getOrCreateUser(
         isNewUser: true,
       },
     };
-
   } catch (error) {
-    console.error('[JIT SYNC ERROR]', error);
-    
+    console.error("[JIT SYNC ERROR]", error);
+
     // Handle unique constraint violations (race condition)
-    if (error instanceof Error && error.message.includes('Unique constraint')) {
+    if (error instanceof Error && error.message.includes("Unique constraint")) {
       // Another request already created the user - try to fetch them
       const existingUser = await prisma.user.findUnique({
         where: { clerk_id: clerkUserId },
@@ -255,7 +260,7 @@ export async function getOrCreateUser(
 
     return {
       success: false,
-      error: 'Failed to sync user. Please try again.',
+      error: "Failed to sync user. Please try again.",
       statusCode: 500,
     };
   }
@@ -271,7 +276,7 @@ export async function getOrCreateUser(
  */
 export async function getOrCreateUserId(
   clerkUserId: string,
-  sessionClaims: ClerkSessionClaims | null | undefined
+  sessionClaims: ClerkSessionClaims | null | undefined,
 ): Promise<string | null> {
   const result = await getOrCreateUser(clerkUserId, sessionClaims);
   if (!result.success) {
@@ -286,8 +291,11 @@ export async function getOrCreateUserId(
  */
 export async function getOrCreateProfile(
   clerkUserId: string,
-  sessionClaims: ClerkSessionClaims | null | undefined
-): Promise<{ profile: StudentProfile | PembinaProfile | null; userId: string } | null> {
+  sessionClaims: ClerkSessionClaims | null | undefined,
+): Promise<{
+  profile: StudentProfile | PembinaProfile | null;
+  userId: string;
+} | null> {
   const result = await getOrCreateUser(clerkUserId, sessionClaims);
   if (!result.success) {
     return null;
@@ -304,17 +312,17 @@ export async function getOrCreateProfile(
  */
 export async function getOrCreateStudentProfile(
   clerkUserId: string,
-  sessionClaims: ClerkSessionClaims | null | undefined
+  sessionClaims: ClerkSessionClaims | null | undefined,
 ): Promise<{ studentProfile: StudentProfile; userId: string } | null> {
   const result = await getOrCreateUser(clerkUserId, sessionClaims);
   if (!result.success) {
     return null;
   }
-  
-  if (result.data.user.role !== 'SISWA' || !result.data.profile) {
+
+  if (result.data.user.role !== "SISWA" || !result.data.profile) {
     return null;
   }
-  
+
   return {
     studentProfile: result.data.profile as StudentProfile,
     userId: result.data.user.id,
@@ -327,17 +335,17 @@ export async function getOrCreateStudentProfile(
  */
 export async function getOrCreatePembinaProfile(
   clerkUserId: string,
-  sessionClaims: ClerkSessionClaims | null | undefined
+  sessionClaims: ClerkSessionClaims | null | undefined,
 ): Promise<{ pembinaProfile: PembinaProfile; userId: string } | null> {
   const result = await getOrCreateUser(clerkUserId, sessionClaims);
   if (!result.success) {
     return null;
   }
-  
-  if (result.data.user.role !== 'PEMBINA' || !result.data.profile) {
+
+  if (result.data.user.role !== "PEMBINA" || !result.data.profile) {
     return null;
   }
-  
+
   return {
     pembinaProfile: result.data.profile as PembinaProfile,
     userId: result.data.user.id,

@@ -23,7 +23,7 @@ import { validatePembinaOwnership } from "@/lib/pembina-ekstrakurikuler-data";
 // ============================================
 
 export async function getAttendanceAction(
-  sessionId: string
+  sessionId: string,
 ): Promise<AttendanceRecord[]> {
   const { userId } = await auth();
 
@@ -37,7 +37,7 @@ export async function getAttendanceAction(
 export async function saveAttendanceAction(
   sessionId: string,
   extracurricularId: string,
-  records: AttendanceInput[]
+  records: AttendanceInput[],
 ): Promise<{ success: boolean; error?: string }> {
   const { userId } = await auth();
 

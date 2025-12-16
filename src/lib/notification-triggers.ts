@@ -25,7 +25,7 @@ import { NotificationType } from "@/generated/prisma";
  * Returns default preferences (all enabled) if no preferences exist.
  */
 async function getStudentPreferencesForEnrollment(
-  enrollmentId: string
+  enrollmentId: string,
 ): Promise<{
   notifyAnnouncements: boolean;
   notifyScheduleChanges: boolean;
@@ -64,7 +64,7 @@ async function getStudentPreferencesForEnrollment(
  * Get user ID from enrollment for notification creation.
  */
 async function getUserIdFromEnrollment(
-  enrollmentId: string
+  enrollmentId: string,
 ): Promise<string | null> {
   try {
     const enrollment = await prisma.enrollment.findUnique({
@@ -105,14 +105,14 @@ export async function createAttendanceNotification(
   enrollmentId: string,
   status: string,
   sessionDate: Date,
-  extracurricularName: string
+  extracurricularName: string,
 ): Promise<void> {
   try {
     // Check preferences
     const prefs = await getStudentPreferencesForEnrollment(enrollmentId);
     if (!prefs || !prefs.notifyAttendance) {
       console.log(
-        `[NOTIFICATION] Skipped attendance notification - disabled by preferences`
+        `[NOTIFICATION] Skipped attendance notification - disabled by preferences`,
       );
       return;
     }
@@ -121,7 +121,7 @@ export async function createAttendanceNotification(
     const userId = await getUserIdFromEnrollment(enrollmentId);
     if (!userId) {
       console.error(
-        `[NOTIFICATION] Cannot create attendance notification - user not found`
+        `[NOTIFICATION] Cannot create attendance notification - user not found`,
       );
       return;
     }
@@ -156,7 +156,7 @@ export async function createAttendanceNotification(
     });
 
     console.log(
-      `[NOTIFICATION] Attendance notification created for enrollment ${enrollmentId}`
+      `[NOTIFICATION] Attendance notification created for enrollment ${enrollmentId}`,
     );
   } catch (error) {
     console.error("[CREATE ATTENDANCE NOTIFICATION ERROR]", error);
@@ -177,7 +177,7 @@ export async function createAttendanceNotification(
 export async function createAnnouncementNotifications(
   extracurricularId: string,
   announcementTitle: string,
-  extracurricularName: string
+  extracurricularName: string,
 ): Promise<void> {
   try {
     // Get all ACTIVE enrollments for this extracurricular
@@ -215,7 +215,7 @@ export async function createAnnouncementNotifications(
         data: notificationsToCreate,
       });
       console.log(
-        `[NOTIFICATION] Created ${notificationsToCreate.length} announcement notifications`
+        `[NOTIFICATION] Created ${notificationsToCreate.length} announcement notifications`,
       );
     }
   } catch (error) {
@@ -239,7 +239,7 @@ export async function createScheduleNotifications(
   extracurricularId: string,
   changeType: "created" | "updated" | "cancelled",
   sessionDate: Date,
-  extracurricularName: string
+  extracurricularName: string,
 ): Promise<void> {
   try {
     // Get all ACTIVE enrollments for this extracurricular
@@ -298,7 +298,7 @@ export async function createScheduleNotifications(
         data: notificationsToCreate,
       });
       console.log(
-        `[NOTIFICATION] Created ${notificationsToCreate.length} schedule notifications`
+        `[NOTIFICATION] Created ${notificationsToCreate.length} schedule notifications`,
       );
     }
   } catch (error) {
@@ -322,14 +322,14 @@ export async function createEnrollmentStatusNotification(
   enrollmentId: string,
   oldStatus: string,
   newStatus: string,
-  extracurricularName: string
+  extracurricularName: string,
 ): Promise<void> {
   try {
     // Get user ID (NOT gated by preferences)
     const userId = await getUserIdFromEnrollment(enrollmentId);
     if (!userId) {
       console.error(
-        `[NOTIFICATION] Cannot create enrollment notification - user not found`
+        `[NOTIFICATION] Cannot create enrollment notification - user not found`,
       );
       return;
     }
@@ -372,7 +372,7 @@ export async function createEnrollmentStatusNotification(
     });
 
     console.log(
-      `[NOTIFICATION] Enrollment status notification created for ${enrollmentId}: ${oldStatus} → ${newStatus}`
+      `[NOTIFICATION] Enrollment status notification created for ${enrollmentId}: ${oldStatus} → ${newStatus}`,
     );
   } catch (error) {
     console.error("[CREATE ENROLLMENT STATUS NOTIFICATION ERROR]", error);

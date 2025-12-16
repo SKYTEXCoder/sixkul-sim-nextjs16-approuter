@@ -1,9 +1,9 @@
 /**
  * Announcement List Component
- * 
+ *
  * Renders announcements in either global feed or grouped mode.
  * Server Component - works with pre-fetched data.
- * 
+ *
  * @module components/announcements/AnnouncementList
  */
 
@@ -42,16 +42,16 @@ interface GroupedData {
  */
 function filterAnnouncements(
   announcements: AnnouncementViewModel[],
-  query: string
+  query: string,
 ): AnnouncementViewModel[] {
   if (!query.trim()) return announcements;
-  
+
   const lowerQuery = query.toLowerCase();
   return announcements.filter(
     (a) =>
       a.title.toLowerCase().includes(lowerQuery) ||
       a.content.toLowerCase().includes(lowerQuery) ||
-      a.extracurricular.name.toLowerCase().includes(lowerQuery)
+      a.extracurricular.name.toLowerCase().includes(lowerQuery),
   );
 }
 
@@ -59,10 +59,10 @@ function filterAnnouncements(
  * Group announcements by extracurricular
  */
 function groupByExtracurricular(
-  announcements: AnnouncementViewModel[]
+  announcements: AnnouncementViewModel[],
 ): GroupedData[] {
   const grouped = new Map<string, GroupedData>();
-  
+
   for (const announcement of announcements) {
     const existing = grouped.get(announcement.extracurricular.id);
     if (existing) {
@@ -75,7 +75,7 @@ function groupByExtracurricular(
       });
     }
   }
-  
+
   return Array.from(grouped.values());
 }
 
@@ -141,7 +141,10 @@ export function AnnouncementList({
           {/* Group Announcements */}
           <div className="space-y-4 pl-4 border-l-2 border-indigo-200 dark:border-indigo-800">
             {group.announcements.map((announcement) => (
-              <AnnouncementCard key={announcement.id} announcement={announcement} />
+              <AnnouncementCard
+                key={announcement.id}
+                announcement={announcement}
+              />
             ))}
           </div>
         </div>

@@ -136,7 +136,7 @@ export async function getStudentHistory(): Promise<HistoryResult> {
     const activeCount = enrollments.filter((e) => e.status === "ACTIVE").length;
 
     const inactiveCount = enrollments.filter((e) =>
-      ["ALUMNI", "REJECTED", "CANCELLED"].includes(e.status)
+      ["ALUMNI", "REJECTED", "CANCELLED"].includes(e.status),
     ).length;
 
     const summary: HistorySummaryStats = {

@@ -32,10 +32,10 @@ export function SettingsClientWrapper({
 
   // Generic update handler with auto-save
   const handleUpdate = async <
-    K extends keyof Omit<StudentPreferencesViewModel, "id">
+    K extends keyof Omit<StudentPreferencesViewModel, "id">,
   >(
     field: K,
-    value: StudentPreferencesViewModel[K]
+    value: StudentPreferencesViewModel[K],
   ) => {
     // Optimistic update
     setPreferences((prev) => ({ ...prev, [field]: value }));

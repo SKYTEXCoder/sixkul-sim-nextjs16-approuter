@@ -143,14 +143,14 @@ export function StudentLayoutClient({
         <div
           className={cn(
             "transition-all duration-300",
-            isSidebarCollapsed ? "md:ml-20" : "md:ml-64"
+            isSidebarCollapsed ? "md:ml-20" : "md:ml-64",
           )}
         >
           {/* Top Navigation - also responsive to sidebar state */}
           <header
             className={cn(
               "fixed top-0 right-0 z-30 h-16 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800 transition-all duration-300",
-              isSidebarCollapsed ? "left-0 md:left-20" : "left-0 md:left-64"
+              isSidebarCollapsed ? "left-0 md:left-20" : "left-0 md:left-64",
             )}
           >
             <TopNavbar

@@ -129,7 +129,7 @@ async function main() {
   console.log(`   - Read: ${notifications.filter((n) => n.is_read).length}`);
 
   console.log(
-    "\n🎉 Seed complete! Refresh /student/notifications to see the data."
+    "\n🎉 Seed complete! Refresh /student/notifications to see the data.",
   );
 }
 

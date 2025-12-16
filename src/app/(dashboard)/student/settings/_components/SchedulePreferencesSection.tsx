@@ -58,7 +58,7 @@ export function SchedulePreferencesSection({
                   "p-3 rounded-xl border-2 text-sm font-medium transition-all cursor-pointer",
                   scheduleDefaultView === option.value
                     ? "border-violet-500 bg-violet-50 dark:bg-violet-950/30 text-violet-600 dark:text-violet-400"
-                    : "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-600"
+                    : "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-600",
                 )}
               >
                 {option.label}
@@ -85,7 +85,7 @@ export function SchedulePreferencesSection({
                   "p-3 rounded-xl border-2 text-sm font-medium transition-all cursor-pointer",
                   scheduleRangeDays === option.value
                     ? "border-violet-500 bg-violet-50 dark:bg-violet-950/30 text-violet-600 dark:text-violet-400"
-                    : "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-600"
+                    : "border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:border-slate-300 dark:hover:border-slate-600",
                 )}
               >
                 {option.label}

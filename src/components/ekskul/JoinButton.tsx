@@ -2,10 +2,10 @@
 
 /**
  * Join Button Client Component
- * 
+ *
  * Handles enrollment to extracurricular with API integration.
  * Implements the Pendaftaran Ekstrakurikuler sequence diagram logic.
- * 
+ *
  * @module components/ekskul/JoinButton
  */
 
@@ -77,7 +77,8 @@ export function JoinButton({
         // Handle 409 Conflict - Already registered
         if (response.status === 409) {
           toast.warning("Sudah Terdaftar", {
-            description: result.message || "Anda sudah terdaftar di ekstrakurikuler ini.",
+            description:
+              result.message || "Anda sudah terdaftar di ekstrakurikuler ini.",
           });
           return;
         }
@@ -101,7 +102,8 @@ export function JoinButton({
 
         // Handle other errors
         toast.error("Pendaftaran Gagal", {
-          description: result.message || "Terjadi kesalahan. Silakan coba lagi.",
+          description:
+            result.message || "Terjadi kesalahan. Silakan coba lagi.",
         });
         return;
       }
@@ -115,7 +117,6 @@ export function JoinButton({
 
       // Refresh page to update UI
       router.refresh();
-
     } catch (error) {
       console.error("Enrollment error:", error);
       toast.error("Terjadi Kesalahan", {
@@ -133,19 +134,23 @@ export function JoinButton({
     const statusConfig: Record<string, { label: string; className: string }> = {
       PENDING: {
         label: "Menunggu Persetujuan",
-        className: "bg-amber-100 text-amber-700 border-amber-300 dark:bg-amber-900/30 dark:text-amber-400",
+        className:
+          "bg-amber-100 text-amber-700 border-amber-300 dark:bg-amber-900/30 dark:text-amber-400",
       },
       ACTIVE: {
         label: "Sudah Terdaftar",
-        className: "bg-emerald-100 text-emerald-700 border-emerald-300 dark:bg-emerald-900/30 dark:text-emerald-400",
+        className:
+          "bg-emerald-100 text-emerald-700 border-emerald-300 dark:bg-emerald-900/30 dark:text-emerald-400",
       },
       REJECTED: {
         label: "Ditolak",
-        className: "bg-red-100 text-red-700 border-red-300 dark:bg-red-900/30 dark:text-red-400",
+        className:
+          "bg-red-100 text-red-700 border-red-300 dark:bg-red-900/30 dark:text-red-400",
       },
     };
 
-    const config = statusConfig[enrollmentStatus || "PENDING"] || statusConfig.PENDING;
+    const config =
+      statusConfig[enrollmentStatus || "PENDING"] || statusConfig.PENDING;
 
     return (
       <Button

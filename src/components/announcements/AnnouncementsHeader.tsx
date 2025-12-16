@@ -1,9 +1,9 @@
 /**
  * Announcements Header Component
- * 
+ *
  * Displays the page header with title and subtitle.
  * Server Component - no client-side interactivity needed.
- * 
+ *
  * @module components/announcements/AnnouncementsHeader
  */
 

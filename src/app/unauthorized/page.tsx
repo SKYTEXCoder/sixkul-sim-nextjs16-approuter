@@ -1,17 +1,18 @@
 /**
  * Unauthorized Page
- * 
+ *
  * Displayed when a user tries to access a route they don't have permission for.
  */
 
-import Link from 'next/link';
+import Link from "next/link";
 
 export default function UnauthorizedPage({
   searchParams,
 }: {
   searchParams: { message?: string };
 }) {
-  const message = searchParams.message || 'Anda tidak memiliki akses ke halaman ini.';
+  const message =
+    searchParams.message || "Anda tidak memiliki akses ke halaman ini.";
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-50 to-orange-50">
@@ -34,9 +35,7 @@ export default function UnauthorizedPage({
         </div>
 
         {/* Title */}
-        <h1 className="text-2xl font-bold text-gray-800 mb-2">
-          Akses Ditolak
-        </h1>
+        <h1 className="text-2xl font-bold text-gray-800 mb-2">Akses Ditolak</h1>
 
         {/* Error Code */}
         <p className="text-5xl font-bold text-red-500 mb-4">401 Unauthorized</p>
@@ -62,7 +61,8 @@ export default function UnauthorizedPage({
 
         {/* Help Text */}
         <p className="mt-6 text-sm text-gray-500">
-          Jika Anda merasa ini adalah kesalahan, <br /> silakan hubungi administrator.
+          Jika Anda merasa ini adalah kesalahan, <br /> silakan hubungi
+          administrator.
         </p>
       </div>
     </div>

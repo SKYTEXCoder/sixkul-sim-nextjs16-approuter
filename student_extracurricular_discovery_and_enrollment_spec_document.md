@@ -12,19 +12,19 @@ This specification defines **everything required** to fully implement, integrate
 
 This document is written to be **directly handed to AGENTIC AI LLM IDEs (AI IDE)** such that:
 
-* all required UI pages are built
-* all API endpoints are implemented
-* database models are used correctly
-* test data is seeded if missing
-* the feature set is usable end‑to‑end by real STUDENT users
+- all required UI pages are built
+- all API endpoints are implemented
+- database models are used correctly
+- test data is seeded if missing
+- the feature set is usable end‑to‑end by real STUDENT users
 
 This specification document assumes:
 
-* Next.js 16 (App Router)
-* **Clerk Authentication** for authentication, session management, route protection, and role-based access control (RBAC)
-* **Supabase PostgreSQL** as the primary database
-* RESTful API routes (Next.js Route Handlers)
-* role-based access control (STUDENT enforced via Clerk metadata)
+- Next.js 16 (App Router)
+- **Clerk Authentication** for authentication, session management, route protection, and role-based access control (RBAC)
+- **Supabase PostgreSQL** as the primary database
+- RESTful API routes (Next.js Route Handlers)
+- role-based access control (STUDENT enforced via Clerk metadata)
 
 ---
 
@@ -32,20 +32,20 @@ This specification document assumes:
 
 ### Included:
 
-* Browse extracurriculars
-* View extracurricular detail
-* Enroll into extracurricular
-* Enrollment state handling (Not Enrolled / Pending / Active)
-* Empty states
-* Error handling
-* Test data seeding
+- Browse extracurriculars
+- View extracurricular detail
+- Enroll into extracurricular
+- Enrollment state handling (Not Enrolled / Pending / Active)
+- Empty states
+- Error handling
+- Test data seeding
 
 ### Explicitly excluded:
 
-* Enrollment approval (PEMBINA)
-* Schedule editing
-* Attendance input
-* Grading / scoring
+- Enrollment approval (PEMBINA)
+- Schedule editing
+- Attendance input
+- Grading / scoring
 
 ---
 
@@ -53,23 +53,22 @@ This specification document assumes:
 
 ### 2.1 Authentication & Session Management
 
-* All authentication MUST be handled by **Clerk**
-* User identity MUST be derived from `auth()` / `currentUser()` in server components or route handlers
-* No custom password, login, or session logic may be implemented
+- All authentication MUST be handled by **Clerk**
+- User identity MUST be derived from `auth()` / `currentUser()` in server components or route handlers
+- No custom password, login, or session logic may be implemented
 
 ### 2.2 Role Storage & Access Control
 
-* User role MUST be stored in **Clerk public or private metadata** under the key `role`
-* Allowed values: `STUDENT` or `SISWA`, `PEMBINA`, `ADMIN`
-* All STUDENT-only pages and APIs MUST explicitly verify:
-
-  * user is authenticated
-  * `user.publicMetadata.role === 'STUDENT'` or `user.publicMetadata.role === 'SISWA'`
+- User role MUST be stored in **Clerk public or private metadata** under the key `role`
+- Allowed values: `STUDENT` or `SISWA`, `PEMBINA`, `ADMIN`
+- All STUDENT-only pages and APIs MUST explicitly verify:
+  - user is authenticated
+  - `user.publicMetadata.role === 'STUDENT'` or `user.publicMetadata.role === 'SISWA'`
 
 ### 2.3 Route Protection (Protected Routes implementation)
 
-* All `/ekstrakurikuler/*` and `/student/*` routes MUST be protected using Clerk middleware
-* Unauthorized users MUST be redirected or receive `401/403`
+- All `/ekstrakurikuler/*` and `/student/*` routes MUST be protected using Clerk middleware
+- Unauthorized users MUST be redirected or receive `401/403`
 
 ---
 
@@ -79,15 +78,15 @@ This specification document assumes:
 
 STUDENT users may:
 
-* view all active extracurriculars
-* view detail of extracurriculars
-* submit enrollment requests
+- view all active extracurriculars
+- view detail of extracurriculars
+- submit enrollment requests
 
 STUDENT users may NOT:
 
-* approve enrollment
-* modify extracurricular data
-* view other students’ private data
+- approve enrollment
+- modify extracurricular data
+- view other students’ private data
 
 ---
 
@@ -96,10 +95,10 @@ STUDENT users may NOT:
 ### 4.1 `users` (Clerk-synced, more-or-less)
 
 ```ts
-id: uuid (PK)
-username: string
-email: string
-role: 'SISWA' | 'PEMBINA' | 'ADMIN'  // mirrored from Clerk metadata
+id: uuid(PK);
+username: string;
+email: string;
+role: "SISWA" | "PEMBINA" | "ADMIN"; // mirrored from Clerk metadata
 ```
 
 ### 3.2 `extracurriculars`
@@ -142,24 +141,24 @@ If `extracurriculars` table is empty:
 
 ### Seed at least:
 
-* 1 Seni (e.g. Drum Band)
-* 1 Olahraga (Basket)
-* 1 Teknologi (Game Development)
+- 1 Seni (e.g. Drum Band)
+- 1 Olahraga (Basket)
+- 1 Teknologi (Game Development)
 
 Each seeded extracurricular MUST:
 
-* be ACTIVE
-* have a valid pembina
+- be ACTIVE
+- have a valid pembina
 
 Seed at least:
 
-* 1 STUDENT user (linked to a real Clerk user ID)
-* 1 PEMBINA user (linked to a real Clerk user ID)
+- 1 STUDENT user (linked to a real Clerk user ID)
+- 1 PEMBINA user (linked to a real Clerk user ID)
 
 NOTE:
 
-* User records MUST reference `clerk_user_id`
-* Do NOT create fake authentication records outside Clerk
+- User records MUST reference `clerk_user_id`
+- Do NOT create fake authentication records outside Clerk
 
 ---
 
@@ -173,22 +172,22 @@ NOTE:
 
 #### UI Requirements:
 
-* Page title: "Jelajahi Ekstrakurikuler"
-* Search input (by name)
-* Grid/list of cards
+- Page title: "Jelajahi Ekstrakurikuler"
+- Search input (by name)
+- Grid/list of cards
 
 #### Card UI MUST show:
 
-* Name
-* Short description
-* Category badge
-* Pembina name
-* Member count
-* CTA: "Lihat Detail"
+- Name
+- Short description
+- Category badge
+- Pembina name
+- Member count
+- CTA: "Lihat Detail"
 
 #### Empty State:
 
-* Text: "Belum ada ekstrakurikuler tersedia"
+- Text: "Belum ada ekstrakurikuler tersedia"
 
 ---
 
@@ -201,15 +200,15 @@ NOTE:
 #### UI Sections:
 
 1. Header
+   - Name
+   - Category badge
+   - Status badge
 
-   * Name
-   * Category badge
-   * Status badge
 2. Description
 3. Pembina info card
 4. Schedule section
+   - List schedules OR empty state
 
-   * List schedules OR empty state
 5. Enrollment action panel
 
 #### Enrollment Panel States:
@@ -258,16 +257,16 @@ Payload:
 
 #### Validation (Server-Side, Required):
 
-* user authenticated via Clerk
-* role === SISWA
-* clerk_user_id matches student_id
-* extracurricular exists
-* extracurricular ACTIVE
-* no duplicate enrollment
-* user is STUDENT
-* extracurricular exists
-* extracurricular ACTIVE
-* no duplicate enrollment
+- user authenticated via Clerk
+- role === SISWA
+- clerk_user_id matches student_id
+- extracurricular exists
+- extracurricular ACTIVE
+- no duplicate enrollment
+- user is STUDENT
+- extracurricular exists
+- extracurricular ACTIVE
+- no duplicate enrollment
 
 Creates enrollment with status = PENDING
 
@@ -299,9 +298,9 @@ GET /api/enrollments/status?extracurricular_id=uuid
 
 ### Required Errors:
 
-* Duplicate enrollment
-* Unauthorized access
-* Inactive extracurricular
+- Duplicate enrollment
+- Unauthorized access
+- Inactive extracurricular
 
 UI must display friendly messages
 
@@ -309,12 +308,12 @@ UI must display friendly messages
 
 ## 10. TEST CASES (CLERK + SUPABASE) (MUST PASS)
 
-* student sees list of extracurriculars
-* student opens detail page
-* student enrolls successfully
-* enrollment status updates
-* duplicate enrollment blocked
-* Role-Based Access Control (RBAC) Enforced
+- student sees list of extracurriculars
+- student opens detail page
+- student enrolls successfully
+- enrollment status updates
+- duplicate enrollment blocked
+- Role-Based Access Control (RBAC) Enforced
 
 ---
 
@@ -322,10 +321,10 @@ UI must display friendly messages
 
 This feature is COMPLETE if:
 
-* no hardcoded data
-* no broken states
-* all empty states handled
-* student can discover and enroll
+- no hardcoded data
+- no broken states
+- all empty states handled
+- student can discover and enroll
 
 ---
 

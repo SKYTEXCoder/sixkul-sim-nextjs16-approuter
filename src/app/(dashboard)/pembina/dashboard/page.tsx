@@ -1,8 +1,8 @@
 /**
  * Pembina Dashboard Page
- * 
+ *
  * Main dashboard view for Pembina role.
- * 
+ *
  * @module app/(dashboard)/pembina/dashboard/page
  */
 
@@ -110,9 +110,7 @@ export default function PembinaDashboardPage() {
               <BookOpen className="h-5 w-5 text-emerald-500" />
               Ekstrakurikuler Saya
             </CardTitle>
-            <CardDescription>
-              Ekstrakurikuler yang Anda bimbing
-            </CardDescription>
+            <CardDescription>Ekstrakurikuler yang Anda bimbing</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {[
@@ -191,8 +189,16 @@ export default function PembinaDashboardPage() {
         <CardContent>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {[
-              { name: "Latihan Robotik", time: "15:00 - 17:00", location: "Lab Komputer" },
-              { name: "Rapat Paskibra", time: "16:00 - 17:00", location: "Aula" },
+              {
+                name: "Latihan Robotik",
+                time: "15:00 - 17:00",
+                location: "Lab Komputer",
+              },
+              {
+                name: "Rapat Paskibra",
+                time: "16:00 - 17:00",
+                location: "Aula",
+              },
             ].map((schedule, i) => (
               <div
                 key={i}

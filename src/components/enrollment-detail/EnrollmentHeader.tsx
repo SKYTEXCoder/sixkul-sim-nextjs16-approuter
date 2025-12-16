@@ -1,9 +1,9 @@
 /**
  * Enrollment Header Component
- * 
+ *
  * Page header with title, subtitle, and back navigation.
  * Server Component - no client-side interactivity needed.
- * 
+ *
  * @module components/enrollment-detail/EnrollmentHeader
  */
 

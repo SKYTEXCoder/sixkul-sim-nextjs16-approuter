@@ -1,9 +1,9 @@
 /**
  * Enrollment Status Card Component
- * 
+ *
  * Displays enrollment status, extracurricular info, and metadata.
  * Server Component - no client-side interactivity needed.
- * 
+ *
  * @module components/enrollment-detail/EnrollmentStatusCard
  */
 
@@ -24,34 +24,46 @@ interface EnrollmentStatusCardProps {
 // Status Badge Component
 // ============================================
 
-function StatusBadge({ status }: { status: EnrollmentDetailViewModel["status"] }) {
+function StatusBadge({
+  status,
+}: {
+  status: EnrollmentDetailViewModel["status"];
+}) {
   const statusConfig = {
     PENDING: {
       label: "Menunggu Persetujuan",
-      className: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border-amber-200 dark:border-amber-800",
+      className:
+        "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border-amber-200 dark:border-amber-800",
     },
     ACTIVE: {
       label: "Aktif",
-      className: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800",
+      className:
+        "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800",
     },
     REJECTED: {
       label: "Ditolak",
-      className: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 border-red-200 dark:border-red-800",
+      className:
+        "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 border-red-200 dark:border-red-800",
     },
     ALUMNI: {
       label: "Alumni",
-      className: "bg-slate-100 text-slate-700 dark:bg-slate-900/30 dark:text-slate-400 border-slate-200 dark:border-slate-800",
+      className:
+        "bg-slate-100 text-slate-700 dark:bg-slate-900/30 dark:text-slate-400 border-slate-200 dark:border-slate-800",
     },
     CANCELLED: {
       label: "Dibatalkan",
-      className: "bg-slate-100 text-slate-600 dark:bg-slate-900/30 dark:text-slate-500 border-slate-200 dark:border-slate-800",
+      className:
+        "bg-slate-100 text-slate-600 dark:bg-slate-900/30 dark:text-slate-500 border-slate-200 dark:border-slate-800",
     },
   };
 
   const config = statusConfig[status] || statusConfig.PENDING;
 
   return (
-    <Badge variant="outline" className={`text-sm px-3 py-1 ${config.className}`}>
+    <Badge
+      variant="outline"
+      className={`text-sm px-3 py-1 ${config.className}`}
+    >
       {config.label}
     </Badge>
   );
@@ -63,31 +75,37 @@ function StatusBadge({ status }: { status: EnrollmentDetailViewModel["status"] }
 
 function CategoryBadge({ category }: { category: string }) {
   const categoryColors: Record<string, string> = {
-    "Olahraga": "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
-    "Seni": "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400",
-    "Akademik": "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
-    "Teknologi": "bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400",
+    Olahraga:
+      "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
+    Seni: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400",
+    Akademik:
+      "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
+    Teknologi:
+      "bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400",
   };
 
-  const colorClass = categoryColors[category] || "bg-slate-100 text-slate-700 dark:bg-slate-900/30 dark:text-slate-400";
+  const colorClass =
+    categoryColors[category] ||
+    "bg-slate-100 text-slate-700 dark:bg-slate-900/30 dark:text-slate-400";
 
-  return (
-    <Badge className={colorClass}>
-      {category}
-    </Badge>
-  );
+  return <Badge className={colorClass}>{category}</Badge>;
 }
 
 // ============================================
 // Main Component
 // ============================================
 
-export function EnrollmentStatusCard({ enrollment }: EnrollmentStatusCardProps) {
-  const formattedJoinDate = new Date(enrollment.joinedAt).toLocaleDateString("id-ID", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
+export function EnrollmentStatusCard({
+  enrollment,
+}: EnrollmentStatusCardProps) {
+  const formattedJoinDate = new Date(enrollment.joinedAt).toLocaleDateString(
+    "id-ID",
+    {
+      day: "numeric",
+      month: "long",
+      year: "numeric",
+    },
+  );
 
   return (
     <Card className="overflow-hidden">
@@ -99,7 +117,7 @@ export function EnrollmentStatusCard({ enrollment }: EnrollmentStatusCardProps) 
             <div className="w-16 h-16 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center flex-shrink-0">
               <GraduationCap className="w-8 h-8 text-white" />
             </div>
-            
+
             <div>
               <h2 className="text-xl font-bold text-slate-900 dark:text-white">
                 {enrollment.extracurricular.name}
@@ -124,7 +142,9 @@ export function EnrollmentStatusCard({ enrollment }: EnrollmentStatusCardProps) 
               <Calendar className="w-5 h-5 text-slate-500" />
             </div>
             <div>
-              <p className="text-xs text-slate-500 dark:text-slate-400">Tanggal Bergabung</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Tanggal Bergabung
+              </p>
               <p className="text-sm font-medium text-slate-900 dark:text-white">
                 {formattedJoinDate}
               </p>
@@ -137,7 +157,9 @@ export function EnrollmentStatusCard({ enrollment }: EnrollmentStatusCardProps) 
               <BookOpen className="w-5 h-5 text-slate-500" />
             </div>
             <div>
-              <p className="text-xs text-slate-500 dark:text-slate-400">Tahun Akademik</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Tahun Akademik
+              </p>
               <p className="text-sm font-medium text-slate-900 dark:text-white">
                 {enrollment.academicYear}
               </p>
@@ -150,7 +172,9 @@ export function EnrollmentStatusCard({ enrollment }: EnrollmentStatusCardProps) 
               <User className="w-5 h-5 text-slate-500" />
             </div>
             <div>
-              <p className="text-xs text-slate-500 dark:text-slate-400">Pembina</p>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                Pembina
+              </p>
               <p className="text-sm font-medium text-slate-900 dark:text-white">
                 {enrollment.pembina.name}
               </p>

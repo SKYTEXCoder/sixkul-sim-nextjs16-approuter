@@ -1,9 +1,9 @@
 /**
  * Enrollment Card Component
- * 
+ *
  * Displays a single enrollment with status, metadata, and action buttons.
  * Actions are conditional based on enrollment status.
- * 
+ *
  * @module components/enrollment/EnrollmentCard
  */
 
@@ -11,12 +11,7 @@ import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import {
-  Eye,
-  User,
-  Clock,
-  GraduationCap,
-} from "lucide-react";
+import { Eye, User, Clock, GraduationCap } from "lucide-react";
 import type { EnrollmentViewModel } from "@/lib/enrollments-data";
 
 // ============================================
@@ -35,23 +30,28 @@ function StatusBadge({ status }: { status: EnrollmentViewModel["status"] }) {
   const statusConfig = {
     PENDING: {
       label: "Menunggu Persetujuan",
-      className: "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border-amber-200 dark:border-amber-800",
+      className:
+        "bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400 border-amber-200 dark:border-amber-800",
     },
     ACTIVE: {
       label: "Aktif",
-      className: "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800",
+      className:
+        "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400 border-emerald-200 dark:border-emerald-800",
     },
     REJECTED: {
       label: "Ditolak",
-      className: "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 border-red-200 dark:border-red-800",
+      className:
+        "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400 border-red-200 dark:border-red-800",
     },
     ALUMNI: {
       label: "Alumni",
-      className: "bg-slate-100 text-slate-700 dark:bg-slate-900/30 dark:text-slate-400 border-slate-200 dark:border-slate-800",
+      className:
+        "bg-slate-100 text-slate-700 dark:bg-slate-900/30 dark:text-slate-400 border-slate-200 dark:border-slate-800",
     },
     CANCELLED: {
       label: "Dibatalkan",
-      className: "bg-slate-100 text-slate-600 dark:bg-slate-900/30 dark:text-slate-500 border-slate-200 dark:border-slate-800",
+      className:
+        "bg-slate-100 text-slate-600 dark:bg-slate-900/30 dark:text-slate-500 border-slate-200 dark:border-slate-800",
     },
   };
 
@@ -70,19 +70,20 @@ function StatusBadge({ status }: { status: EnrollmentViewModel["status"] }) {
 
 function CategoryBadge({ category }: { category: string }) {
   const categoryColors: Record<string, string> = {
-    "Olahraga": "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
-    "Seni": "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400",
-    "Akademik": "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
-    "Teknologi": "bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400",
+    Olahraga:
+      "bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400",
+    Seni: "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-400",
+    Akademik:
+      "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400",
+    Teknologi:
+      "bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-400",
   };
 
-  const colorClass = categoryColors[category] || "bg-slate-100 text-slate-700 dark:bg-slate-900/30 dark:text-slate-400";
+  const colorClass =
+    categoryColors[category] ||
+    "bg-slate-100 text-slate-700 dark:bg-slate-900/30 dark:text-slate-400";
 
-  return (
-    <Badge className={colorClass}>
-      {category}
-    </Badge>
-  );
+  return <Badge className={colorClass}>{category}</Badge>;
 }
 
 // ============================================
@@ -90,7 +91,6 @@ function CategoryBadge({ category }: { category: string }) {
 // ============================================
 
 export function EnrollmentCard({ enrollment }: EnrollmentCardProps) {
-
   return (
     <Card className="overflow-hidden transition-all hover:shadow-md">
       <CardHeader className="pb-3">
@@ -101,7 +101,7 @@ export function EnrollmentCard({ enrollment }: EnrollmentCardProps) {
             <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center flex-shrink-0">
               <GraduationCap className="w-6 h-6 text-white" />
             </div>
-            
+
             <div className="min-w-0 flex-1">
               <h3 className="font-semibold text-slate-900 dark:text-white leading-tight">
                 {enrollment.extracurricular.name}
@@ -137,12 +137,7 @@ export function EnrollmentCard({ enrollment }: EnrollmentCardProps) {
         {/* Actions */}
         <div className="flex flex-wrap gap-2 pt-2 border-t border-slate-100 dark:border-slate-800">
           {/* Lihat Aktivitas - Available for ALL statuses */}
-          <Button
-            variant="outline"
-            size="sm"
-            asChild
-            className="gap-1.5"
-          >
+          <Button variant="outline" size="sm" asChild className="gap-1.5">
             <Link href={`/student/enrollments/${enrollment.id}`}>
               <Eye className="w-4 h-4" />
               Lihat Aktivitas

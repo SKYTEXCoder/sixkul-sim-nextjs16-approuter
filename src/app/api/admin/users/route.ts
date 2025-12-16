@@ -1,24 +1,24 @@
 /**
  * SIXKUL Admin User Management API Routes
- * 
+ *
  * Full CRUD operations for managing users (Admin only)
- * 
+ *
  * POST   /api/admin/users     - Create new user with profile
  * GET    /api/admin/users     - List all users
- * 
+ *
  * @module api/admin/users
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
-import { auth } from '@clerk/nextjs/server';
-import { UserRole } from '@/generated/prisma';
+import { NextRequest, NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
+import { auth } from "@clerk/nextjs/server";
+import { UserRole } from "@/generated/prisma";
 
 // ============================================
 // Constants
 // ============================================
 
-const DEFAULT_PASSWORD = '123456';
+const DEFAULT_PASSWORD = "123456";
 
 // ============================================
 // Type Definitions
@@ -104,21 +104,22 @@ async function authenticateAdmin(): Promise<{
 }> {
   try {
     const { userId, sessionClaims } = await auth();
-    
+
     if (!userId) {
       return {
         success: false,
-        error: 'Authentication required. Please login.',
+        error: "Authentication required. Please login.",
         statusCode: 401,
       };
     }
 
-    const userRole = (sessionClaims?.public_metadata as { role?: string })?.role;
-    
-    if (userRole !== 'ADMIN') {
+    const userRole = (sessionClaims?.public_metadata as { role?: string })
+      ?.role;
+
+    if (userRole !== "ADMIN") {
       return {
         success: false,
-        error: 'Admin access required.',
+        error: "Admin access required.",
         statusCode: 403,
       };
     }
@@ -128,10 +129,10 @@ async function authenticateAdmin(): Promise<{
       userId,
     };
   } catch (error) {
-    console.error('[ADMIN AUTH ERROR]', error);
+    console.error("[ADMIN AUTH ERROR]", error);
     return {
       success: false,
-      error: 'Authentication failed. Please login again.',
+      error: "Authentication failed. Please login again.",
       statusCode: 401,
     };
   }
@@ -147,44 +148,58 @@ function validateCreateUserInput(body: unknown): {
 } {
   const errors: string[] = [];
 
-  if (!body || typeof body !== 'object') {
-    return { valid: false, errors: ['Request body is required'] };
+  if (!body || typeof body !== "object") {
+    return { valid: false, errors: ["Request body is required"] };
   }
 
-  const { name, email, role, specificId, className, major, expertise, phoneNumber } = 
-    body as Partial<CreateUserRequestBody>;
+  const {
+    name,
+    email,
+    role,
+    specificId,
+    className,
+    major,
+    expertise,
+    phoneNumber,
+  } = body as Partial<CreateUserRequestBody>;
 
   // Validate required fields
-  if (!name || typeof name !== 'string' || name.trim().length === 0) {
-    errors.push('name is required and must be a non-empty string');
+  if (!name || typeof name !== "string" || name.trim().length === 0) {
+    errors.push("name is required and must be a non-empty string");
   }
 
-  if (!email || typeof email !== 'string') {
-    errors.push('email is required');
+  if (!email || typeof email !== "string") {
+    errors.push("email is required");
   } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    errors.push('email must be a valid email address');
+    errors.push("email must be a valid email address");
   }
 
   if (!role) {
-    errors.push('role is required');
-  } else if (!['ADMIN', 'PEMBINA', 'SISWA'].includes(role)) {
-    errors.push('role must be one of: ADMIN, PEMBINA, SISWA');
+    errors.push("role is required");
+  } else if (!["ADMIN", "PEMBINA", "SISWA"].includes(role)) {
+    errors.push("role must be one of: ADMIN, PEMBINA, SISWA");
   }
 
   // specificId validation based on role
-  if (role === 'SISWA' || role === 'PEMBINA') {
-    if (!specificId || typeof specificId !== 'string' || specificId.trim().length === 0) {
-      errors.push(`specificId is required for ${role} (${role === 'SISWA' ? 'NIS' : 'NIP'})`);
+  if (role === "SISWA" || role === "PEMBINA") {
+    if (
+      !specificId ||
+      typeof specificId !== "string" ||
+      specificId.trim().length === 0
+    ) {
+      errors.push(
+        `specificId is required for ${role} (${role === "SISWA" ? "NIS" : "NIP"})`,
+      );
     }
   }
 
   // SISWA-specific validation
-  if (role === 'SISWA') {
-    if (!className || typeof className !== 'string') {
-      errors.push('className is required for SISWA');
+  if (role === "SISWA") {
+    if (!className || typeof className !== "string") {
+      errors.push("className is required for SISWA");
     }
-    if (!major || typeof major !== 'string') {
-      errors.push('major is required for SISWA');
+    if (!major || typeof major !== "string") {
+      errors.push("major is required for SISWA");
     }
   }
 
@@ -198,7 +213,7 @@ function validateCreateUserInput(body: unknown): {
       name: name!.trim(),
       email: email!.toLowerCase().trim(),
       role: role as UserRole,
-      specificId: specificId?.trim() || '',
+      specificId: specificId?.trim() || "",
       className: className?.trim(),
       major: major?.trim(),
       expertise: expertise?.trim(),
@@ -212,18 +227,18 @@ function validateCreateUserInput(body: unknown): {
 // ============================================
 
 export async function POST(
-  request: NextRequest
+  request: NextRequest,
 ): Promise<NextResponse<UserSuccessResponse | UserErrorResponse>> {
   try {
     // ----------------------------------------
     // Step 1: Authenticate and verify ADMIN role
     // ----------------------------------------
     const authResult = await authenticateAdmin();
-    
+
     if (!authResult.success) {
       return NextResponse.json(
         { success: false, message: authResult.error! },
-        { status: authResult.statusCode }
+        { status: authResult.statusCode },
       );
     }
 
@@ -235,26 +250,34 @@ export async function POST(
       body = await request.json();
     } catch {
       return NextResponse.json(
-        { success: false, message: 'Invalid JSON in request body' },
-        { status: 400 }
+        { success: false, message: "Invalid JSON in request body" },
+        { status: 400 },
       );
     }
 
     const validation = validateCreateUserInput(body);
-    
+
     if (!validation.valid || !validation.data) {
       return NextResponse.json(
         {
           success: false,
-          message: 'Validation failed',
+          message: "Validation failed",
           errors: validation.errors,
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    const { name, email, role, specificId, className, major, expertise, phoneNumber } = 
-      validation.data;
+    const {
+      name,
+      email,
+      role,
+      specificId,
+      className,
+      major,
+      expertise,
+      phoneNumber,
+    } = validation.data;
 
     // ----------------------------------------
     // Step 3: Check for duplicate email (optional field but should be unique if provided)
@@ -270,7 +293,7 @@ export async function POST(
             success: false,
             message: `User dengan email "${email}" sudah ada.`,
           },
-          { status: 409 }
+          { status: 409 },
         );
       }
     }
@@ -278,7 +301,7 @@ export async function POST(
     // ----------------------------------------
     // Step 4: Check for duplicate NIS/NIP
     // ----------------------------------------
-    if (role === 'SISWA') {
+    if (role === "SISWA") {
       const existingNis = await prisma.studentProfile.findUnique({
         where: { nis: specificId },
       });
@@ -288,10 +311,10 @@ export async function POST(
             success: false,
             message: `Student dengan NIS "${specificId}" sudah ada.`,
           },
-          { status: 409 }
+          { status: 409 },
         );
       }
-    } else if (role === 'PEMBINA') {
+    } else if (role === "PEMBINA") {
       const existingNip = await prisma.pembinaProfile.findUnique({
         where: { nip: specificId },
       });
@@ -301,7 +324,7 @@ export async function POST(
             success: false,
             message: `Pembina dengan NIP "${specificId}" sudah ada.`,
           },
-          { status: 409 }
+          { status: 409 },
         );
       }
     }
@@ -340,7 +363,7 @@ export async function POST(
       } | null = null;
 
       // Create role-specific profile
-      if (role === 'SISWA') {
+      if (role === "SISWA") {
         const studentProfile = await tx.studentProfile.create({
           data: {
             user_id: newUser.id,
@@ -357,7 +380,7 @@ export async function POST(
           className: studentProfile.class_name,
           major: studentProfile.major,
         };
-      } else if (role === 'PEMBINA') {
+      } else if (role === "PEMBINA") {
         const pembinaProfile = await tx.pembinaProfile.create({
           data: {
             user_id: newUser.id,
@@ -378,7 +401,7 @@ export async function POST(
     });
 
     console.log(
-      `[ADMIN] User created: ${result.user.email} (${result.user.role}) - ID: ${result.user.id}`
+      `[ADMIN] User created: ${result.user.email} (${result.user.role}) - ID: ${result.user.id}`,
     );
 
     // ----------------------------------------
@@ -397,20 +420,19 @@ export async function POST(
           created_at: result.user.created_at,
           profile: result.profile || undefined,
         },
-        defaultPassword: 'N/A - Create user in Clerk Dashboard',
+        defaultPassword: "N/A - Create user in Clerk Dashboard",
       },
-      { status: 201 }
+      { status: 201 },
     );
-
   } catch (error) {
-    console.error('[ADMIN USER CREATE ERROR]', error);
+    console.error("[ADMIN USER CREATE ERROR]", error);
 
     return NextResponse.json(
       {
         success: false,
-        message: 'Terjadi kesalahan pada server. Silakan coba lagi.',
+        message: "Terjadi kesalahan pada server. Silakan coba lagi.",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -420,33 +442,33 @@ export async function POST(
 // ============================================
 
 export async function GET(
-  request: NextRequest
+  request: NextRequest,
 ): Promise<NextResponse<UserListResponse | UserErrorResponse>> {
   try {
     // Authenticate admin
     const authResult = await authenticateAdmin();
-    
+
     if (!authResult.success) {
       return NextResponse.json(
         { success: false, message: authResult.error! },
-        { status: authResult.statusCode }
+        { status: authResult.statusCode },
       );
     }
 
     // Get query parameters for filtering
     const { searchParams } = new URL(request.url);
-    const role = searchParams.get('role');
-    const search = searchParams.get('search');
+    const role = searchParams.get("role");
+    const search = searchParams.get("search");
 
     // Build filter
     const where: Record<string, unknown> = {};
-    if (role && ['ADMIN', 'PEMBINA', 'SISWA'].includes(role)) {
+    if (role && ["ADMIN", "PEMBINA", "SISWA"].includes(role)) {
       where.role = role;
     }
     if (search) {
       where.OR = [
-        { full_name: { contains: search, mode: 'insensitive' } },
-        { email: { contains: search, mode: 'insensitive' } },
+        { full_name: { contains: search, mode: "insensitive" } },
+        { email: { contains: search, mode: "insensitive" } },
       ];
     }
 
@@ -476,25 +498,24 @@ export async function GET(
           },
         },
       },
-      orderBy: { created_at: 'desc' },
+      orderBy: { created_at: "desc" },
     });
 
     return NextResponse.json({
       success: true,
-      message: 'Users retrieved successfully',
+      message: "Users retrieved successfully",
       data: users,
       total: users.length,
     });
-
   } catch (error) {
-    console.error('[ADMIN USER GET ERROR]', error);
+    console.error("[ADMIN USER GET ERROR]", error);
 
     return NextResponse.json(
       {
         success: false,
-        message: 'Terjadi kesalahan pada server. Silakan coba lagi.',
+        message: "Terjadi kesalahan pada server. Silakan coba lagi.",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -507,9 +528,9 @@ export async function PUT(): Promise<NextResponse<UserErrorResponse>> {
   return NextResponse.json(
     {
       success: false,
-      message: 'Use /api/admin/users/[id] for updating users.',
+      message: "Use /api/admin/users/[id] for updating users.",
     },
-    { status: 405 }
+    { status: 405 },
   );
 }
 
@@ -517,8 +538,8 @@ export async function DELETE(): Promise<NextResponse<UserErrorResponse>> {
   return NextResponse.json(
     {
       success: false,
-      message: 'Use /api/admin/users/[id] for deleting users.',
+      message: "Use /api/admin/users/[id] for deleting users.",
     },
-    { status: 405 }
+    { status: 405 },
   );
 }

@@ -1,9 +1,9 @@
 /**
  * Schedule Page Header Component
- * 
+ *
  * Displays the title and subtitle for the Jadwal Saya page.
  * Server Component - no client-side interactivity needed.
- * 
+ *
  * @module components/student-schedule/ScheduleHeader
  */
 

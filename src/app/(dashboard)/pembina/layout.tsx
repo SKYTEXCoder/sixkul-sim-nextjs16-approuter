@@ -8,11 +8,13 @@
  * @module app/(dashboard)/pembina/layout
  */
 
+import { useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import { useAuthSync } from "@/hooks/useAuthSync";
 import { Sidebar, NavItem } from "@/components/layout/Sidebar";
 import { TopNavbar } from "@/components/layout/TopNavbar";
 import { LayoutDashboard, BookOpen } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 // ============================================
 // Pembina Menu Configuration
@@ -40,6 +42,9 @@ export default function PembinaLayout({
 }: {
   children: React.ReactNode;
 }) {
+  // Sidebar collapsed state - lifted up for responsive content
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+
   // Get user data from Clerk
   const { user, isLoaded } = useUser();
 
@@ -64,16 +69,37 @@ export default function PembinaLayout({
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
-      {/* Sidebar */}
-      <Sidebar menuItems={pembinaMenuItems} user={userData} />
+      {/* Sidebar - pass collapse state */}
+      <Sidebar
+        menuItems={pembinaMenuItems}
+        user={userData}
+        isCollapsed={isSidebarCollapsed}
+        onCollapseChange={setIsSidebarCollapsed}
+      />
 
-      {/* Main Content Area */}
-      <div className="md:ml-64 transition-all duration-300">
-        {/* Top Navigation */}
-        <TopNavbar user={userData} />
+      {/* Main Content Area - responds to sidebar collapse */}
+      <div
+        className={cn(
+          "transition-all duration-300",
+          isSidebarCollapsed ? "md:ml-20" : "md:ml-64",
+        )}
+      >
+        {/* Top Navigation with divider and padding */}
+        <header className="sticky top-0 z-30 bg-white dark:bg-slate-900">
+          {/* Top padding to move navbar away from browser edge */}
+          <div className="pt-3" />
+
+          {/* Navbar content */}
+          <div className="h-14">
+            <TopNavbar user={userData} />
+          </div>
+
+          {/* Clean divider */}
+          <div className="h-px bg-gradient-to-r from-transparent via-slate-200 dark:via-slate-700 to-transparent mx-4" />
+        </header>
 
         {/* Page Content */}
-        <main className="pt-20 px-4 md:px-6 pb-8">
+        <main className="pt-6 px-4 md:px-6 pb-8">
           <div className="max-w-7xl mx-auto">{children}</div>
         </main>
       </div>

@@ -45,7 +45,7 @@ export interface UpdateAnnouncementInput {
  * Get all announcements for an extracurricular.
  */
 export async function getAnnouncementsByExtracurricular(
-  extracurricularId: string
+  extracurricularId: string,
 ): Promise<Announcement[]> {
   const announcements = await prisma.announcement.findMany({
     where: {
@@ -84,7 +84,7 @@ export async function getAnnouncementsByExtracurricular(
 export async function createAnnouncement(
   extracurricularId: string,
   authorUserId: string,
-  data: CreateAnnouncementInput
+  data: CreateAnnouncementInput,
 ): Promise<{ success: boolean; error?: string }> {
   try {
     // Get the User record from clerk_id
@@ -107,7 +107,7 @@ export async function createAnnouncement(
     });
 
     revalidatePath(
-      `/pembina/ekstrakurikuler/${extracurricularId}/announcements`
+      `/pembina/ekstrakurikuler/${extracurricularId}/announcements`,
     );
     revalidatePath(`/pembina/ekstrakurikuler/${extracurricularId}`);
 
@@ -126,7 +126,7 @@ export async function updateAnnouncement(
   announcementId: string,
   authorUserId: string,
   extracurricularId: string,
-  data: UpdateAnnouncementInput
+  data: UpdateAnnouncementInput,
 ): Promise<{ success: boolean; error?: string }> {
   try {
     // Get the User record from clerk_id
@@ -164,7 +164,7 @@ export async function updateAnnouncement(
     });
 
     revalidatePath(
-      `/pembina/ekstrakurikuler/${extracurricularId}/announcements`
+      `/pembina/ekstrakurikuler/${extracurricularId}/announcements`,
     );
 
     return { success: true };
@@ -181,7 +181,7 @@ export async function updateAnnouncement(
 export async function deleteAnnouncement(
   announcementId: string,
   authorUserId: string,
-  extracurricularId: string
+  extracurricularId: string,
 ): Promise<{ success: boolean; error?: string }> {
   try {
     // Get the User record from clerk_id
@@ -215,7 +215,7 @@ export async function deleteAnnouncement(
     });
 
     revalidatePath(
-      `/pembina/ekstrakurikuler/${extracurricularId}/announcements`
+      `/pembina/ekstrakurikuler/${extracurricularId}/announcements`,
     );
     revalidatePath(`/pembina/ekstrakurikuler/${extracurricularId}`);
 

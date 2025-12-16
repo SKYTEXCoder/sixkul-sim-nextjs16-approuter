@@ -56,7 +56,7 @@ export function AnnouncementList({
     try {
       const result = await deleteAnnouncementAction(
         announcementId,
-        extracurricularId
+        extracurricularId,
       );
 
       if (result.success) {
@@ -112,7 +112,7 @@ export function AnnouncementList({
                         "dd MMM yyyy, HH:mm",
                         {
                           locale: idLocale,
-                        }
+                        },
                       )}
                     </span>
                   </div>

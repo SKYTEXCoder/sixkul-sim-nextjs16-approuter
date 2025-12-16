@@ -107,7 +107,6 @@ You **MUST** implement notification creation for the following events.
 - Triggered when a new announcement is created for an extracurricular
 - Applies to **ACTIVE enrollments only**
 - Gated by:
-
   - `StudentPreferences.notify_announcements === true`
 
 ### 5.2 Attendance Recorded
@@ -115,26 +114,22 @@ You **MUST** implement notification creation for the following events.
 - Triggered when attendance is created for a session
 - Applies to the enrollment owner
 - Gated by:
-
   - `StudentPreferences.notify_attendance === true`
 
 ### 5.3 Schedule / Session Change
 
 - Triggered when a session is:
-
   - created
   - updated
   - cancelled
 
 - Applies to **ACTIVE enrollments**
 - Gated by:
-
   - `StudentPreferences.notify_schedule_changes === true`
 
 ### 5.4 Enrollment Status Change
 
 - Triggered when enrollment changes status:
-
   - `PENDING → ACTIVE`
   - `ACTIVE → ALUMNI / CANCELLED / REJECTED`
 
@@ -208,7 +203,6 @@ getUnreadNotificationCount()
 ### Interaction
 
 - Clicking a notification:
-
   1. Marks it as read
   2. Navigates to `/student/enrollments/[id]`
 
@@ -237,7 +231,6 @@ getUnreadNotificationCount()
 - Notifications default to `is_read = false`
 - When clicked → mark as read
 - Optional:
-
   - “Mark all as read” button
 
 ❌ No deletion required for MVP.

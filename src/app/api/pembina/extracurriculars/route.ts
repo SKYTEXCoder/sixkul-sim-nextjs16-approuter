@@ -1,15 +1,15 @@
 /**
  * SIXKUL Pembina Extracurriculars API Route
- * 
+ *
  * GET /api/pembina/extracurriculars - List extracurriculars managed by authenticated pembina
- * 
+ *
  * @module api/pembina/extracurriculars
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
-import { auth } from '@clerk/nextjs/server';
-import { getOrCreatePembinaProfile } from '@/lib/sync-user';
+import { NextRequest, NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
+import { auth } from "@clerk/nextjs/server";
+import { getOrCreatePembinaProfile } from "@/lib/sync-user";
 
 // ============================================
 // Type Definitions
@@ -51,32 +51,33 @@ async function authenticatePembina(): Promise<{
 }> {
   try {
     const { userId, sessionClaims } = await auth();
-    
+
     if (!userId) {
       return {
         success: false,
-        error: 'Authentication required. Please login.',
+        error: "Authentication required. Please login.",
         statusCode: 401,
       };
     }
 
-    const userRole = (sessionClaims?.public_metadata as { role?: string })?.role;
-    
-    if (userRole !== 'PEMBINA' && userRole !== 'ADMIN') {
+    const userRole = (sessionClaims?.public_metadata as { role?: string })
+      ?.role;
+
+    if (userRole !== "PEMBINA" && userRole !== "ADMIN") {
       return {
         success: false,
-        error: 'Only Pembina can access this resource.',
+        error: "Only Pembina can access this resource.",
         statusCode: 403,
       };
     }
 
     // Use JIT sync to get or create pembina profile
     const result = await getOrCreatePembinaProfile(userId, sessionClaims);
-    
+
     if (!result) {
       return {
         success: false,
-        error: 'Pembina profile not found or could not be created.',
+        error: "Pembina profile not found or could not be created.",
         statusCode: 404,
       };
     }
@@ -86,10 +87,10 @@ async function authenticatePembina(): Promise<{
       pembinaProfileId: result.pembinaProfile.id,
     };
   } catch (error) {
-    console.error('[PEMBINA AUTH ERROR]', error);
+    console.error("[PEMBINA AUTH ERROR]", error);
     return {
       success: false,
-      error: 'Authentication failed. Please login again.',
+      error: "Authentication failed. Please login again.",
       statusCode: 401,
     };
   }
@@ -100,16 +101,16 @@ async function authenticatePembina(): Promise<{
 // ============================================
 
 export async function GET(
-  request: NextRequest
+  request: NextRequest,
 ): Promise<NextResponse<SuccessResponse | ErrorResponse>> {
   try {
     // Authenticate pembina
     const authResult = await authenticatePembina();
-    
+
     if (!authResult.success || !authResult.pembinaProfileId) {
       return NextResponse.json(
         { success: false, message: authResult.error! },
-        { status: authResult.statusCode }
+        { status: authResult.statusCode },
       );
     }
 
@@ -117,7 +118,7 @@ export async function GET(
     const extracurriculars = await prisma.extracurricular.findMany({
       where: {
         pembina_id: authResult.pembinaProfileId,
-        status: 'ACTIVE',
+        status: "ACTIVE",
       },
       select: {
         id: true,
@@ -128,31 +129,30 @@ export async function GET(
           select: {
             enrollments: {
               where: {
-                status: 'ACTIVE',
+                status: "ACTIVE",
               },
             },
           },
         },
       },
       orderBy: {
-        name: 'asc',
+        name: "asc",
       },
     });
 
     return NextResponse.json({
       success: true,
-      message: 'Extracurriculars fetched successfully',
+      message: "Extracurriculars fetched successfully",
       data: extracurriculars,
     });
-
   } catch (error) {
-    console.error('[PEMBINA EXTRACURRICULARS ERROR]', error);
+    console.error("[PEMBINA EXTRACURRICULARS ERROR]", error);
     return NextResponse.json(
       {
         success: false,
-        message: 'Terjadi kesalahan pada server. Silakan coba lagi.',
+        message: "Terjadi kesalahan pada server. Silakan coba lagi.",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

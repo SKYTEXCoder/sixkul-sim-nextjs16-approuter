@@ -1,9 +1,9 @@
 /**
  * Empty Enrollments Component
- * 
+ *
  * Displayed when student has no enrollments.
  * Provides a CTA to browse extracurriculars.
- * 
+ *
  * @module components/enrollment/EmptyEnrollments
  */
 
@@ -29,7 +29,8 @@ export function EmptyEnrollments() {
         Kamu belum mengikuti ekstrakurikuler apa pun
       </h3>
       <p className="text-slate-500 dark:text-slate-400 text-center max-w-md mb-6">
-        Jelajahi berbagai ekstrakurikuler yang tersedia dan temukan yang sesuai dengan minat dan bakatmu!
+        Jelajahi berbagai ekstrakurikuler yang tersedia dan temukan yang sesuai
+        dengan minat dan bakatmu!
       </p>
 
       {/* CTA Button */}

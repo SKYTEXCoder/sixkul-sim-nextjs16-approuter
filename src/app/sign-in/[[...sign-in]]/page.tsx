@@ -1,9 +1,9 @@
 /**
  * SIXKUL Custom Sign-In Page
- * 
+ *
  * Custom sign-in page using Clerk's SignIn component with SIXKUL branding.
  * Sign-up is disabled - only admins can create accounts.
- * 
+ *
  * @module app/sign-in/[[...sign-in]]/page
  */
 
@@ -39,13 +39,16 @@ export default function SignInPage() {
                 card: "bg-slate-800/50 backdrop-blur-sm border-slate-700 shadow-2xl",
                 headerTitle: "text-white",
                 headerSubtitle: "text-slate-400",
-                socialButtonsBlockButton: "bg-slate-700 border-slate-600 text-white hover:bg-slate-600",
+                socialButtonsBlockButton:
+                  "bg-slate-700 border-slate-600 text-white hover:bg-slate-600",
                 formFieldLabel: "text-slate-200",
-                formFieldInput: "bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-400",
+                formFieldInput:
+                  "bg-slate-700/50 border-slate-600 text-white placeholder:text-slate-400",
                 formButtonPrimary: "bg-primary hover:bg-primary/90",
                 footerActionLink: "text-primary hover:text-primary/90",
                 identifierPreviewText: "text-white",
-                formFieldInputShowPasswordButton: "text-slate-400 hover:text-slate-200",
+                formFieldInputShowPasswordButton:
+                  "text-slate-400 hover:text-slate-200",
               },
             }}
             routing="path"

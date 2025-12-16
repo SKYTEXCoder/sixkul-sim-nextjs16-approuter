@@ -1,8 +1,8 @@
 /**
  * Ekskul Type Definitions
- * 
+ *
  * Shared types for extracurricular-related components.
- * 
+ *
  * @module types/ekskul
  */
 

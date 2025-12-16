@@ -42,7 +42,7 @@ export function GenerateSessionsForm({
       const result = await generateSessionsAction(
         extracurricularId,
         startDate,
-        endDate
+        endDate,
       );
 
       if (result.success) {

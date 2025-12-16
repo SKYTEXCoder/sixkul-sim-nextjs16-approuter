@@ -148,8 +148,8 @@ export function TopNavbar({
                   user?.role === "SISWA"
                     ? "/student/profile"
                     : user?.role === "PEMBINA"
-                    ? "/pembina/profile"
-                    : "/admin/profile"
+                      ? "/pembina/profile"
+                      : "/admin/profile"
                 }
               >
                 <User className="mr-2 h-4 w-4" />

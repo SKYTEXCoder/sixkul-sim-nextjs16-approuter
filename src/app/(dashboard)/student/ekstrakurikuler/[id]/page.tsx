@@ -1,8 +1,8 @@
 /**
  * Extracurricular Detail Page (Server Component)
- * 
+ *
  * Shows full details of an extracurricular with enrollment option.
- * 
+ *
  * @module app/(dashboard)/student/ekstrakurikuler/[id]/page
  */
 
@@ -83,9 +83,9 @@ interface ExtracurricularDetailData {
 async function getCurrentUserId(): Promise<string | null> {
   try {
     const { userId, sessionClaims } = await auth();
-    
+
     if (!userId) return null;
-    
+
     // Use JIT sync to get or create user and return their local DB ID
     return await getOrCreateUserId(userId, sessionClaims);
   } catch {
@@ -97,7 +97,9 @@ async function getCurrentUserId(): Promise<string | null> {
 // Data Fetching
 // ============================================
 
-async function getExtracurricular(id: string): Promise<ExtracurricularDetailData | null> {
+async function getExtracurricular(
+  id: string,
+): Promise<ExtracurricularDetailData | null> {
   const extracurricular = await prisma.extracurricular.findUnique({
     where: { id },
     include: {
@@ -167,14 +169,16 @@ export default async function EkskulDetailPage({ params }: PageProps) {
   // Check if user is already enrolled
   const userId = await getCurrentUserId();
   let enrollment = null;
-  
+
   if (userId) {
     enrollment = await getUserEnrollment(userId, id);
   }
 
   const isAlreadyEnrolled = !!enrollment;
   const enrollmentStatus = enrollment?.status;
-  const memberCount = extracurricular.enrollments.filter(e => e.status === "ACTIVE").length;
+  const memberCount = extracurricular.enrollments.filter(
+    (e) => e.status === "ACTIVE",
+  ).length;
 
   return (
     <div className="space-y-6">
@@ -225,7 +229,8 @@ export default async function EkskulDetailPage({ params }: PageProps) {
                 Deskripsi
               </h3>
               <p className="text-slate-600 dark:text-slate-400 leading-relaxed">
-                {extracurricular.description || "Tidak ada deskripsi tersedia untuk ekstrakurikuler ini."}
+                {extracurricular.description ||
+                  "Tidak ada deskripsi tersedia untuk ekstrakurikuler ini."}
               </p>
             </CardContent>
           </Card>
@@ -256,7 +261,8 @@ export default async function EkskulDetailPage({ params }: PageProps) {
                       <div className="flex items-center gap-2 mb-2">
                         <Calendar className="h-4 w-4 text-blue-500" />
                         <span className="font-medium text-slate-900 dark:text-white">
-                          {dayNames[schedule.day_of_week] || schedule.day_of_week}
+                          {dayNames[schedule.day_of_week] ||
+                            schedule.day_of_week}
                         </span>
                       </div>
                       <div className="flex items-center gap-2 text-sm text-slate-500">
@@ -319,7 +325,9 @@ export default async function EkskulDetailPage({ params }: PageProps) {
                     alt={extracurricular.pembina.user.full_name}
                   />
                   <AvatarFallback className="bg-emerald-100 text-emerald-700 text-lg">
-                    {extracurricular.pembina.user.full_name.charAt(0).toUpperCase()}
+                    {extracurricular.pembina.user.full_name
+                      .charAt(0)
+                      .toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
                 <div>
@@ -327,7 +335,8 @@ export default async function EkskulDetailPage({ params }: PageProps) {
                     {extracurricular.pembina.user.full_name}
                   </p>
                   <p className="text-sm text-slate-500">
-                    {extracurricular.pembina.user.email || "Email tidak tersedia"}
+                    {extracurricular.pembina.user.email ||
+                      "Email tidak tersedia"}
                   </p>
                   {extracurricular.pembina.expertise && (
                     <Badge variant="secondary" className="mt-1">
@@ -366,7 +375,9 @@ export default async function EkskulDetailPage({ params }: PageProps) {
               <div className="flex justify-between text-sm">
                 <span className="text-slate-500">Dibuat</span>
                 <span className="text-slate-900 dark:text-white">
-                  {new Date(extracurricular.created_at).toLocaleDateString("id-ID")}
+                  {new Date(extracurricular.created_at).toLocaleDateString(
+                    "id-ID",
+                  )}
                 </span>
               </div>
             </CardContent>

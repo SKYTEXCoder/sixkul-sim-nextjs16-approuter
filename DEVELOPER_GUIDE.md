@@ -1,6 +1,6 @@
 # 🚀 Panduan Developer SIXKUL
 
-> **SIXKUL** - *Sistem Informasi Ekstrakurikuler*  
+> **SIXKUL** - _Sistem Informasi Ekstrakurikuler_  
 > Sistem manajemen ekstrakurikuler untuk sekolah menengah
 
 Selamat datang di proyek SIXKUL! Panduan lengkap ini akan membantu kamu untuk memulai proses development.
@@ -26,13 +26,13 @@ Selamat datang di proyek SIXKUL! Panduan lengkap ini akan membantu kamu untuk me
 
 Sebelum memulai, pastikan kamu sudah menginstall software berikut di komputer:
 
-| Software | Versi Minimum | Link Download |
-|----------|---------------|---------------|
-| **Node.js** | v20.x atau lebih baru | [nodejs.org](https://nodejs.org/) |
-| **npm** | v10.x atau lebih baru | Sudah termasuk dalam Node.js |
-| **Git** | Terbaru | [git-scm.com](https://git-scm.com/) |
-| **PostgreSQL** | v14.x atau lebih baru | [postgresql.org](https://www.postgresql.org/download/) |
-| **VS Code** (disarankan) | Terbaru | [code.visualstudio.com](https://code.visualstudio.com/) |
+| Software                 | Versi Minimum         | Link Download                                           |
+| ------------------------ | --------------------- | ------------------------------------------------------- |
+| **Node.js**              | v20.x atau lebih baru | [nodejs.org](https://nodejs.org/)                       |
+| **npm**                  | v10.x atau lebih baru | Sudah termasuk dalam Node.js                            |
+| **Git**                  | Terbaru               | [git-scm.com](https://git-scm.com/)                     |
+| **PostgreSQL**           | v14.x atau lebih baru | [postgresql.org](https://www.postgresql.org/download/)  |
+| **VS Code** (disarankan) | Terbaru               | [code.visualstudio.com](https://code.visualstudio.com/) |
 
 ### Verifikasi Instalasi
 
@@ -67,6 +67,7 @@ npm install
 ```
 
 Perintah ini akan menginstall semua package yang diperlukan termasuk:
+
 - **Next.js 16** - Framework React
 - **Prisma** - Database ORM
 - **Clerk** - Autentikasi
@@ -186,13 +187,13 @@ Aplikasi akan tersedia di: **http://localhost:3000**
 
 ### Script Lainnya
 
-| Perintah | Deskripsi |
-|----------|-----------|
-| `npm run dev` | Jalankan development server dengan hot-reload |
-| `npm run build` | Buat production build |
-| `npm run start` | Jalankan production server |
-| `npm run lint` | Jalankan ESLint untuk kualitas kode |
-| `npm run db:seed` | Seed database dengan data testing |
+| Perintah          | Deskripsi                                     |
+| ----------------- | --------------------------------------------- |
+| `npm run dev`     | Jalankan development server dengan hot-reload |
+| `npm run build`   | Buat production build                         |
+| `npm run start`   | Jalankan production server                    |
+| `npm run lint`    | Jalankan ESLint untuk kualitas kode           |
+| `npm run db:seed` | Seed database dengan data testing             |
 
 ---
 
@@ -234,30 +235,36 @@ sixkul-sim-nextjs16-approuter/
 ## 🛠 Tech Stack
 
 ### Framework Utama
+
 - **[Next.js 16](https://nextjs.org/)** - Framework React dengan App Router
 - **[React 19](https://react.dev/)** - Library UI
 - **[TypeScript](https://www.typescriptlang.org/)** - JavaScript yang type-safe
 
 ### Database & ORM
+
 - **[PostgreSQL](https://www.postgresql.org/)** - Database relasional
 - **[Prisma 6](https://www.prisma.io/)** - ORM modern untuk Node.js
 
 ### Autentikasi
+
 - **[Clerk](https://clerk.com/)** - Solusi autentikasi lengkap
   - Role-based access control (ADMIN, PEMBINA, SISWA)
   - Manajemen session via JWT
 
 ### Styling & UI
+
 - **[Tailwind CSS 4](https://tailwindcss.com/)** - Framework CSS utility-first
 - **[ShadCN UI](https://ui.shadcn.com/)** - Komponen dengan desain yang cantik
 - **[Radix UI](https://www.radix-ui.com/)** - UI primitives headless
 - **[Lucide React](https://lucide.dev/)** - Library ikon
 
 ### Form & Validasi
+
 - **[React Hook Form](https://react-hook-form.com/)** - Manajemen form
 - **[Zod](https://zod.dev/)** - Validasi schema
 
 ### Utilitas
+
 - **[date-fns](https://date-fns.org/)** - Library utilitas tanggal
 - **[Sonner](https://sonner.emilkowal.ski/)** - Notifikasi toast
 
@@ -312,25 +319,28 @@ npx shadcn@latest add dialog
 Setelah menjalankan `npm run db:seed`, kamu bisa menggunakan akun testing ini:
 
 ### Akun Admin
-| Email | Password |
-|-------|----------|
-| `admin@sixkul.sch.id` | `rtx5070ti16gb` |
+
+| Email                  | Password        |
+| ---------------------- | --------------- |
+| `admin@sixkul.sch.id`  | `rtx5070ti16gb` |
 | `admin2@sixkul.sch.id` | `rtx5070ti16gb` |
 | `admin3@sixkul.sch.id` | `rtx5070ti16gb` |
 
 ### Akun Pembina (Guru)
-| Email | Password |
-|-------|----------|
-| `pembina@sixkul.sch.id` | `rtx5070ti16gb` |
+
+| Email                    | Password        |
+| ------------------------ | --------------- |
+| `pembina@sixkul.sch.id`  | `rtx5070ti16gb` |
 | `pembina2@sixkul.sch.id` | `rtx5070ti16gb` |
 | `pembina3@sixkul.sch.id` | `rtx5070ti16gb` |
 | `pembina4@sixkul.sch.id` | `rtx5070ti16gb` |
 | `pembina5@sixkul.sch.id` | `rtx5070ti16gb` |
 
 ### Akun Siswa
-| Email | Password |
-|-------|----------|
-| `student@sixkul.sch.id` | `rtx5070ti16gb` |
+
+| Email                    | Password        |
+| ------------------------ | --------------- |
+| `student@sixkul.sch.id`  | `rtx5070ti16gb` |
 | `student2@sixkul.sch.id` | `rtx5070ti16gb` |
 | `student3@sixkul.sch.id` | `rtx5070ti16gb` |
 | `student4@sixkul.sch.id` | `rtx5070ti16gb` |
@@ -354,6 +364,7 @@ Setelah menjalankan `npm run db:seed`, kamu bisa menggunakan akun testing ini:
 
 **Masalah**: Tidak bisa konek ke PostgreSQL.  
 **Solusi**:
+
 - Pastikan PostgreSQL sudah berjalan
 - Cek `DATABASE_URL` di `.env`
 - Pastikan database sudah dibuat
@@ -362,6 +373,7 @@ Setelah menjalankan `npm run db:seed`, kamu bisa menggunakan akun testing ini:
 
 **Masalah**: Aplikasi lain sedang menggunakan port 3000.  
 **Solusi**: Hentikan aplikasi lain tersebut atau jalankan Next.js di port berbeda:
+
 ```bash
 npm run dev -- -p 3001
 ```
@@ -369,7 +381,8 @@ npm run dev -- -p 3001
 ### 5. Loop Redirect Autentikasi
 
 **Masalah**: Terjebak dalam loop redirect sign-in.  
-**Solusi**: 
+**Solusi**:
+
 - Bersihkan cookies browser
 - Pastikan variabel environment Clerk sudah benar
 - Cek bahwa `publicMetadata.role` sudah diset dengan benar di Clerk
@@ -378,6 +391,7 @@ npm run dev -- -p 3001
 
 **Masalah**: Error TypeScript untuk tipe Prisma.  
 **Solusi**: Regenerate Prisma client:
+
 ```bash
 npx prisma generate
 ```

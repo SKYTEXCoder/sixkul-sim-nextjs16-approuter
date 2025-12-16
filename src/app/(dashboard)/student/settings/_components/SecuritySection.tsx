@@ -81,7 +81,7 @@ export function SecuritySection() {
         newPassword,
       });
     },
-    [user]
+    [user],
   );
 
   // Wrap with reverification - this will show Clerk's reverification modal when needed
@@ -149,7 +149,7 @@ export function SecuritySection() {
       // Use the reverification-wrapped function
       const result = await updatePasswordWithReverification(
         formData.currentPassword,
-        formData.newPassword
+        formData.newPassword,
       );
 
       // If user cancelled reverification, result will be null
@@ -176,7 +176,7 @@ export function SecuritySection() {
           setSubmitError("Kata sandi saat ini salah.");
         } else if (firstError.code === "form_password_pwned") {
           setSubmitError(
-            "Kata sandi baru terlalu umum. Gunakan kata sandi yang lebih kuat."
+            "Kata sandi baru terlalu umum. Gunakan kata sandi yang lebih kuat.",
           );
         } else if (firstError.code === "form_password_length_too_short") {
           setSubmitError("Kata sandi baru terlalu pendek. Minimal 8 karakter.");
@@ -185,7 +185,7 @@ export function SecuritySection() {
         }
       } else if (error instanceof Error) {
         setSubmitError(
-          error.message || "Terjadi kesalahan. Silakan coba lagi."
+          error.message || "Terjadi kesalahan. Silakan coba lagi.",
         );
       } else {
         setSubmitError("Terjadi kesalahan. Silakan coba lagi.");

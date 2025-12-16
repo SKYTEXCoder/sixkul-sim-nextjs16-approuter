@@ -1,9 +1,9 @@
 /**
  * Announcement Card Component
- * 
+ *
  * Displays a single announcement with title, extracurricular info,
  * date, and content preview. Links to enrollment detail page.
- * 
+ *
  * @module components/announcements/AnnouncementCard
  */
 
@@ -86,8 +86,8 @@ export function AnnouncementCard({ announcement }: AnnouncementCardProps) {
                 <span className="font-medium text-slate-700 dark:text-slate-300">
                   {announcement.extracurricular.name}
                 </span>
-                <Badge 
-                  variant="secondary" 
+                <Badge
+                  variant="secondary"
                   className="text-xs bg-slate-100 dark:bg-slate-800"
                 >
                   {announcement.extracurricular.category}

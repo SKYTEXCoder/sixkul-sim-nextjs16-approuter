@@ -15,9 +15,9 @@ If a feature requirement appears to conflict with this contract, the agent **MUS
 
 No entity may be accessed outside the context of its owner.
 
-* Students never access raw management entities
-* Pembina never access student-private views
-* Admin never reuse student or pembina routes
+- Students never access raw management entities
+- Pembina never access student-private views
+- Admin never reuse student or pembina routes
 
 ---
 
@@ -33,7 +33,7 @@ No entity may be accessed outside the context of its owner.
 | Announcement        | Extracurricular      | Role-filtered context  |
 
 > ⚠️ **Sessions NEVER have standalone routes.**
-> They are always accessed *through Enrollment (Student)* or *Extracurricular (Pembina/Admin)*.
+> They are always accessed _through Enrollment (Student)_ or _Extracurricular (Pembina/Admin)_.
 
 ---
 
@@ -71,10 +71,10 @@ Any click related to **sessions, attendance, announcements, or activity** MUST n
 
 This includes:
 
-* Jadwal Saya cards
-* Dashboard “Jadwal Mendatang”
-* Attendance rows
-* Announcement links
+- Jadwal Saya cards
+- Dashboard “Jadwal Mendatang”
+- Attendance rows
+- Announcement links
 
 ---
 
@@ -99,9 +99,9 @@ Sessions are accessed **only** via enrollment context.
 
 This page:
 
-* MAY show join status
-* MUST NOT show attendance
-* MUST NOT show student-specific data
+- MAY show join status
+- MUST NOT show attendance
+- MUST NOT show student-specific data
 
 ---
 
@@ -130,11 +130,11 @@ This page:
 
 #### Rule P-1 — Pembina Owns Schedules & Sessions
 
-* Pembina manages:
+- Pembina manages:
+  - Schedules (recurring rules)
+  - Sessions (pertemuan)
 
-  * Schedules (recurring rules)
-  * Sessions (pertemuan)
-* Pembina NEVER navigates through Enrollment
+- Pembina NEVER navigates through Enrollment
 
 ---
 
@@ -174,8 +174,8 @@ This page:
 
 #### Rule A-1 — Admin Is Observational
 
-* Admin views data **without student context**
-* Admin NEVER navigates to enrollment pages
+- Admin views data **without student context**
+- Admin NEVER navigates to enrollment pages
 
 🚫 Forbidden:
 
@@ -198,8 +198,8 @@ The following routes must **never exist**:
 
 Reason:
 
-* These entities are context-dependent
-* Standalone routes break ownership semantics
+- These entities are context-dependent
+- Standalone routes break ownership semantics
 
 ---
 
@@ -207,13 +207,12 @@ Reason:
 
 Any Agentic AI IDE:
 
-* MUST reference this contract before creating links
-* MUST refactor existing links to comply
-* MUST NOT invent routes
-* MUST STOP and consult the project owner if:
-
-  * a new feature seems to require a forbidden route
-  * a route’s ownership is unclear
+- MUST reference this contract before creating links
+- MUST refactor existing links to comply
+- MUST NOT invent routes
+- MUST STOP and consult the project owner if:
+  - a new feature seems to require a forbidden route
+  - a route’s ownership is unclear
 
 ---
 
@@ -222,9 +221,8 @@ Any Agentic AI IDE:
 This contract MUST be:
 
 1. Included verbatim in:
-
-   * the **main project SDD**
-   * **every feature-specific SDD** under a section titled:
+   - the **main project SDD**
+   - **every feature-specific SDD** under a section titled:
 
      > **Referenced Contract — Global Navigation Contract**
 

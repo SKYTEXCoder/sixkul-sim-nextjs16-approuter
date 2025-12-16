@@ -1,16 +1,16 @@
 /**
  * useAuthSync Hook
- * 
+ *
  * Ensures the current Clerk user is synced to the Prisma database.
  * Should be used in dashboard layouts to trigger JIT sync on first load.
- * 
+ *
  * @module hooks/useAuthSync
  */
 
 "use client";
 
-import { useEffect, useState, useRef } from 'react';
-import { useUser } from '@clerk/nextjs';
+import { useEffect, useState, useRef } from "react";
+import { useUser } from "@clerk/nextjs";
 
 interface SyncState {
   isSynced: boolean;
@@ -21,16 +21,16 @@ interface SyncState {
 
 /**
  * Hook to sync Clerk user to Prisma database
- * 
+ *
  * @returns SyncState with syncing status
- * 
+ *
  * @example
  * function DashboardLayout({ children }) {
  *   const { isSynced, isSyncing, error } = useAuthSync();
- *   
+ *
  *   if (isSyncing) return <LoadingSpinner />;
  *   if (error) return <ErrorMessage error={error} />;
- *   
+ *
  *   return <>{children}</>;
  * }
  */
@@ -42,7 +42,7 @@ export function useAuthSync(): SyncState {
     error: null,
     isNewUser: false,
   });
-  
+
   // Use ref to prevent double-sync in strict mode
   const hasSynced = useRef(false);
 
@@ -55,13 +55,13 @@ export function useAuthSync(): SyncState {
 
       // Mark as syncing attempt
       hasSynced.current = true;
-      setState(prev => ({ ...prev, isSyncing: true }));
+      setState((prev) => ({ ...prev, isSyncing: true }));
 
       try {
-        const response = await fetch('/api/auth/sync', {
-          method: 'POST',
+        const response = await fetch("/api/auth/sync", {
+          method: "POST",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
         });
 
@@ -74,24 +74,24 @@ export function useAuthSync(): SyncState {
             error: null,
             isNewUser: data.data?.isNewUser || false,
           });
-          
+
           if (data.data?.isNewUser) {
-            console.log('[AUTH SYNC] New user created in database');
+            console.log("[AUTH SYNC] New user created in database");
           }
         } else {
           setState({
             isSynced: false,
             isSyncing: false,
-            error: data.message || 'Failed to sync user',
+            error: data.message || "Failed to sync user",
             isNewUser: false,
           });
         }
       } catch (error) {
-        console.error('[AUTH SYNC] Error:', error);
+        console.error("[AUTH SYNC] Error:", error);
         setState({
           isSynced: false,
           isSyncing: false,
-          error: 'Network error during sync',
+          error: "Network error during sync",
           isNewUser: false,
         });
       }

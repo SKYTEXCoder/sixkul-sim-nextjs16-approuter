@@ -1,8 +1,8 @@
 /**
  * Attendance Summary Cards Component
- * 
+ *
  * Server Component showing attendance statistics in styled cards.
- * 
+ *
  * @module components/student-attendance/AttendanceSummaryCards
  */
 
@@ -12,19 +12,16 @@ import {
   CardDescription,
   CardHeader,
 } from "@/components/ui/card";
-import {
-  TrendingUp,
-  Calendar,
-  CheckCircle2,
-  XCircle,
-} from "lucide-react";
+import { TrendingUp, Calendar, CheckCircle2, XCircle } from "lucide-react";
 import type { AttendanceSummary } from "@/lib/attendance-data";
 
 interface AttendanceSummaryCardsProps {
   summary: AttendanceSummary;
 }
 
-export function AttendanceSummaryCards({ summary }: AttendanceSummaryCardsProps) {
+export function AttendanceSummaryCards({
+  summary,
+}: AttendanceSummaryCardsProps) {
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       {/* Attendance Percentage */}
@@ -37,7 +34,9 @@ export function AttendanceSummaryCards({ summary }: AttendanceSummaryCardsProps)
         <CardContent>
           <div className="flex items-center justify-between">
             <div>
-              <span className="text-3xl font-bold">{summary.attendancePercentage}%</span>
+              <span className="text-3xl font-bold">
+                {summary.attendancePercentage}%
+              </span>
               <p className="text-sm text-emerald-100 mt-1">semester ini</p>
             </div>
             <TrendingUp className="h-8 w-8 text-emerald-200" />
@@ -55,7 +54,9 @@ export function AttendanceSummaryCards({ summary }: AttendanceSummaryCardsProps)
         <CardContent>
           <div className="flex items-center justify-between">
             <div>
-              <span className="text-3xl font-bold">{summary.totalSessions}</span>
+              <span className="text-3xl font-bold">
+                {summary.totalSessions}
+              </span>
               <p className="text-sm text-blue-100 mt-1">sesi</p>
             </div>
             <Calendar className="h-8 w-8 text-blue-200" />

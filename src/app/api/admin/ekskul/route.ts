@@ -1,18 +1,18 @@
 /**
  * SIXKUL Admin Extracurricular Management API Routes
- * 
+ *
  * Full CRUD operations for managing extracurriculars (Admin only)
- * 
+ *
  * POST   /api/admin/ekskul     - Create new extracurricular
  * GET    /api/admin/ekskul     - List all extracurriculars
- * 
+ *
  * @module api/admin/ekskul
  */
 
-import { NextRequest, NextResponse } from 'next/server';
-import prisma from '@/lib/prisma';
-import { auth } from '@clerk/nextjs/server';
-import { ExtracurricularStatus } from '@/generated/prisma';
+import { NextRequest, NextResponse } from "next/server";
+import prisma from "@/lib/prisma";
+import { auth } from "@clerk/nextjs/server";
+import { ExtracurricularStatus } from "@/generated/prisma";
 
 // ============================================
 // Type Definitions
@@ -96,21 +96,22 @@ async function authenticateAdmin(): Promise<{
 }> {
   try {
     const { userId, sessionClaims } = await auth();
-    
+
     if (!userId) {
       return {
         success: false,
-        error: 'Authentication required. Please login.',
+        error: "Authentication required. Please login.",
         statusCode: 401,
       };
     }
 
-    const userRole = (sessionClaims?.public_metadata as { role?: string })?.role;
-    
-    if (userRole !== 'ADMIN') {
+    const userRole = (sessionClaims?.public_metadata as { role?: string })
+      ?.role;
+
+    if (userRole !== "ADMIN") {
       return {
         success: false,
-        error: 'Admin access required.',
+        error: "Admin access required.",
         statusCode: 403,
       };
     }
@@ -120,10 +121,10 @@ async function authenticateAdmin(): Promise<{
       userId,
     };
   } catch (error) {
-    console.error('[ADMIN AUTH ERROR]', error);
+    console.error("[ADMIN AUTH ERROR]", error);
     return {
       success: false,
-      error: 'Authentication failed. Please login again.',
+      error: "Authentication failed. Please login again.",
       statusCode: 401,
     };
   }
@@ -139,37 +140,45 @@ function validateCreateEkskulInput(body: unknown): {
 } {
   const errors: string[] = [];
 
-  if (!body || typeof body !== 'object') {
-    return { valid: false, errors: ['Request body is required'] };
+  if (!body || typeof body !== "object") {
+    return { valid: false, errors: ["Request body is required"] };
   }
 
-  const { name, category, description, pembinaId, logoUrl, status } = 
+  const { name, category, description, pembinaId, logoUrl, status } =
     body as Partial<CreateEkskulRequestBody>;
 
   // Validate required fields
-  if (!name || typeof name !== 'string' || name.trim().length === 0) {
-    errors.push('name is required and must be a non-empty string');
+  if (!name || typeof name !== "string" || name.trim().length === 0) {
+    errors.push("name is required and must be a non-empty string");
   }
 
-  if (!category || typeof category !== 'string' || category.trim().length === 0) {
-    errors.push('category is required and must be a non-empty string');
+  if (
+    !category ||
+    typeof category !== "string" ||
+    category.trim().length === 0
+  ) {
+    errors.push("category is required and must be a non-empty string");
   }
 
-  if (!pembinaId || typeof pembinaId !== 'string' || pembinaId.trim().length === 0) {
-    errors.push('pembinaId is required and must be a non-empty string');
+  if (
+    !pembinaId ||
+    typeof pembinaId !== "string" ||
+    pembinaId.trim().length === 0
+  ) {
+    errors.push("pembinaId is required and must be a non-empty string");
   }
 
   // Validate optional fields
-  if (description !== undefined && typeof description !== 'string') {
-    errors.push('description must be a string if provided');
+  if (description !== undefined && typeof description !== "string") {
+    errors.push("description must be a string if provided");
   }
 
-  if (logoUrl !== undefined && typeof logoUrl !== 'string') {
-    errors.push('logoUrl must be a string if provided');
+  if (logoUrl !== undefined && typeof logoUrl !== "string") {
+    errors.push("logoUrl must be a string if provided");
   }
 
-  if (status !== undefined && !['ACTIVE', 'INACTIVE'].includes(status)) {
-    errors.push('status must be either ACTIVE or INACTIVE');
+  if (status !== undefined && !["ACTIVE", "INACTIVE"].includes(status)) {
+    errors.push("status must be either ACTIVE or INACTIVE");
   }
 
   if (errors.length > 0) {
@@ -184,7 +193,7 @@ function validateCreateEkskulInput(body: unknown): {
       description: description?.trim(),
       pembinaId: pembinaId!.trim(),
       logoUrl: logoUrl?.trim(),
-      status: status || 'ACTIVE',
+      status: status || "ACTIVE",
     },
   };
 }
@@ -194,18 +203,18 @@ function validateCreateEkskulInput(body: unknown): {
 // ============================================
 
 export async function POST(
-  request: NextRequest
+  request: NextRequest,
 ): Promise<NextResponse<EkskulSuccessResponse | EkskulErrorResponse>> {
   try {
     // ----------------------------------------
     // Step 1: Authenticate and verify ADMIN role
     // ----------------------------------------
     const authResult = await authenticateAdmin();
-    
+
     if (!authResult.success) {
       return NextResponse.json(
         { success: false, message: authResult.error! },
-        { status: authResult.statusCode }
+        { status: authResult.statusCode },
       );
     }
 
@@ -217,25 +226,26 @@ export async function POST(
       body = await request.json();
     } catch {
       return NextResponse.json(
-        { success: false, message: 'Invalid JSON in request body' },
-        { status: 400 }
+        { success: false, message: "Invalid JSON in request body" },
+        { status: 400 },
       );
     }
 
     const validation = validateCreateEkskulInput(body);
-    
+
     if (!validation.valid || !validation.data) {
       return NextResponse.json(
         {
           success: false,
-          message: 'Validation failed',
+          message: "Validation failed",
           errors: validation.errors,
         },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
-    const { name, category, description, pembinaId, logoUrl, status } = validation.data;
+    const { name, category, description, pembinaId, logoUrl, status } =
+      validation.data;
 
     // ----------------------------------------
     // Step 3: Verify Pembina exists
@@ -257,9 +267,9 @@ export async function POST(
       return NextResponse.json(
         {
           success: false,
-          message: 'Pembina tidak ditemukan.',
+          message: "Pembina tidak ditemukan.",
         },
-        { status: 404 }
+        { status: 404 },
       );
     }
 
@@ -267,7 +277,7 @@ export async function POST(
     // Step 4: Check for duplicate name
     // ----------------------------------------
     const existingEkskul = await prisma.extracurricular.findFirst({
-      where: { name: { equals: name, mode: 'insensitive' } },
+      where: { name: { equals: name, mode: "insensitive" } },
     });
 
     if (existingEkskul) {
@@ -276,7 +286,7 @@ export async function POST(
           success: false,
           message: `Ekstrakurikuler dengan nama "${name}" sudah ada.`,
         },
-        { status: 409 }
+        { status: 409 },
       );
     }
 
@@ -306,12 +316,14 @@ export async function POST(
       },
     });
 
-    console.log(`[ADMIN] Extracurricular created: ${newEkskul.name} (ID: ${newEkskul.id})`);
+    console.log(
+      `[ADMIN] Extracurricular created: ${newEkskul.name} (ID: ${newEkskul.id})`,
+    );
 
     return NextResponse.json(
       {
         success: true,
-        message: 'Ekstrakurikuler berhasil dibuat!',
+        message: "Ekstrakurikuler berhasil dibuat!",
         data: {
           id: newEkskul.id,
           name: newEkskul.name,
@@ -327,18 +339,17 @@ export async function POST(
           },
         },
       },
-      { status: 201 }
+      { status: 201 },
     );
-
   } catch (error) {
-    console.error('[ADMIN EKSKUL CREATE ERROR]', error);
+    console.error("[ADMIN EKSKUL CREATE ERROR]", error);
 
     return NextResponse.json(
       {
         success: false,
-        message: 'Terjadi kesalahan pada server. Silakan coba lagi.',
+        message: "Terjadi kesalahan pada server. Silakan coba lagi.",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -348,31 +359,31 @@ export async function POST(
 // ============================================
 
 export async function GET(
-  request: NextRequest
+  request: NextRequest,
 ): Promise<NextResponse<EkskulListResponse | EkskulErrorResponse>> {
   try {
     // Authenticate admin
     const authResult = await authenticateAdmin();
-    
+
     if (!authResult.success) {
       return NextResponse.json(
         { success: false, message: authResult.error! },
-        { status: authResult.statusCode }
+        { status: authResult.statusCode },
       );
     }
 
     // Get query parameters for filtering
     const { searchParams } = new URL(request.url);
-    const status = searchParams.get('status');
-    const category = searchParams.get('category');
+    const status = searchParams.get("status");
+    const category = searchParams.get("category");
 
     // Build filter
     const where: Record<string, unknown> = {};
-    if (status && ['ACTIVE', 'INACTIVE'].includes(status)) {
+    if (status && ["ACTIVE", "INACTIVE"].includes(status)) {
       where.status = status;
     }
     if (category) {
-      where.category = { contains: category, mode: 'insensitive' };
+      where.category = { contains: category, mode: "insensitive" };
     }
 
     // Fetch all extracurriculars with related data
@@ -396,12 +407,12 @@ export async function GET(
           },
         },
       },
-      orderBy: { created_at: 'desc' },
+      orderBy: { created_at: "desc" },
     });
 
     return NextResponse.json({
       success: true,
-      message: 'Ekstrakurikuler retrieved successfully',
+      message: "Ekstrakurikuler retrieved successfully",
       data: ekstrakurikuler.map((e) => ({
         id: e.id,
         name: e.name,
@@ -418,16 +429,15 @@ export async function GET(
       })),
       total: ekstrakurikuler.length,
     });
-
   } catch (error) {
-    console.error('[ADMIN EKSKUL GET ERROR]', error);
+    console.error("[ADMIN EKSKUL GET ERROR]", error);
 
     return NextResponse.json(
       {
         success: false,
-        message: 'Terjadi kesalahan pada server. Silakan coba lagi.',
+        message: "Terjadi kesalahan pada server. Silakan coba lagi.",
       },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
@@ -440,9 +450,9 @@ export async function PUT(): Promise<NextResponse<EkskulErrorResponse>> {
   return NextResponse.json(
     {
       success: false,
-      message: 'Use /api/admin/ekskul/[id] for updating extracurriculars.',
+      message: "Use /api/admin/ekskul/[id] for updating extracurriculars.",
     },
-    { status: 405 }
+    { status: 405 },
   );
 }
 
@@ -450,8 +460,8 @@ export async function DELETE(): Promise<NextResponse<EkskulErrorResponse>> {
   return NextResponse.json(
     {
       success: false,
-      message: 'Use /api/admin/ekskul/[id] for deleting extracurriculars.',
+      message: "Use /api/admin/ekskul/[id] for deleting extracurriculars.",
     },
-    { status: 405 }
+    { status: 405 },
   );
 }

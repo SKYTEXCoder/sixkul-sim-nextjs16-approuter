@@ -16,7 +16,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "SIXKUL - Sistem Informasi Ekstrakurikuler",
-  description: "Sistem informasi manajemen ekstrakurikuler untuk sekolah menengah atas",
+  description:
+    "Sistem informasi manajemen ekstrakurikuler untuk sekolah menengah atas",
 };
 
 export default function RootLayout({
@@ -37,4 +38,3 @@ export default function RootLayout({
     </ClerkProvider>
   );
 }
-

@@ -2,9 +2,9 @@
 
 /**
  * Admin Dashboard Layout
- * 
+ *
  * Layout for Admin role with appropriate navigation menu.
- * 
+ *
  * @module app/(dashboard)/admin/layout
  */
 
@@ -81,10 +81,10 @@ export default function AdminLayout({
 }) {
   // Get user data from Clerk
   const { user, isLoaded } = useUser();
-  
+
   // Sync user to Prisma database (JIT)
   const { isSyncing } = useAuthSync();
-  
+
   const userData = {
     name: user?.fullName || user?.username || "Admin User",
     email: user?.primaryEmailAddress?.emailAddress || "",

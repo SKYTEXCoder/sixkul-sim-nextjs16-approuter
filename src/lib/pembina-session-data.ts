@@ -57,7 +57,7 @@ const DAY_MAP: Record<string, number> = {
  * Fetch all sessions for an extracurricular.
  */
 export async function getSessionsByExtracurricular(
-  extracurricularId: string
+  extracurricularId: string,
 ): Promise<SessionListItem[]> {
   const sessions = await prisma.session.findMany({
     where: {
@@ -97,7 +97,7 @@ export async function getSessionsByExtracurricular(
  * Get upcoming sessions (for attendance selection).
  */
 export async function getUpcomingSessions(
-  extracurricularId: string
+  extracurricularId: string,
 ): Promise<SessionListItem[]> {
   const today = startOfDay(new Date());
 
@@ -162,7 +162,7 @@ export async function canDeleteSession(sessionId: string): Promise<boolean> {
 export async function generateSessionsFromSchedules(
   extracurricularId: string,
   startDate: Date,
-  endDate: Date
+  endDate: Date,
 ): Promise<{ success: boolean; count: number; error?: string }> {
   try {
     // Get all schedules for this extracurricular
@@ -198,8 +198,8 @@ export async function generateSessionsFromSchedules(
     // Create a set of existing session keys for quick lookup
     const existingKeys = new Set(
       existingSessions.map(
-        (s) => `${format(s.date, "yyyy-MM-dd")}_${s.schedule_id}`
-      )
+        (s) => `${format(s.date, "yyyy-MM-dd")}_${s.schedule_id}`,
+      ),
     );
 
     // Generate sessions for each day in the range
@@ -270,7 +270,7 @@ export async function generateSessionsFromSchedules(
  */
 export async function deleteSession(
   sessionId: string,
-  extracurricularId: string
+  extracurricularId: string,
 ): Promise<{ success: boolean; error?: string }> {
   try {
     const canDelete = await canDeleteSession(sessionId);
