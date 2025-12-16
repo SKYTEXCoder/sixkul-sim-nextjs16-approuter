@@ -25,6 +25,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Bell, LogOut, User, Settings, Menu, Loader2 } from "lucide-react";
+import { NotificationDropdown } from "@/components/pembina/NotificationDropdown";
+import type { PembinaNotification } from "@/lib/pembina-notification-data";
 
 // ============================================
 // Types
@@ -40,6 +42,8 @@ interface TopNavbarProps {
   onMenuClick?: () => void;
   showSearch?: boolean;
   unreadNotificationCount?: number;
+  // PEMBINA-specific: notifications for dropdown
+  pembinaNotifications?: PembinaNotification[];
 }
 
 // ============================================
@@ -51,6 +55,7 @@ export function TopNavbar({
   onMenuClick,
   showSearch = true,
   unreadNotificationCount = 0,
+  pembinaNotifications = [],
 }: TopNavbarProps) {
   const router = useRouter();
   const { signOut } = useClerk();
@@ -97,17 +102,26 @@ export function TopNavbar({
 
       {/* Right Section */}
       <div className="flex items-center gap-3">
-        {/* Notification Bell */}
-        <Link
-          href={user?.role === "SISWA" ? "/student/notifications" : "#"}
-          className="relative p-2 rounded-md text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-        >
-          <Bell className="h-5 w-5" />
-          {/* Notification badge - show only when unread count > 0 */}
-          {unreadNotificationCount > 0 && (
-            <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-red-500" />
-          )}
-        </Link>
+        {/* Notification Bell - Role-specific behavior */}
+        {user?.role === "PEMBINA" ? (
+          // PEMBINA: Show dropdown with notifications
+          <NotificationDropdown
+            notifications={pembinaNotifications}
+            unreadCount={unreadNotificationCount}
+          />
+        ) : (
+          // SISWA: Link to notifications page, ADMIN: placeholder
+          <Link
+            href={user?.role === "SISWA" ? "/student/notifications" : "#"}
+            className="relative p-2 rounded-md text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+          >
+            <Bell className="h-5 w-5" />
+            {/* Notification badge - show only when unread count > 0 */}
+            {unreadNotificationCount > 0 && (
+              <span className="absolute top-1.5 right-1.5 h-2 w-2 rounded-full bg-red-500" />
+            )}
+          </Link>
+        )}
 
         {/* User Profile Dropdown */}
         <DropdownMenu>
@@ -156,9 +170,19 @@ export function TopNavbar({
                 Profil Saya
               </Link>
             </DropdownMenuItem>
-            <DropdownMenuItem>
-              <Settings className="mr-2 h-4 w-4" />
-              Pengaturan
+            <DropdownMenuItem asChild>
+              <Link
+                href={
+                  user?.role === "SISWA"
+                    ? "/student/settings"
+                    : user?.role === "PEMBINA"
+                      ? "/pembina/settings"
+                      : "/admin/settings"
+                }
+              >
+                <Settings className="mr-2 h-4 w-4" />
+                Pengaturan
+              </Link>
             </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
