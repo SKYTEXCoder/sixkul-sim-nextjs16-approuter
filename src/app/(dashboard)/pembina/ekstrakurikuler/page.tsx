@@ -83,7 +83,7 @@ interface ExtracurricularCardProps {
 function ExtracurricularCard({ ekskul }: ExtracurricularCardProps) {
   return (
     <Link href={`/pembina/ekstrakurikuler/${ekskul.id}`}>
-      <Card className="h-full hover:shadow-md transition-shadow cursor-pointer group">
+      <Card className="h-full hover:shadow-md transition-shadow cursor-pointer group py-4">
         <CardHeader className="pb-3">
           <div className="flex items-start justify-between">
             <div className="flex items-center gap-3">

@@ -57,7 +57,7 @@ export default async function ExtracurricularHubPage({ params }: PageProps) {
       {/* Description */}
       {ekskul.description && (
         <Card>
-          <CardContent className="pt-6">
+          <CardContent>
             <p className="text-slate-600 dark:text-slate-400">
               {ekskul.description}
             </p>
@@ -172,7 +172,7 @@ function SummaryCard({
 }: SummaryCardProps) {
   return (
     <Card className={highlight ? "border-amber-300 dark:border-amber-700" : ""}>
-      <CardContent className="pt-6">
+      <CardContent>
         <div className="flex items-center gap-4">
           <div className={`p-3 rounded-lg ${bgColor}`}>
             <Icon className={`h-6 w-6 ${color}`} />
@@ -215,7 +215,7 @@ function NavigationCard({
           highlight ? "border-amber-300 dark:border-amber-700" : ""
         }`}
       >
-        <CardContent className="pt-6">
+        <CardContent>
           <div className="flex items-start gap-4">
             <div className="p-2 rounded-lg bg-slate-100 dark:bg-slate-800 group-hover:bg-primary/10 transition-colors">
               <Icon className="h-5 w-5 text-slate-600 dark:text-slate-400 group-hover:text-primary transition-colors" />

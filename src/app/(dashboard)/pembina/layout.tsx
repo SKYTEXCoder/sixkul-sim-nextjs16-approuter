@@ -81,13 +81,12 @@ export default function PembinaLayout({
       <div
         className={cn(
           "transition-all duration-300",
-          isSidebarCollapsed ? "md:ml-20" : "md:ml-64",
+          isSidebarCollapsed ? "md:ml-20" : "md:ml-64"
         )}
       >
         {/* Top Navigation with divider and padding */}
         <header className="sticky top-0 z-30 bg-white dark:bg-slate-900">
           {/* Top padding to move navbar away from browser edge */}
-          <div className="pt-3" />
 
           {/* Navbar content */}
           <div className="h-14">
