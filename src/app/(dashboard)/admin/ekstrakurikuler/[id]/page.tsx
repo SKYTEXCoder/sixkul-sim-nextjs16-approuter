@@ -9,19 +9,15 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import {
-  ArrowLeft,
-  BookOpen,
-  Users,
-  Calendar,
-  Edit,
-  Archive,
-  User,
-} from "lucide-react";
+import { ArrowLeft, BookOpen, Users, Calendar } from "lucide-react";
 import { getEkstrakurikulerById } from "@/lib/admin-ekstrakurikuler-data";
 import { getAvailablePembina } from "@/lib/admin-user-data";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import {
+  EkskulDetailClient,
+  PembinaAssignmentCard,
+} from "@/components/admin/EkskulDetailClient";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -46,7 +42,7 @@ export default async function AdminEkstrakurikulerDetailPage({
       {/* Header */}
       <div className="flex items-center gap-4">
         <Link href="/admin/ekstrakurikuler">
-          <Button variant="ghost" size="icon">
+          <Button variant="ghost" size="icon" className="cursor-pointer">
             <ArrowLeft className="h-5 w-5" />
           </Button>
         </Link>
@@ -58,21 +54,16 @@ export default async function AdminEkstrakurikulerDetailPage({
             {ekskul.category}
           </p>
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline">
-            <Edit className="mr-2 h-4 w-4" />
-            Edit
-          </Button>
-          {ekskul.status === "ACTIVE" && (
-            <Button
-              variant="outline"
-              className="text-amber-600 hover:text-amber-700"
-            >
-              <Archive className="mr-2 h-4 w-4" />
-              Arsipkan
-            </Button>
-          )}
-        </div>
+        {/* Interactive buttons - Edit and Archive */}
+        <EkskulDetailClient
+          ekskulId={ekskul.id}
+          name={ekskul.name}
+          category={ekskul.category}
+          description={ekskul.description}
+          status={ekskul.status}
+          currentPembina={ekskul.pembina}
+          availablePembina={availablePembina}
+        />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -170,48 +161,12 @@ export default async function AdminEkstrakurikulerDetailPage({
 
         {/* Sidebar */}
         <div className="space-y-6">
-          {/* PEMBINA Assignment Card */}
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <User className="h-5 w-5 text-purple-500" />
-                Pembina
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center gap-3 p-3 rounded-lg bg-slate-50 dark:bg-slate-800">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center text-white font-medium">
-                  {ekskul.pembina.user.full_name.charAt(0).toUpperCase()}
-                </div>
-                <div>
-                  <p className="font-medium text-slate-900 dark:text-white">
-                    {ekskul.pembina.user.full_name}
-                  </p>
-                  <p className="text-sm text-slate-500">
-                    NIP: {ekskul.pembina.nip}
-                  </p>
-                </div>
-              </div>
-
-              {/* Change Pembina - Placeholder for interactive functionality */}
-              <div>
-                <label className="text-sm text-slate-500 block mb-2">
-                  Ganti Pembina
-                </label>
-                <select className="w-full p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
-                  <option value="">Pilih pembina...</option>
-                  {availablePembina.map((pembina) => (
-                    <option key={pembina.id} value={pembina.id}>
-                      {pembina.user.full_name} ({pembina.nip})
-                    </option>
-                  ))}
-                </select>
-                <Button className="w-full mt-3" variant="outline">
-                  Simpan Perubahan
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+          {/* PEMBINA Assignment Card - Interactive */}
+          <PembinaAssignmentCard
+            ekskulId={ekskul.id}
+            currentPembina={ekskul.pembina}
+            availablePembina={availablePembina}
+          />
 
           {/* Quick Actions */}
           <Card>

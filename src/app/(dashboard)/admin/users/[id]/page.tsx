@@ -9,10 +9,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, User, Mail, Shield, Calendar, Edit } from "lucide-react";
+import { ArrowLeft, User, Mail, Shield, Calendar } from "lucide-react";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { UserDetailClient } from "@/components/admin/UserDetailClient";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -40,7 +41,7 @@ export default async function AdminUserDetailPage({ params }: PageProps) {
       {/* Header */}
       <div className="flex items-center gap-4">
         <Link href="/admin/users">
-          <Button variant="ghost" size="icon">
+          <Button variant="ghost" size="icon" className="cursor-pointer">
             <ArrowLeft className="h-5 w-5" />
           </Button>
         </Link>
@@ -52,10 +53,13 @@ export default async function AdminUserDetailPage({ params }: PageProps) {
             Informasi lengkap pengguna
           </p>
         </div>
-        <Button variant="outline">
-          <Edit className="mr-2 h-4 w-4" />
-          Edit
-        </Button>
+        {/* Interactive buttons - Edit and Status toggle */}
+        <UserDetailClient
+          userId={user.id}
+          fullName={user.full_name}
+          role={user.role}
+          isActive={isActive}
+        />
       </div>
 
       {/* User Info Card */}
@@ -198,13 +202,6 @@ export default async function AdminUserDetailPage({ params }: PageProps) {
           </div>
         </CardContent>
       </Card>
-
-      {/* Actions */}
-      <div className="flex gap-4">
-        <Button variant="outline" className="text-red-600 hover:text-red-700">
-          {isActive ? "Nonaktifkan User" : "Aktifkan User"}
-        </Button>
-      </div>
     </div>
   );
 }

@@ -207,7 +207,11 @@ export async function PUT(
     }
 
     // Build update data
-    const updateData: { full_name?: string; role?: UserRole } = {};
+    const updateData: {
+      full_name?: string;
+      role?: UserRole;
+      clerk_id?: string;
+    } = {};
 
     if (body.full_name && typeof body.full_name === "string") {
       updateData.full_name = body.full_name.trim();
@@ -215,6 +219,20 @@ export async function PUT(
 
     if (body.role && ["ADMIN", "PEMBINA", "SISWA"].includes(body.role)) {
       updateData.role = body.role;
+    }
+
+    // Handle is_active field for activation/deactivation
+    if (typeof body.is_active === "boolean") {
+      const isCurrentlyActive =
+        !existingUser.clerk_id.startsWith("DEACTIVATED_");
+
+      if (body.is_active && !isCurrentlyActive) {
+        // Reactivate: remove DEACTIVATED_ prefix
+        updateData.clerk_id = existingUser.clerk_id.replace("DEACTIVATED_", "");
+      } else if (!body.is_active && isCurrentlyActive) {
+        // Deactivate: add DEACTIVATED_ prefix
+        updateData.clerk_id = `DEACTIVATED_${existingUser.clerk_id}`;
+      }
     }
 
     if (Object.keys(updateData).length === 0) {
