@@ -4,14 +4,17 @@
  * Admin Dashboard Layout
  *
  * Layout for Admin role with appropriate navigation menu.
+ * Content area is responsive to sidebar collapse/expand state.
  *
  * @module app/(dashboard)/admin/layout
  */
 
+import { useState } from "react";
 import { useUser } from "@clerk/nextjs";
 import { useAuthSync } from "@/hooks/useAuthSync";
 import { Sidebar, NavItem } from "@/components/layout/Sidebar";
 import { TopNavbar } from "@/components/layout/TopNavbar";
+import { cn } from "@/lib/utils";
 import {
   LayoutDashboard,
   Users,
@@ -39,8 +42,8 @@ const adminMenuItems: NavItem[] = [
     icon: Users,
   },
   {
-    label: "Manajemen Ekskul",
-    href: "/admin/ekskul",
+    label: "Manajemen Ekstrakurikuler",
+    href: "/admin/ekstrakurikuler",
     icon: BookOpen,
   },
   {
@@ -85,6 +88,9 @@ export default function AdminLayout({
   // Sync user to Prisma database (JIT)
   const { isSyncing } = useAuthSync();
 
+  // Sidebar collapse state - lifted to layout for content responsiveness
+  const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
+
   const userData = {
     name: user?.fullName || user?.username || "Admin User",
     email: user?.primaryEmailAddress?.emailAddress || "",
@@ -103,11 +109,21 @@ export default function AdminLayout({
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
-      {/* Sidebar */}
-      <Sidebar menuItems={adminMenuItems} user={userData} />
+      {/* Sidebar with controlled collapse state */}
+      <Sidebar
+        menuItems={adminMenuItems}
+        user={userData}
+        isCollapsed={isSidebarCollapsed}
+        onCollapseChange={setIsSidebarCollapsed}
+      />
 
-      {/* Main Content Area */}
-      <div className="md:ml-64 transition-all duration-300">
+      {/* Main Content Area - responsive to sidebar state */}
+      <div
+        className={cn(
+          "transition-all duration-300",
+          isSidebarCollapsed ? "md:ml-20" : "md:ml-64"
+        )}
+      >
         {/* Top Navigation */}
         <TopNavbar user={userData} />
 

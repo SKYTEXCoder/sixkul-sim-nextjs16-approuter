@@ -3,10 +3,10 @@
  *
  * Full CRUD operations for managing extracurriculars (Admin only)
  *
- * POST   /api/admin/ekskul     - Create new extracurricular
- * GET    /api/admin/ekskul     - List all extracurriculars
+ * POST   /api/admin/ekstrakurikuler     - Create new extracurricular
+ * GET    /api/admin/ekstrakurikuler     - List all extracurriculars
  *
- * @module api/admin/ekskul
+ * @module api/admin/ekstrakurikuler
  */
 
 import { NextRequest, NextResponse } from "next/server";
@@ -203,7 +203,7 @@ function validateCreateEkskulInput(body: unknown): {
 // ============================================
 
 export async function POST(
-  request: NextRequest,
+  request: NextRequest
 ): Promise<NextResponse<EkskulSuccessResponse | EkskulErrorResponse>> {
   try {
     // ----------------------------------------
@@ -214,7 +214,7 @@ export async function POST(
     if (!authResult.success) {
       return NextResponse.json(
         { success: false, message: authResult.error! },
-        { status: authResult.statusCode },
+        { status: authResult.statusCode }
       );
     }
 
@@ -227,7 +227,7 @@ export async function POST(
     } catch {
       return NextResponse.json(
         { success: false, message: "Invalid JSON in request body" },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -240,7 +240,7 @@ export async function POST(
           message: "Validation failed",
           errors: validation.errors,
         },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -269,7 +269,7 @@ export async function POST(
           success: false,
           message: "Pembina tidak ditemukan.",
         },
-        { status: 404 },
+        { status: 404 }
       );
     }
 
@@ -286,7 +286,7 @@ export async function POST(
           success: false,
           message: `Ekstrakurikuler dengan nama "${name}" sudah ada.`,
         },
-        { status: 409 },
+        { status: 409 }
       );
     }
 
@@ -317,7 +317,7 @@ export async function POST(
     });
 
     console.log(
-      `[ADMIN] Extracurricular created: ${newEkskul.name} (ID: ${newEkskul.id})`,
+      `[ADMIN] Extracurricular created: ${newEkskul.name} (ID: ${newEkskul.id})`
     );
 
     return NextResponse.json(
@@ -339,17 +339,17 @@ export async function POST(
           },
         },
       },
-      { status: 201 },
+      { status: 201 }
     );
   } catch (error) {
-    console.error("[ADMIN EKSKUL CREATE ERROR]", error);
+    console.error("[ADMIN EKSTRAKURIKULER CREATE ERROR]", error);
 
     return NextResponse.json(
       {
         success: false,
         message: "Terjadi kesalahan pada server. Silakan coba lagi.",
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -359,7 +359,7 @@ export async function POST(
 // ============================================
 
 export async function GET(
-  request: NextRequest,
+  request: NextRequest
 ): Promise<NextResponse<EkskulListResponse | EkskulErrorResponse>> {
   try {
     // Authenticate admin
@@ -368,7 +368,7 @@ export async function GET(
     if (!authResult.success) {
       return NextResponse.json(
         { success: false, message: authResult.error! },
-        { status: authResult.statusCode },
+        { status: authResult.statusCode }
       );
     }
 
@@ -430,14 +430,14 @@ export async function GET(
       total: ekstrakurikuler.length,
     });
   } catch (error) {
-    console.error("[ADMIN EKSKUL GET ERROR]", error);
+    console.error("[ADMIN EKSTRAKURIKULER GET ERROR]", error);
 
     return NextResponse.json(
       {
         success: false,
         message: "Terjadi kesalahan pada server. Silakan coba lagi.",
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -450,9 +450,10 @@ export async function PUT(): Promise<NextResponse<EkskulErrorResponse>> {
   return NextResponse.json(
     {
       success: false,
-      message: "Use /api/admin/ekskul/[id] for updating extracurriculars.",
+      message:
+        "Use /api/admin/ekstrakurikuler/[id] for updating extracurriculars.",
     },
-    { status: 405 },
+    { status: 405 }
   );
 }
 
@@ -460,8 +461,9 @@ export async function DELETE(): Promise<NextResponse<EkskulErrorResponse>> {
   return NextResponse.json(
     {
       success: false,
-      message: "Use /api/admin/ekskul/[id] for deleting extracurriculars.",
+      message:
+        "Use /api/admin/ekstrakurikuler/[id] for deleting extracurriculars.",
     },
-    { status: 405 },
+    { status: 405 }
   );
 }

@@ -12,13 +12,19 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
+import { createClerkClient } from "@clerk/backend";
 import { UserRole } from "@/generated/prisma";
+
+// Initialize Clerk Backend client
+const clerkClient = createClerkClient({
+  secretKey: process.env.CLERK_SECRET_KEY,
+});
 
 // ============================================
 // Constants
 // ============================================
 
-const DEFAULT_PASSWORD = "123456";
+const DEFAULT_PASSWORD = "sixkul2024!";
 
 // ============================================
 // Type Definitions
@@ -188,7 +194,7 @@ function validateCreateUserInput(body: unknown): {
       specificId.trim().length === 0
     ) {
       errors.push(
-        `specificId is required for ${role} (${role === "SISWA" ? "NIS" : "NIP"})`,
+        `specificId is required for ${role} (${role === "SISWA" ? "NIS" : "NIP"})`
       );
     }
   }
@@ -227,7 +233,7 @@ function validateCreateUserInput(body: unknown): {
 // ============================================
 
 export async function POST(
-  request: NextRequest,
+  request: NextRequest
 ): Promise<NextResponse<UserSuccessResponse | UserErrorResponse>> {
   try {
     // ----------------------------------------
@@ -238,7 +244,7 @@ export async function POST(
     if (!authResult.success) {
       return NextResponse.json(
         { success: false, message: authResult.error! },
-        { status: authResult.statusCode },
+        { status: authResult.statusCode }
       );
     }
 
@@ -251,7 +257,7 @@ export async function POST(
     } catch {
       return NextResponse.json(
         { success: false, message: "Invalid JSON in request body" },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -264,7 +270,7 @@ export async function POST(
           message: "Validation failed",
           errors: validation.errors,
         },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -293,7 +299,7 @@ export async function POST(
             success: false,
             message: `User dengan email "${email}" sudah ada.`,
           },
-          { status: 409 },
+          { status: 409 }
         );
       }
     }
@@ -311,7 +317,7 @@ export async function POST(
             success: false,
             message: `Student dengan NIS "${specificId}" sudah ada.`,
           },
-          { status: 409 },
+          { status: 409 }
         );
       }
     } else if (role === "PEMBINA") {
@@ -324,84 +330,119 @@ export async function POST(
             success: false,
             message: `Pembina dengan NIP "${specificId}" sudah ada.`,
           },
-          { status: 409 },
+          { status: 409 }
         );
       }
     }
 
     // ----------------------------------------
-    // Step 5: Generate placeholder clerk_id and username
-    // Note: In production, users should be created via Clerk Dashboard or Clerk Backend API
+    // Step 5: Create user in Clerk Backend API
     // ----------------------------------------
-    const timestamp = Date.now();
-    const placeholderClerkId = `placeholder_${timestamp}`;
-    const username = `${role.toLowerCase()}_${specificId || timestamp}`;
-
-    // ----------------------------------------
-    // Step 6: Create user with profile in transaction
-    // ----------------------------------------
-    const result = await prisma.$transaction(async (tx) => {
-      // Create the user
-      const newUser = await tx.user.create({
-        data: {
-          clerk_id: placeholderClerkId,
-          username,
-          email: email || null,
-          full_name: name,
-          role,
-          avatar_url: null,
-        },
+    let clerkUserId: string;
+    try {
+      const clerkUser = await clerkClient.users.createUser({
+        emailAddress: [email],
+        password: DEFAULT_PASSWORD,
+        firstName: name.split(" ")[0],
+        lastName: name.split(" ").slice(1).join(" ") || undefined,
+        publicMetadata: { role },
       });
+      clerkUserId = clerkUser.id;
+      console.log(`[ADMIN] Clerk user created: ${clerkUserId}`);
+    } catch (clerkError) {
+      console.error("[ADMIN] Clerk user creation failed:", clerkError);
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Gagal membuat akun di Clerk. Periksa email dan coba lagi.",
+        },
+        { status: 400 }
+      );
+    }
 
-      let profile: {
-        id: string;
-        specificId: string;
-        phoneNumber?: string | null;
-        className?: string;
-        major?: string;
-        expertise?: string | null;
-      } | null = null;
+    const username = `${role.toLowerCase()}_${specificId || Date.now()}`;
 
-      // Create role-specific profile
-      if (role === "SISWA") {
-        const studentProfile = await tx.studentProfile.create({
+    // ----------------------------------------
+    // Step 6: Create user with profile in Prisma transaction
+    // ----------------------------------------
+    let result;
+    try {
+      result = await prisma.$transaction(async (tx) => {
+        // Create the user
+        const newUser = await tx.user.create({
           data: {
-            user_id: newUser.id,
-            nis: specificId,
-            class_name: className!,
-            major: major!,
-            phone_number: phoneNumber || null,
+            clerk_id: clerkUserId,
+            username,
+            email: email || null,
+            full_name: name,
+            role,
+            avatar_url: null,
           },
         });
-        profile = {
-          id: studentProfile.id,
-          specificId: studentProfile.nis,
-          phoneNumber: studentProfile.phone_number,
-          className: studentProfile.class_name,
-          major: studentProfile.major,
-        };
-      } else if (role === "PEMBINA") {
-        const pembinaProfile = await tx.pembinaProfile.create({
-          data: {
-            user_id: newUser.id,
-            nip: specificId,
-            expertise: expertise || null,
-            phone_number: phoneNumber || null,
-          },
-        });
-        profile = {
-          id: pembinaProfile.id,
-          specificId: pembinaProfile.nip,
-          phoneNumber: pembinaProfile.phone_number,
-          expertise: pembinaProfile.expertise,
-        };
+
+        let profile: {
+          id: string;
+          specificId: string;
+          phoneNumber?: string | null;
+          className?: string;
+          major?: string;
+          expertise?: string | null;
+        } | null = null;
+
+        // Create role-specific profile
+        if (role === "SISWA") {
+          const studentProfile = await tx.studentProfile.create({
+            data: {
+              user_id: newUser.id,
+              nis: specificId,
+              class_name: className!,
+              major: major!,
+              phone_number: phoneNumber || null,
+            },
+          });
+          profile = {
+            id: studentProfile.id,
+            specificId: studentProfile.nis,
+            phoneNumber: studentProfile.phone_number,
+            className: studentProfile.class_name,
+            major: studentProfile.major,
+          };
+        } else if (role === "PEMBINA") {
+          const pembinaProfile = await tx.pembinaProfile.create({
+            data: {
+              user_id: newUser.id,
+              nip: specificId,
+              expertise: expertise || null,
+              phone_number: phoneNumber || null,
+            },
+          });
+          profile = {
+            id: pembinaProfile.id,
+            specificId: pembinaProfile.nip,
+            phoneNumber: pembinaProfile.phone_number,
+            expertise: pembinaProfile.expertise,
+          };
+        }
+
+        return { user: newUser, profile };
+      });
+    } catch (prismaError) {
+      // Rollback: Delete Clerk user if Prisma fails
+      console.error(
+        "[ADMIN] Prisma transaction failed, rolling back Clerk user:",
+        prismaError
+      );
+      try {
+        await clerkClient.users.deleteUser(clerkUserId);
+        console.log(`[ADMIN] Clerk user rolled back: ${clerkUserId}`);
+      } catch (rollbackError) {
+        console.error("[ADMIN] Failed to rollback Clerk user:", rollbackError);
       }
-
-      return { user: newUser, profile };
-    });
+      throw prismaError;
+    }
 
     console.log(
-      `[ADMIN] User created: ${result.user.email} (${result.user.role}) - ID: ${result.user.id}`,
+      `[ADMIN] User created: ${result.user.email} (${result.user.role}) - ID: ${result.user.id}`
     );
 
     // ----------------------------------------
@@ -410,7 +451,7 @@ export async function POST(
     return NextResponse.json(
       {
         success: true,
-        message: `User ${role} berhasil dibuat! Note: Untuk login, user harus dibuat via Clerk Dashboard.`,
+        message: `User ${role} berhasil dibuat!`,
         data: {
           id: result.user.id,
           email: result.user.email,
@@ -420,9 +461,9 @@ export async function POST(
           created_at: result.user.created_at,
           profile: result.profile || undefined,
         },
-        defaultPassword: "N/A - Create user in Clerk Dashboard",
+        defaultPassword: DEFAULT_PASSWORD,
       },
-      { status: 201 },
+      { status: 201 }
     );
   } catch (error) {
     console.error("[ADMIN USER CREATE ERROR]", error);
@@ -432,7 +473,7 @@ export async function POST(
         success: false,
         message: "Terjadi kesalahan pada server. Silakan coba lagi.",
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -442,7 +483,7 @@ export async function POST(
 // ============================================
 
 export async function GET(
-  request: NextRequest,
+  request: NextRequest
 ): Promise<NextResponse<UserListResponse | UserErrorResponse>> {
   try {
     // Authenticate admin
@@ -451,7 +492,7 @@ export async function GET(
     if (!authResult.success) {
       return NextResponse.json(
         { success: false, message: authResult.error! },
-        { status: authResult.statusCode },
+        { status: authResult.statusCode }
       );
     }
 
@@ -515,7 +556,7 @@ export async function GET(
         success: false,
         message: "Terjadi kesalahan pada server. Silakan coba lagi.",
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -530,7 +571,7 @@ export async function PUT(): Promise<NextResponse<UserErrorResponse>> {
       success: false,
       message: "Use /api/admin/users/[id] for updating users.",
     },
-    { status: 405 },
+    { status: 405 }
   );
 }
 
@@ -540,6 +581,6 @@ export async function DELETE(): Promise<NextResponse<UserErrorResponse>> {
       success: false,
       message: "Use /api/admin/users/[id] for deleting users.",
     },
-    { status: 405 },
+    { status: 405 }
   );
 }

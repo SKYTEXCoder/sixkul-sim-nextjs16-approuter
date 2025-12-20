@@ -1,7 +1,7 @@
 /**
  * Admin Dashboard Page
  *
- * Main dashboard view for Admin role.
+ * Main dashboard view for Admin role with real data from database.
  *
  * @module app/(dashboard)/admin/dashboard/page
  */
@@ -25,8 +25,34 @@ import {
   Bell,
   BarChart3,
 } from "lucide-react";
+import {
+  getDashboardStats,
+  getRecentActivity,
+  getTopEkstrakurikuler,
+} from "@/lib/admin-dashboard-data";
+import Link from "next/link";
 
-export default function AdminDashboardPage() {
+export default async function AdminDashboardPage() {
+  const [stats, recentActivity, topEkskul] = await Promise.all([
+    getDashboardStats(),
+    getRecentActivity(4),
+    getTopEkstrakurikuler(4),
+  ]);
+
+  // Format relative time
+  const formatRelativeTime = (date: Date) => {
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMins / 60);
+    const diffDays = Math.floor(diffHours / 24);
+
+    if (diffMins < 1) return "Baru saja";
+    if (diffMins < 60) return `${diffMins} menit lalu`;
+    if (diffHours < 24) return `${diffHours} jam lalu`;
+    return `${diffDays} hari lalu`;
+  };
+
   return (
     <div className="space-y-6">
       {/* Welcome Header */}
@@ -40,14 +66,18 @@ export default function AdminDashboardPage() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline">
-            <Bell className="mr-2 h-4 w-4" />
-            Pengumuman
-          </Button>
-          <Button className="bg-red-600 hover:bg-red-700">
-            <UserPlus className="mr-2 h-4 w-4" />
-            Tambah User
-          </Button>
+          <Link href="/admin/ekstrakurikuler">
+            <Button variant="outline">
+              <Bell className="mr-2 h-4 w-4" />
+              Kelola Ekskul
+            </Button>
+          </Link>
+          <Link href="/admin/users">
+            <Button className="bg-red-600 hover:bg-red-700">
+              <UserPlus className="mr-2 h-4 w-4" />
+              Tambah User
+            </Button>
+          </Link>
         </div>
       </div>
 
@@ -62,8 +92,10 @@ export default function AdminDashboardPage() {
           <CardContent>
             <div className="flex items-center justify-between">
               <div>
-                <span className="text-3xl font-bold">156</span>
-                <p className="text-xs text-red-200 mt-1">+12 bulan ini</p>
+                <span className="text-3xl font-bold">{stats.users.total}</span>
+                <p className="text-xs text-red-200 mt-1">
+                  {stats.users.active} aktif
+                </p>
               </div>
               <Users className="h-8 w-8 text-red-200" />
             </div>
@@ -73,14 +105,18 @@ export default function AdminDashboardPage() {
         <Card className="bg-gradient-to-br from-blue-500 to-indigo-600 text-white border-0">
           <CardHeader className="pb-2">
             <CardDescription className="text-blue-100">
-              Ekskul Aktif
+              Ekstrakurikuler Aktif
             </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="flex items-center justify-between">
               <div>
-                <span className="text-3xl font-bold">12</span>
-                <p className="text-xs text-blue-200 mt-1">5 kategori</p>
+                <span className="text-3xl font-bold">
+                  {stats.ekstrakurikuler.active}
+                </span>
+                <p className="text-xs text-blue-200 mt-1">
+                  {stats.ekstrakurikuler.categories} kategori
+                </p>
               </div>
               <BookOpen className="h-8 w-8 text-blue-200" />
             </div>
@@ -96,7 +132,9 @@ export default function AdminDashboardPage() {
           <CardContent>
             <div className="flex items-center justify-between">
               <div>
-                <span className="text-3xl font-bold">8</span>
+                <span className="text-3xl font-bold">
+                  {stats.users.byRole.PEMBINA}
+                </span>
                 <p className="text-xs text-emerald-200 mt-1">Aktif semua</p>
               </div>
               <Shield className="h-8 w-8 text-emerald-200" />
@@ -113,9 +151,9 @@ export default function AdminDashboardPage() {
           <CardContent>
             <div className="flex items-center justify-between">
               <div>
-                <span className="text-3xl font-bold">89%</span>
+                <span className="text-3xl font-bold">{stats.activity}%</span>
                 <p className="text-xs text-amber-200 mt-1">
-                  ↑ 5% dari bulan lalu
+                  {stats.enrollments.active} pendaftaran aktif
                 </p>
               </div>
               <TrendingUp className="h-8 w-8 text-amber-200" />
@@ -139,29 +177,44 @@ export default function AdminDashboardPage() {
             <div className="grid grid-cols-3 gap-4">
               <div className="text-center p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20">
                 <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">
-                  145
+                  {stats.users.byRole.SISWA}
                 </p>
                 <p className="text-sm text-slate-500 mt-1">Siswa</p>
                 <Badge variant="secondary" className="mt-2">
-                  93%
+                  {stats.users.total > 0
+                    ? Math.round(
+                        (stats.users.byRole.SISWA / stats.users.total) * 100
+                      )
+                    : 0}
+                  %
                 </Badge>
               </div>
               <div className="text-center p-4 rounded-lg bg-emerald-50 dark:bg-emerald-900/20">
                 <p className="text-3xl font-bold text-emerald-600 dark:text-emerald-400">
-                  8
+                  {stats.users.byRole.PEMBINA}
                 </p>
                 <p className="text-sm text-slate-500 mt-1">Pembina</p>
                 <Badge variant="secondary" className="mt-2">
-                  5%
+                  {stats.users.total > 0
+                    ? Math.round(
+                        (stats.users.byRole.PEMBINA / stats.users.total) * 100
+                      )
+                    : 0}
+                  %
                 </Badge>
               </div>
               <div className="text-center p-4 rounded-lg bg-red-50 dark:bg-red-900/20">
                 <p className="text-3xl font-bold text-red-600 dark:text-red-400">
-                  3
+                  {stats.users.byRole.ADMIN}
                 </p>
                 <p className="text-sm text-slate-500 mt-1">Admin</p>
                 <Badge variant="secondary" className="mt-2">
-                  2%
+                  {stats.users.total > 0
+                    ? Math.round(
+                        (stats.users.byRole.ADMIN / stats.users.total) * 100
+                      )
+                    : 0}
+                  %
                 </Badge>
               </div>
             </div>
@@ -178,19 +231,23 @@ export default function AdminDashboardPage() {
             <CardDescription>Manajemen sistem</CardDescription>
           </CardHeader>
           <CardContent className="space-y-2">
-            <Button variant="outline" className="w-full justify-start">
-              <UserPlus className="mr-2 h-4 w-4" />
-              Tambah User Baru
-            </Button>
-            <Button variant="outline" className="w-full justify-start">
-              <BookOpen className="mr-2 h-4 w-4" />
-              Tambah Ekskul
-            </Button>
-            <Button variant="outline" className="w-full justify-start">
+            <Link href="/admin/users">
+              <Button variant="outline" className="w-full justify-start">
+                <UserPlus className="mr-2 h-4 w-4" />
+                Tambah User Baru
+              </Button>
+            </Link>
+            <Link href="/admin/ekstrakurikuler">
+              <Button variant="outline" className="w-full justify-start">
+                <BookOpen className="mr-2 h-4 w-4" />
+                Tambah Ekstrakurikuler
+              </Button>
+            </Link>
+            <Button variant="outline" className="w-full justify-start" disabled>
               <BarChart3 className="mr-2 h-4 w-4" />
               Lihat Laporan
             </Button>
-            <Button variant="outline" className="w-full justify-start">
+            <Button variant="outline" className="w-full justify-start" disabled>
               <Bell className="mr-2 h-4 w-4" />
               Buat Pengumuman
             </Button>
@@ -210,42 +267,37 @@ export default function AdminDashboardPage() {
             <CardDescription>Log aktivitas sistem</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {[
-              {
-                action: "User baru terdaftar",
-                user: "Siti Nurhaliza",
-                time: "2 menit lalu",
-              },
-              {
-                action: "Pendaftaran ekskul",
-                user: "Ahmad Rizki → Robotik",
-                time: "15 menit lalu",
-              },
-              {
-                action: "Absensi diinput",
-                user: "Pembina: Basket",
-                time: "1 jam lalu",
-              },
-              {
-                action: "Ekskul baru dibuat",
-                user: "Admin: English Club",
-                time: "3 jam lalu",
-              },
-            ].map((activity, i) => (
-              <div
-                key={i}
-                className="flex items-start gap-3 p-3 rounded-lg bg-slate-50 dark:bg-slate-800"
-              >
-                <div className="w-2 h-2 rounded-full bg-blue-500 mt-2" />
-                <div className="flex-1">
-                  <p className="font-medium text-slate-900 dark:text-white text-sm">
-                    {activity.action}
-                  </p>
-                  <p className="text-xs text-slate-500">{activity.user}</p>
+            {recentActivity.length > 0 ? (
+              recentActivity.map((activity) => (
+                <div
+                  key={activity.id}
+                  className="flex items-start gap-3 p-3 rounded-lg bg-slate-50 dark:bg-slate-800"
+                >
+                  <div
+                    className={`w-2 h-2 rounded-full mt-2 ${
+                      activity.type === "user"
+                        ? "bg-blue-500"
+                        : activity.type === "enrollment"
+                          ? "bg-green-500"
+                          : "bg-amber-500"
+                    }`}
+                  />
+                  <div className="flex-1">
+                    <p className="font-medium text-slate-900 dark:text-white text-sm">
+                      {activity.action}
+                    </p>
+                    <p className="text-xs text-slate-500">{activity.user}</p>
+                  </div>
+                  <span className="text-xs text-slate-400">
+                    {formatRelativeTime(activity.time)}
+                  </span>
                 </div>
-                <span className="text-xs text-slate-400">{activity.time}</span>
-              </div>
-            ))}
+              ))
+            ) : (
+              <p className="text-center text-slate-500 py-4">
+                Belum ada aktivitas terbaru.
+              </p>
+            )}
           </CardContent>
         </Card>
 
@@ -254,35 +306,40 @@ export default function AdminDashboardPage() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <BookOpen className="h-5 w-5 text-emerald-500" />
-              Ekskul Terpopuler
+              Ekstrakurikuler Terpopuler
             </CardTitle>
             <CardDescription>Berdasarkan jumlah anggota</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {[
-              { name: "Basket", members: 28, category: "Olahraga" },
-              { name: "Robotik", members: 24, category: "Teknologi" },
-              { name: "Paskibra", members: 20, category: "Kepanduan" },
-              { name: "PMR", members: 18, category: "Sosial" },
-            ].map((ekskul, i) => (
-              <div
-                key={i}
-                className="flex items-center justify-between p-3 rounded-lg bg-slate-50 dark:bg-slate-800"
-              >
-                <div className="flex items-center gap-3">
-                  <span className="text-lg font-bold text-slate-400">
-                    #{i + 1}
-                  </span>
-                  <div>
-                    <p className="font-medium text-slate-900 dark:text-white">
-                      {ekskul.name}
-                    </p>
-                    <p className="text-xs text-slate-500">{ekskul.category}</p>
+            {topEkskul.length > 0 ? (
+              topEkskul.map((ekskul, i) => (
+                <div
+                  key={ekskul.id}
+                  className="flex items-center justify-between p-3 rounded-lg bg-slate-50 dark:bg-slate-800"
+                >
+                  <div className="flex items-center gap-3">
+                    <span className="text-lg font-bold text-slate-400">
+                      #{i + 1}
+                    </span>
+                    <div>
+                      <p className="font-medium text-slate-900 dark:text-white">
+                        {ekskul.name}
+                      </p>
+                      <p className="text-xs text-slate-500">
+                        {ekskul.category}
+                      </p>
+                    </div>
                   </div>
+                  <Badge variant="secondary">
+                    {ekskul.enrollmentCount} anggota
+                  </Badge>
                 </div>
-                <Badge variant="secondary">{ekskul.members} anggota</Badge>
-              </div>
-            ))}
+              ))
+            ) : (
+              <p className="text-center text-slate-500 py-4">
+                Belum ada ekstrakurikuler.
+              </p>
+            )}
           </CardContent>
         </Card>
       </div>
