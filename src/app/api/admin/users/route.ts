@@ -24,7 +24,7 @@ const clerkClient = createClerkClient({
 // Constants
 // ============================================
 
-const DEFAULT_PASSWORD = "sixkul2024!";
+const DEFAULT_PASSWORD = "rtx5070ti16gb";
 
 // ============================================
 // Type Definitions
@@ -33,6 +33,7 @@ const DEFAULT_PASSWORD = "sixkul2024!";
 interface CreateUserRequestBody {
   name: string;
   email: string;
+  password?: string; // Optional, defaults to DEFAULT_PASSWORD
   role: UserRole;
   specificId: string; // NIS for SISWA, NIP for PEMBINA
   className?: string; // For SISWA only
@@ -161,6 +162,7 @@ function validateCreateUserInput(body: unknown): {
   const {
     name,
     email,
+    password,
     role,
     specificId,
     className,
@@ -218,6 +220,7 @@ function validateCreateUserInput(body: unknown): {
     data: {
       name: name!.trim(),
       email: email!.toLowerCase().trim(),
+      password: password?.trim(),
       role: role as UserRole,
       specificId: specificId?.trim() || "",
       className: className?.trim(),
@@ -277,6 +280,7 @@ export async function POST(
     const {
       name,
       email,
+      password,
       role,
       specificId,
       className,
@@ -284,6 +288,9 @@ export async function POST(
       expertise,
       phoneNumber,
     } = validation.data;
+
+    // Use provided password or fall back to default
+    const userPassword = password || DEFAULT_PASSWORD;
 
     // ----------------------------------------
     // Step 3: Check for duplicate email (optional field but should be unique if provided)
@@ -338,11 +345,15 @@ export async function POST(
     // ----------------------------------------
     // Step 5: Create user in Clerk Backend API
     // ----------------------------------------
+    // Generate username before Clerk call (Clerk requires username for this instance)
+    const username = `${role.toLowerCase()}_${specificId || Date.now()}`;
+
     let clerkUserId: string;
     try {
       const clerkUser = await clerkClient.users.createUser({
+        username, // Required by Clerk instance configuration
         emailAddress: [email],
-        password: DEFAULT_PASSWORD,
+        password: userPassword,
         firstName: name.split(" ")[0],
         lastName: name.split(" ").slice(1).join(" ") || undefined,
         publicMetadata: { role },
@@ -351,16 +362,43 @@ export async function POST(
       console.log(`[ADMIN] Clerk user created: ${clerkUserId}`);
     } catch (clerkError) {
       console.error("[ADMIN] Clerk user creation failed:", clerkError);
+
+      // Extract detailed error message from Clerk
+      let errorMessage = "Gagal membuat akun di Clerk.";
+      const errorDetails: string[] = [];
+
+      if (clerkError && typeof clerkError === "object") {
+        const err = clerkError as {
+          errors?: Array<{
+            message?: string;
+            longMessage?: string;
+            code?: string;
+          }>;
+        };
+        if (err.errors && Array.isArray(err.errors)) {
+          for (const e of err.errors) {
+            if (e.longMessage) {
+              errorDetails.push(e.longMessage);
+            } else if (e.message) {
+              errorDetails.push(e.message);
+            }
+          }
+        }
+      }
+
+      if (errorDetails.length > 0) {
+        errorMessage = errorDetails.join(". ");
+      }
+
       return NextResponse.json(
         {
           success: false,
-          message: "Gagal membuat akun di Clerk. Periksa email dan coba lagi.",
+          message: errorMessage,
+          errors: errorDetails.length > 0 ? errorDetails : undefined,
         },
         { status: 400 }
       );
     }
-
-    const username = `${role.toLowerCase()}_${specificId || Date.now()}`;
 
     // ----------------------------------------
     // Step 6: Create user with profile in Prisma transaction
