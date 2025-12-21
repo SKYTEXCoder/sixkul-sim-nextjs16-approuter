@@ -1,11 +1,15 @@
 /**
  * Admin Dashboard Page
  *
- * Main dashboard view for Admin role with real data from database.
+ * Main dashboard view for Admin Phase 2 (Monitoring & Evaluation).
+ * Strictly read-only views with aggregated system metrics.
  *
  * @module app/(dashboard)/admin/dashboard/page
  */
 
+import { Users, BookOpen, Activity, Shield, TrendingUp } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   Card,
   CardContent,
@@ -13,33 +17,38 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
+import { MetricCard } from "@/components/admin/MetricCard";
 import {
-  BookOpen,
-  Users,
-  UserPlus,
-  TrendingUp,
-  Activity,
-  Shield,
-  Bell,
-  BarChart3,
-} from "lucide-react";
+  getSystemOverviewMetrics,
+  getExtracurricularHealthList,
+  getPembinaActivityMetrics,
+} from "@/lib/admin/admin-data-aggregation";
 import {
-  getDashboardStats,
   getRecentActivity,
   getTopEkstrakurikuler,
 } from "@/lib/admin-dashboard-data";
 import Link from "next/link";
+import { AlertTriangle, UserX } from "lucide-react";
 
 export default async function AdminDashboardPage() {
-  const [stats, recentActivity, topEkskul] = await Promise.all([
-    getDashboardStats(),
-    getRecentActivity(4),
-    getTopEkstrakurikuler(4),
-  ]);
+  // Fetch Phase 2 Aggregated Metrics
+  const [metrics, recentActivity, topEkskul, healthList, pembinaMetrics] =
+    await Promise.all([
+      getSystemOverviewMetrics(),
+      getRecentActivity(5),
+      getTopEkstrakurikuler(5),
+      getExtracurricularHealthList(),
+      getPembinaActivityMetrics(),
+    ]);
 
-  // Format relative time
+  const criticalEkskuls = healthList.filter(
+    (e) => e.healthStatus === "CRITICAL" || e.healthStatus === "WARNING"
+  );
+  const inactivePembinas = pembinaMetrics.filter(
+    (p) => p.sessionsCreated30Days === 0
+  );
+
+  // Format relative time helper
   const formatRelativeTime = (date: Date) => {
     const now = new Date();
     const diffMs = now.getTime() - date.getTime();
@@ -54,275 +63,231 @@ export default async function AdminDashboardPage() {
   };
 
   return (
-    <div className="space-y-6">
-      {/* Welcome Header */}
+    <div className="space-y-8">
+      {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">
-            Dashboard Administrator 🏫
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
+            Dashboard Monitoring 📊
           </h1>
           <p className="text-slate-500 dark:text-slate-400 mt-1">
-            Kelola sistem SIXKUL dan pantau aktivitas keseluruhan.
+            Evaluasi kesehatan dan aktivitas ekstrakurikuler (Phase 2).
           </p>
         </div>
         <div className="flex gap-2">
+          {/* Phase 2: Action buttons are minimized or focused on navigation, not creation */}
           <Link href="/admin/ekstrakurikuler">
             <Button variant="outline">
-              <Bell className="mr-2 h-4 w-4" />
-              Kelola Ekskul
-            </Button>
-          </Link>
-          <Link href="/admin/users">
-            <Button className="bg-red-600 hover:bg-red-700">
-              <UserPlus className="mr-2 h-4 w-4" />
-              Tambah User
+              <Activity className="mr-2 h-4 w-4" />
+              Monitoring Kesehatan
             </Button>
           </Link>
         </div>
       </div>
 
-      {/* Stats Cards */}
+      {/* System Overview Metrics (Phase 2 Priority) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="bg-gradient-to-br from-red-500 to-rose-600 text-white border-0">
-          <CardHeader className="pb-2">
-            <CardDescription className="text-red-100">
-              Total User
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              <div>
-                <span className="text-3xl font-bold">{stats.users.total}</span>
-                <p className="text-xs text-red-200 mt-1">
-                  {stats.users.active} aktif
-                </p>
-              </div>
-              <Users className="h-8 w-8 text-red-200" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-br from-blue-500 to-indigo-600 text-white border-0">
-          <CardHeader className="pb-2">
-            <CardDescription className="text-blue-100">
-              Ekstrakurikuler Aktif
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              <div>
-                <span className="text-3xl font-bold">
-                  {stats.ekstrakurikuler.active}
-                </span>
-                <p className="text-xs text-blue-200 mt-1">
-                  {stats.ekstrakurikuler.categories} kategori
-                </p>
-              </div>
-              <BookOpen className="h-8 w-8 text-blue-200" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-br from-emerald-500 to-teal-600 text-white border-0">
-          <CardHeader className="pb-2">
-            <CardDescription className="text-emerald-100">
-              Total Pembina
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              <div>
-                <span className="text-3xl font-bold">
-                  {stats.users.byRole.PEMBINA}
-                </span>
-                <p className="text-xs text-emerald-200 mt-1">Aktif semua</p>
-              </div>
-              <Shield className="h-8 w-8 text-emerald-200" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="bg-gradient-to-br from-amber-500 to-orange-600 text-white border-0">
-          <CardHeader className="pb-2">
-            <CardDescription className="text-amber-100">
-              Keaktifan
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="flex items-center justify-between">
-              <div>
-                <span className="text-3xl font-bold">{stats.activity}%</span>
-                <p className="text-xs text-amber-200 mt-1">
-                  {stats.enrollments.active} pendaftaran aktif
-                </p>
-              </div>
-              <TrendingUp className="h-8 w-8 text-amber-200" />
-            </div>
-          </CardContent>
-        </Card>
+        <MetricCard
+          title="Total Siswa"
+          value={metrics.totalStudents}
+          description="Siswa terdaftar dalam sistem"
+          icon={Users}
+          iconColorClass="text-blue-500"
+          trend={{
+            value: Math.abs(metrics.trends.usersGrowth),
+            label: "vs 30 hari lalu",
+            positive: metrics.trends.usersGrowth >= 0,
+          }}
+        />
+        <MetricCard
+          title="Ekstrakurikuler Aktif"
+          value={`${metrics.activeExtracurriculars} / ${metrics.totalExtracurriculars}`}
+          description="Status Aktif vs Total"
+          icon={BookOpen}
+          iconColorClass="text-emerald-500"
+        />
+        <MetricCard
+          title="Total Pembina"
+          value={metrics.totalPembina}
+          description="Pembina aktif bertugas"
+          icon={Shield}
+          iconColorClass="text-amber-500"
+        />
+        <MetricCard
+          title="Pendaftaran Aktif"
+          value={metrics.activeEnrollments}
+          description="Total partisipasi siswa"
+          icon={TrendingUp}
+          iconColorClass="text-purple-500"
+          trend={{
+            value: Math.abs(metrics.trends.enrollmentGrowth),
+            label: "vs 30 hari lalu",
+            positive: metrics.trends.enrollmentGrowth >= 0,
+          }}
+        />
       </div>
 
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* User Overview */}
+        {/* User Distribution (Visual) */}
         <Card className="lg:col-span-2">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Users className="h-5 w-5 text-blue-500" />
-              Distribusi User
+              <Users className="h-5 w-5 text-indigo-500" />
+              Distribusi Pengguna
             </CardTitle>
-            <CardDescription>Berdasarkan role dalam sistem</CardDescription>
+            <CardDescription>
+              Proporsi pengguna berdasarkan peran sistem
+            </CardDescription>
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-3 gap-4">
-              <div className="text-center p-4 rounded-lg bg-blue-50 dark:bg-blue-900/20">
-                <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">
-                  {stats.users.byRole.SISWA}
-                </p>
-                <p className="text-sm text-slate-500 mt-1">Siswa</p>
-                <Badge variant="secondary" className="mt-2">
-                  {stats.users.total > 0
-                    ? Math.round(
-                        (stats.users.byRole.SISWA / stats.users.total) * 100
-                      )
-                    : 0}
-                  %
-                </Badge>
+              <div className="flex flex-col items-center p-4 bg-blue-50 dark:bg-blue-950/30 rounded-lg">
+                <span className="text-3xl font-bold text-blue-600 dark:text-blue-400">
+                  {metrics.totalStudents}
+                </span>
+                <span className="text-sm font-medium text-slate-600 dark:text-slate-300 mt-1">
+                  Siswa
+                </span>
               </div>
-              <div className="text-center p-4 rounded-lg bg-emerald-50 dark:bg-emerald-900/20">
-                <p className="text-3xl font-bold text-emerald-600 dark:text-emerald-400">
-                  {stats.users.byRole.PEMBINA}
-                </p>
-                <p className="text-sm text-slate-500 mt-1">Pembina</p>
-                <Badge variant="secondary" className="mt-2">
-                  {stats.users.total > 0
-                    ? Math.round(
-                        (stats.users.byRole.PEMBINA / stats.users.total) * 100
-                      )
-                    : 0}
-                  %
-                </Badge>
+              <div className="flex flex-col items-center p-4 bg-amber-50 dark:bg-amber-950/30 rounded-lg">
+                <span className="text-3xl font-bold text-amber-600 dark:text-amber-400">
+                  {metrics.totalPembina}
+                </span>
+                <span className="text-sm font-medium text-slate-600 dark:text-slate-300 mt-1">
+                  Pembina
+                </span>
               </div>
-              <div className="text-center p-4 rounded-lg bg-red-50 dark:bg-red-900/20">
-                <p className="text-3xl font-bold text-red-600 dark:text-red-400">
-                  {stats.users.byRole.ADMIN}
-                </p>
-                <p className="text-sm text-slate-500 mt-1">Admin</p>
-                <Badge variant="secondary" className="mt-2">
-                  {stats.users.total > 0
-                    ? Math.round(
-                        (stats.users.byRole.ADMIN / stats.users.total) * 100
-                      )
-                    : 0}
-                  %
-                </Badge>
+              <div className="flex flex-col items-center p-4 bg-slate-50 dark:bg-slate-800 rounded-lg">
+                <span className="text-3xl font-bold text-slate-600 dark:text-slate-400">
+                  {metrics.totalUsers}
+                </span>
+                <span className="text-sm font-medium text-slate-600 dark:text-slate-300 mt-1">
+                  Total Akun
+                </span>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Quick Actions */}
+        {/* Anomaly Signals */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Activity className="h-5 w-5 text-purple-500" />
-              Aksi Cepat
+              <AlertTriangle className="h-5 w-5 text-rose-500" />
+              Sinyal & Anomali
             </CardTitle>
-            <CardDescription>Manajemen sistem</CardDescription>
+            <CardDescription>
+              Indikator perhatian yang perlu ditindaklanjuti
+            </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-2">
-            <Link href="/admin/users">
-              <Button variant="outline" className="w-full justify-start">
-                <UserPlus className="mr-2 h-4 w-4" />
-                Tambah User Baru
-              </Button>
-            </Link>
+          <CardContent className="space-y-4">
             <Link href="/admin/ekstrakurikuler">
-              <Button variant="outline" className="w-full justify-start">
-                <BookOpen className="mr-2 h-4 w-4" />
-                Tambah Ekstrakurikuler
-              </Button>
+              <div className="flex items-center justify-between p-3 rounded-lg border border-rose-100 bg-rose-50 hover:bg-rose-100 dark:border-rose-900/50 dark:bg-rose-950/20 dark:hover:bg-rose-950/30 transition-colors cursor-pointer group">
+                <div className="flex items-center gap-3">
+                  <Activity className="h-5 w-5 text-rose-600 dark:text-rose-400" />
+                  <div>
+                    <p className="font-medium text-rose-900 dark:text-rose-200">
+                      Kesehatan Ekskul
+                    </p>
+                    <p className="text-xs text-rose-700 dark:text-rose-400">
+                      {criticalEkskuls.length} Butuh Perhatian
+                    </p>
+                  </div>
+                </div>
+                <div className="h-8 w-8 rounded-full bg-rose-200 dark:bg-rose-900 flex items-center justify-center text-rose-700 dark:text-rose-300 font-bold group-hover:scale-110 transition-transform">
+                  {criticalEkskuls.length}
+                </div>
+              </div>
             </Link>
-            <Button variant="outline" className="w-full justify-start" disabled>
-              <BarChart3 className="mr-2 h-4 w-4" />
-              Lihat Laporan
-            </Button>
-            <Button variant="outline" className="w-full justify-start" disabled>
-              <Bell className="mr-2 h-4 w-4" />
-              Buat Pengumuman
-            </Button>
+
+            <Link href="/admin/users">
+              <div className="flex items-center justify-between p-3 rounded-lg border border-amber-100 bg-amber-50 hover:bg-amber-100 dark:border-amber-900/50 dark:bg-amber-950/20 dark:hover:bg-amber-950/30 transition-colors cursor-pointer group">
+                <div className="flex items-center gap-3">
+                  <UserX className="h-5 w-5 text-amber-600 dark:text-amber-400" />
+                  <div>
+                    <p className="font-medium text-amber-900 dark:text-amber-200">
+                      Pembina Tidak Aktif
+                    </p>
+                    <p className="text-xs text-amber-700 dark:text-amber-400">
+                      {inactivePembinas.length} Pembina Sedang Tidak Aktif{" "}
+                      <br /> (dalam rentang waktu 30 hari)
+                    </p>
+                  </div>
+                </div>
+                <div className="h-8 w-8 rounded-full bg-amber-200 dark:bg-amber-900 flex items-center justify-center text-amber-700 dark:text-amber-300 font-bold group-hover:scale-110 transition-transform">
+                  {inactivePembinas.length}
+                </div>
+              </div>
+            </Link>
           </CardContent>
         </Card>
       </div>
 
-      {/* Recent Activity & Ekskul List */}
+      {/* Secondary Metrics: Recent Activity & Top Ekskul */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Recent Activity */}
+        {/* Recent System Activity */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Activity className="h-5 w-5 text-amber-500" />
-              Aktivitas Terbaru
-            </CardTitle>
-            <CardDescription>Log aktivitas sistem</CardDescription>
+            <CardTitle className="text-lg">Aktivitas Terkini</CardTitle>
+            <CardDescription>Log kejadian sistem terakhir</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {recentActivity.length > 0 ? (
               recentActivity.map((activity) => (
                 <div
                   key={activity.id}
-                  className="flex items-start gap-3 p-3 rounded-lg bg-slate-50 dark:bg-slate-800"
+                  className="flex items-start gap-3 text-sm pb-3 border-b last:border-0 border-slate-100 dark:border-slate-800"
                 >
                   <div
-                    className={`w-2 h-2 rounded-full mt-2 ${
-                      activity.type === "user"
-                        ? "bg-blue-500"
-                        : activity.type === "enrollment"
-                          ? "bg-green-500"
-                          : "bg-amber-500"
+                    className={`mt-1.5 w-2 h-2 rounded-full shrink-0 ${
+                      activity.type === "enrollment"
+                        ? "bg-green-500"
+                        : activity.type === "attendance"
+                          ? "bg-blue-500"
+                          : "bg-orange-500"
                     }`}
                   />
                   <div className="flex-1">
-                    <p className="font-medium text-slate-900 dark:text-white text-sm">
+                    <p className="font-medium text-slate-900 dark:text-slate-200">
                       {activity.action}
                     </p>
-                    <p className="text-xs text-slate-500">{activity.user}</p>
+                    <p className="text-slate-500 dark:text-slate-400 text-xs">
+                      {activity.user}
+                    </p>
                   </div>
-                  <span className="text-xs text-slate-400">
+                  <span className="text-xs text-slate-400 whitespace-nowrap">
                     {formatRelativeTime(activity.time)}
                   </span>
                 </div>
               ))
             ) : (
-              <p className="text-center text-slate-500 py-4">
-                Belum ada aktivitas terbaru.
-              </p>
+              <div className="text-center py-6 text-slate-500">
+                Tidak ada aktivitas tercatat.
+              </div>
             )}
           </CardContent>
         </Card>
 
-        {/* Top Ekskul */}
+        {/* Popular Extracurriculars */}
         <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <BookOpen className="h-5 w-5 text-emerald-500" />
-              Ekstrakurikuler Terpopuler
-            </CardTitle>
-            <CardDescription>Berdasarkan jumlah anggota</CardDescription>
+            <CardTitle className="text-lg">Ekstrakurikuler Populer</CardTitle>
+            <CardDescription>Berdasarkan jumlah pendaftar</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             {topEkskul.length > 0 ? (
               topEkskul.map((ekskul, i) => (
                 <div
                   key={ekskul.id}
-                  className="flex items-center justify-between p-3 rounded-lg bg-slate-50 dark:bg-slate-800"
+                  className="flex items-center justify-between"
                 >
                   <div className="flex items-center gap-3">
-                    <span className="text-lg font-bold text-slate-400">
-                      #{i + 1}
-                    </span>
+                    <div className="flex items-center justify-center w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-800 text-xs font-bold text-slate-600">
+                      {i + 1}
+                    </div>
                     <div>
-                      <p className="font-medium text-slate-900 dark:text-white">
+                      <p className="font-medium text-sm text-slate-900 dark:text-slate-200">
                         {ekskul.name}
                       </p>
                       <p className="text-xs text-slate-500">
@@ -330,15 +295,18 @@ export default async function AdminDashboardPage() {
                       </p>
                     </div>
                   </div>
-                  <Badge variant="secondary">
-                    {ekskul.enrollmentCount} anggota
+                  <Badge
+                    variant="outline"
+                    className="bg-slate-50 dark:bg-slate-900"
+                  >
+                    {ekskul.enrollmentCount}
                   </Badge>
                 </div>
               ))
             ) : (
-              <p className="text-center text-slate-500 py-4">
-                Belum ada ekstrakurikuler.
-              </p>
+              <div className="text-center py-6 text-slate-500">
+                Data tidak tersedia.
+              </div>
             )}
           </CardContent>
         </Card>

@@ -8,10 +8,21 @@
  */
 
 import { getAllUsers, getUserStats } from "@/lib/admin-user-data";
+import { getPembinaActivityMetrics } from "@/lib/admin/admin-data-aggregation";
 import { UsersClientWrapper } from "@/components/admin/UsersClientWrapper";
 
 export default async function AdminUsersPage() {
-  const [users, stats] = await Promise.all([getAllUsers(), getUserStats()]);
+  const [users, stats, pembinaMetrics] = await Promise.all([
+    getAllUsers(),
+    getUserStats(),
+    getPembinaActivityMetrics(),
+  ]);
 
-  return <UsersClientWrapper users={users} stats={stats} />;
+  return (
+    <UsersClientWrapper
+      users={users}
+      stats={stats}
+      pembinaMetrics={pembinaMetrics}
+    />
+  );
 }
