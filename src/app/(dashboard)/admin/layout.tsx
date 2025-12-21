@@ -124,11 +124,13 @@ export default function AdminLayout({
           isSidebarCollapsed ? "md:ml-20" : "md:ml-64"
         )}
       >
-        {/* Top Navigation */}
-        <TopNavbar user={userData} />
+        {/* Top Navigation - Sticky & Styled */}
+        <header className="sticky top-0 z-50 w-full h-16 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+          <TopNavbar user={userData} />
+        </header>
 
         {/* Page Content */}
-        <main className="pt-20 px-4 md:px-6 pb-8">
+        <main className="pt-6 px-4 md:px-6 pb-8">
           <div className="max-w-7xl mx-auto">{children}</div>
         </main>
       </div>

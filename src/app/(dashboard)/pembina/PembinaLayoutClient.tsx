@@ -108,19 +108,13 @@ export function PembinaLayoutClient({
             isSidebarCollapsed ? "md:ml-20" : "md:ml-64"
           )}
         >
-          {/* Top Navigation with divider and padding */}
-          <header className="sticky top-0 z-30 bg-white dark:bg-slate-900">
-            {/* Navbar content */}
-            <div className="h-14">
-              <TopNavbar
-                user={userData}
-                unreadNotificationCount={unreadNotificationCount}
-                pembinaNotifications={notifications}
-              />
-            </div>
-
-            {/* Clean divider */}
-            <div className="h-px bg-gradient-to-r from-transparent via-slate-200 dark:via-slate-700 to-transparent mx-4" />
+          {/* Top Navigation with glassmorphism */}
+          <header className="sticky top-0 z-50 w-full h-16 bg-white/80 dark:bg-slate-950/80 backdrop-blur-md border-b border-slate-200 dark:border-slate-800">
+            <TopNavbar
+              user={userData}
+              unreadNotificationCount={unreadNotificationCount}
+              pembinaNotifications={notifications}
+            />
           </header>
 
           {/* Page Content */}
