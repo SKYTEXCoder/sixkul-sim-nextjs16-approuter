@@ -28,7 +28,7 @@ interface AttendanceRecord {
 
 interface BatchAttendanceRequestBody {
   date: string; // ISO date string (e.g., "2024-12-08")
-  scheduleId?: string; // Optional link to specific schedule
+  sessionId: string; // REQUIRED: Link to specific Session
   records: AttendanceRecord[];
 }
 
@@ -156,7 +156,7 @@ function validateBatchAttendanceInput(body: unknown): {
     return { valid: false, errors: ["Request body is required"] };
   }
 
-  const { date, scheduleId, records } =
+  const { date, sessionId, records } =
     body as Partial<BatchAttendanceRequestBody>;
 
   // Validate date
@@ -174,9 +174,11 @@ function validateBatchAttendanceInput(body: unknown): {
     }
   }
 
-  // Validate scheduleId if provided
-  if (scheduleId !== undefined && typeof scheduleId !== "string") {
-    errors.push("scheduleId must be a string if provided");
+  // Validate sessionId
+  if (!sessionId) {
+    errors.push("sessionId is required");
+  } else if (typeof sessionId !== "string") {
+    errors.push("sessionId must be a string");
   }
 
   // Validate records array
@@ -199,8 +201,8 @@ function validateBatchAttendanceInput(body: unknown): {
       ) {
         errors.push(
           `records[${index}].status must be one of: ${VALID_STATUS_VALUES.join(
-            ", ",
-          )}`,
+            ", "
+          )}`
         );
       }
     });
@@ -214,7 +216,7 @@ function validateBatchAttendanceInput(body: unknown): {
     valid: true,
     data: {
       date: date!,
-      scheduleId: scheduleId?.trim(),
+      sessionId: sessionId!.trim(),
       records: records!.map((r) => ({
         enrollmentId: r.enrollmentId.trim(),
         status: r.status as AttendanceStatus,
@@ -239,7 +241,7 @@ function validateBatchAttendanceInput(body: unknown): {
  * 5. Return 200 OK with count of processed records
  */
 export async function POST(
-  request: NextRequest,
+  request: NextRequest
 ): Promise<
   NextResponse<BatchAttendanceSuccessResponse | BatchAttendanceErrorResponse>
 > {
@@ -252,7 +254,7 @@ export async function POST(
     if (!authResult.success) {
       return NextResponse.json(
         { success: false, message: authResult.error! },
-        { status: authResult.statusCode },
+        { status: authResult.statusCode }
       );
     }
 
@@ -265,7 +267,7 @@ export async function POST(
     } catch {
       return NextResponse.json(
         { success: false, message: "Invalid JSON in request body" },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -278,11 +280,11 @@ export async function POST(
           message: "Validation failed",
           errors: validation.errors,
         },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
-    const { date, scheduleId, records } = validation.data;
+    const { date, sessionId, records } = validation.data;
     const attendanceDate = new Date(date);
 
     // Normalize to start of day for consistent comparison
@@ -304,7 +306,7 @@ export async function POST(
 
     // Build map for quick lookup of extracurricular names
     const enrollmentExtracurricularMap = new Map(
-      existingEnrollments.map((e) => [e.id, e.extracurricular.name]),
+      existingEnrollments.map((e) => [e.id, e.extracurricular.name])
     );
 
     const existingIds = new Set(existingEnrollments.map((e) => e.id));
@@ -317,20 +319,20 @@ export async function POST(
           message: "Some enrollment IDs do not exist",
           errors: missingIds.map((id) => `Enrollment not found: ${id}`),
         },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
     // ----------------------------------------
-    // Step 4: Use transaction to upsert all attendance records
-    // All succeed or all fail (atomic operation)
+    // Step 4: Use transaction to process records
+    // Enforce IMMUTABILITY (Blocker B) and INTEGRITY (Blocker A)
     // ----------------------------------------
     let createdCount = 0;
-    let updatedCount = 0;
+    let skippedCount = 0;
 
     await prisma.$transaction(async (tx) => {
       for (const record of records) {
-        // Check if attendance already exists for this enrollment on this date
+        // Blocker B: Check execution path - Create Only
         const existingAttendance = await tx.attendance.findUnique({
           where: {
             enrollment_id_date: {
@@ -341,65 +343,76 @@ export async function POST(
         });
 
         if (existingAttendance) {
-          // Update existing attendance
-          await tx.attendance.update({
-            where: {
-              enrollment_id_date: {
-                enrollment_id: record.enrollmentId,
-                date: attendanceDate,
-              },
-            },
-            data: {
-              status: record.status,
-              notes: record.notes,
-              session_id: scheduleId || null,
-            },
-          });
-          updatedCount++;
-        } else {
-          // Create new attendance record
-          await tx.attendance.create({
-            data: {
-              enrollment_id: record.enrollmentId,
-              session_id: scheduleId || null,
-              date: attendanceDate,
-              status: record.status,
-              notes: record.notes,
-            },
-          });
-          createdCount++;
+          // GUARDRAIL 1: STRICT BATCH FAILURE
+          // If we encounter ANY existing record that is locked, we must abort the ENTIRE transaction.
+          // This prevents partial application where some students get marked and others don't,
+          // hiding the fact that there was a conflict.
+          if (existingAttendance.is_locked) {
+            throw new Error(
+              `Batch failed: Attendance for student ${record.enrollmentId} on ${date} is LOCKED and cannot be modified.`
+            );
+          } else {
+            // Even for unlocked records, our Hardening Policy is "Create Only".
+            // Silent skipping is risky if the user thinks they updated it.
+            // Throwing ensures the user knows they are trying to write over existing data.
+            throw new Error(
+              `Batch failed: Attendance for student ${record.enrollmentId} on ${date} already exists.`
+            );
+          }
         }
+
+        // Create new attendance record
+        // Blocker A: session_id is MANDATORY
+        await tx.attendance.create({
+          data: {
+            enrollment_id: record.enrollmentId,
+            session_id: sessionId, // Strictly usage of sessionId
+            date: attendanceDate,
+            status: record.status,
+            notes: record.notes,
+            is_locked: true, // Lock immediately upon creation
+          },
+        });
+        createdCount++;
       }
     });
 
     console.log(
-      `[ATTENDANCE BATCH] Processed ${records.length} records for ${date} - Created: ${createdCount}, Updated: ${updatedCount}`,
+      `[ATTENDANCE BATCH] Processed ${records.length} records for ${date} - Created: ${createdCount}, Skipped: ${skippedCount}`
     );
 
     // ----------------------------------------
     // Step 6: Create notifications for each attendance record
     // Non-blocking - notifications are created after transaction completes
     // ----------------------------------------
-    for (const record of records) {
-      const extracurricularName =
-        enrollmentExtracurricularMap.get(record.enrollmentId) ||
-        "Ekstrakurikuler";
-      // Fire and forget - don't await to avoid blocking response
-      createAttendanceNotification(
-        record.enrollmentId,
-        record.status,
-        attendanceDate,
-        extracurricularName,
-      ).catch((err) => {
-        console.error(
-          `[NOTIFICATION] Failed to create attendance notification: ${err}`,
-        );
-      });
+    if (createdCount > 0) {
+      for (const record of records) {
+        // Only notify for actual processing? Or all?
+        // Usually only for new records, but simplistic approach notifies matching status.
+        // Let's notify for all attempting to be consistent with UI feedback,
+        // OR better: ensure we don't spam.
+        // Given skippedCount, we might skip notifications for those.
+        // BUT, calculating which were new is hard outside loop.
+        // We will skip notification optimization for now as it's not a Blocker.
+        const extracurricularName =
+          enrollmentExtracurricularMap.get(record.enrollmentId) ||
+          "Ekstrakurikuler";
+
+        createAttendanceNotification(
+          record.enrollmentId,
+          record.status,
+          attendanceDate,
+          extracurricularName
+        ).catch((err) => {
+          console.error(
+            `[NOTIFICATION] Failed to create attendance notification: ${err}`
+          );
+        });
+      }
     }
 
     // ----------------------------------------
-    // Step 5: Return 200 OK with count
-    // "Absensi Berhasil Disimpan"
+    // Step 5: Return 200 OK
     // ----------------------------------------
     return NextResponse.json({
       success: true,
@@ -408,34 +421,22 @@ export async function POST(
         date: date,
         totalRecords: records.length,
         created: createdCount,
-        updated: updatedCount,
+        updated: 0, // No updates allowed
+        skipped: skippedCount,
       },
     });
   } catch (error) {
     // ----------------------------------------
-    // Error Handling - Return 500 Internal Server Error
+    // Error Handling
     // ----------------------------------------
     console.error("[ATTENDANCE BATCH ERROR]", error);
-
-    // Check for specific Prisma errors
-    if (error instanceof Error) {
-      if (error.message.includes("Foreign key constraint")) {
-        return NextResponse.json(
-          {
-            success: false,
-            message: "One or more enrollment IDs are invalid.",
-          },
-          { status: 400 },
-        );
-      }
-    }
 
     return NextResponse.json(
       {
         success: false,
         message: "Terjadi kesalahan pada server. Silakan coba lagi.",
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }
@@ -453,7 +454,7 @@ export async function GET(): Promise<
       message:
         "Method GET not allowed. Use /api/attendance with query params instead.",
     },
-    { status: 405 },
+    { status: 405 }
   );
 }
 
@@ -465,7 +466,7 @@ export async function PUT(): Promise<
       success: false,
       message: "Method PUT not allowed. Use POST for batch operations.",
     },
-    { status: 405 },
+    { status: 405 }
   );
 }
 
@@ -477,6 +478,6 @@ export async function DELETE(): Promise<
       success: false,
       message: "Method DELETE not allowed on batch endpoint.",
     },
-    { status: 405 },
+    { status: 405 }
   );
 }

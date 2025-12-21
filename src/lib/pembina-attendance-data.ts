@@ -55,7 +55,7 @@ export interface AttendanceInput {
  * Get sessions available for attendance input.
  */
 export async function getSessionsForAttendance(
-  extracurricularId: string,
+  extracurricularId: string
 ): Promise<SessionForAttendance[]> {
   const sessions = await prisma.session.findMany({
     where: {
@@ -88,7 +88,7 @@ export async function getSessionsForAttendance(
  * Get ACTIVE enrollments for an extracurricular.
  */
 export async function getActiveEnrollments(
-  extracurricularId: string,
+  extracurricularId: string
 ): Promise<EnrollmentWithStudent[]> {
   const enrollments = await prisma.enrollment.findMany({
     where: {
@@ -126,7 +126,7 @@ export async function getActiveEnrollments(
  * Get existing attendance records for a session.
  */
 export async function getAttendanceBySession(
-  sessionId: string,
+  sessionId: string
 ): Promise<AttendanceRecord[]> {
   const attendances = await prisma.attendance.findMany({
     where: {
@@ -152,7 +152,7 @@ export async function getAttendanceBySession(
 export async function saveSessionAttendance(
   sessionId: string,
   extracurricularId: string,
-  records: AttendanceInput[],
+  records: AttendanceInput[]
 ): Promise<{ success: boolean; error?: string }> {
   try {
     // Validate session exists
@@ -168,25 +168,33 @@ export async function saveSessionAttendance(
     // Use transaction for atomic updates
     await prisma.$transaction(async (tx) => {
       for (const record of records) {
-        // Upsert attendance - use enrollment_id + date as unique constraint
-        await tx.attendance.upsert({
+        // Blocker B: Enforce Immutability - Check existence first
+        const existingAttendance = await tx.attendance.findUnique({
           where: {
             enrollment_id_date: {
               enrollment_id: record.enrollmentId,
               date: session.date,
             },
           },
-          create: {
+        });
+
+        if (existingAttendance) {
+          // STRICT IMMUTABILITY (UPDATED):
+          // If record exists, we SKIP it (continue).
+          // This allows "Partial Completion" where new students can be added,
+          // but existing records remain locked and untouched.
+          continue;
+        }
+
+        // Create new attendance record
+        await tx.attendance.create({
+          data: {
             enrollment_id: record.enrollmentId,
             session_id: sessionId, // REQUIRED - session-based
             date: session.date,
             status: record.status,
             notes: record.notes || null,
-          },
-          update: {
-            session_id: sessionId, // Always update to session-based
-            status: record.status,
-            notes: record.notes || null,
+            is_locked: true, // Lock immediately
           },
         });
       }

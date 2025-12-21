@@ -97,7 +97,9 @@ export function AttendanceForm({
   >({});
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
-  const [hasExistingRecords, setHasExistingRecords] = useState(false);
+  const [lockedEnrollmentIds, setLockedEnrollmentIds] = useState<Set<string>>(
+    new Set()
+  );
 
   // Get selected session details
   const selectedSession = sessions.find((s) => s.id === selectedSessionId);
@@ -117,14 +119,14 @@ export function AttendanceForm({
       });
 
       // Override with existing records
-      let hasExisting = false;
+      const lockedIds = new Set<string>();
       records.forEach((record) => {
         map[record.enrollmentId] = record.status;
-        hasExisting = true;
+        lockedIds.add(record.enrollmentId);
       });
 
       setAttendanceMap(map);
-      setHasExistingRecords(hasExisting);
+      setLockedEnrollmentIds(lockedIds);
     } catch {
       toast.error("Gagal memuat data absensi");
     } finally {
@@ -137,14 +139,14 @@ export function AttendanceForm({
       fetchExistingAttendance();
     } else {
       setAttendanceMap({});
-      setHasExistingRecords(false);
+      setLockedEnrollmentIds(new Set());
     }
   }, [selectedSessionId, fetchExistingAttendance]);
 
   // Handle status change
   const handleStatusChange = (
     enrollmentId: string,
-    status: AttendanceStatus,
+    status: AttendanceStatus
   ) => {
     setAttendanceMap((prev) => ({
       ...prev,
@@ -165,18 +167,19 @@ export function AttendanceForm({
         ([enrollmentId, status]) => ({
           enrollmentId,
           status,
-        }),
+        })
       );
 
       const result = await saveAttendanceAction(
         selectedSessionId,
         extracurricularId,
-        records,
+        records
       );
 
       if (result.success) {
         toast.success("Absensi berhasil disimpan!");
-        setHasExistingRecords(true);
+        // Refresh lock state
+        await fetchExistingAttendance();
         router.refresh();
       } else {
         toast.error(result.error || "Gagal menyimpan absensi");
@@ -267,12 +270,14 @@ export function AttendanceForm({
             <MapPin className="h-4 w-4 text-slate-500" />
             <span>{selectedSession.location}</span>
           </div>
-          {hasExistingRecords && (
+          {lockedEnrollmentIds.size > 0 && (
             <Badge
-              variant="outline"
-              className="text-amber-600 border-amber-300"
+              variant="secondary"
+              className="bg-slate-200 text-slate-700 dark:bg-slate-800 dark:text-slate-300"
             >
-              Memperbarui data yang ada
+              {lockedEnrollmentIds.size === enrollments.length
+                ? "Absensi Terkunci (Final)"
+                : `${lockedEnrollmentIds.size}/${enrollments.length} Siswa Sudah Absen`}
             </Badge>
           )}
         </div>
@@ -326,9 +331,10 @@ export function AttendanceForm({
                             attendanceMap[enrollment.enrollmentId] || "PRESENT"
                           }
                           onValueChange={(value) =>
+                            !lockedEnrollmentIds.has(enrollment.enrollmentId) &&
                             handleStatusChange(
                               enrollment.enrollmentId,
-                              value as AttendanceStatus,
+                              value as AttendanceStatus
                             )
                           }
                           className="flex flex-wrap gap-3 justify-center"
@@ -341,10 +347,19 @@ export function AttendanceForm({
                               <RadioGroupItem
                                 value={option.value}
                                 id={`${enrollment.enrollmentId}-${option.value}`}
+                                disabled={lockedEnrollmentIds.has(
+                                  enrollment.enrollmentId
+                                )}
                               />
                               <Label
                                 htmlFor={`${enrollment.enrollmentId}-${option.value}`}
-                                className={`text-sm cursor-pointer ${
+                                className={`text-sm ${
+                                  lockedEnrollmentIds.has(
+                                    enrollment.enrollmentId
+                                  )
+                                    ? "cursor-not-allowed opacity-70"
+                                    : "cursor-pointer"
+                                } ${
                                   attendanceMap[enrollment.enrollmentId] ===
                                   option.value
                                     ? option.color + " font-medium"
@@ -366,8 +381,16 @@ export function AttendanceForm({
               <div className="flex justify-end pt-4 border-t">
                 <Button
                   onClick={handleSave}
-                  disabled={isSaving || enrollments.length === 0}
-                  className="bg-emerald-600 hover:bg-emerald-700"
+                  disabled={
+                    isSaving ||
+                    enrollments.length === 0 ||
+                    lockedEnrollmentIds.size === enrollments.length
+                  }
+                  className={
+                    lockedEnrollmentIds.size === enrollments.length
+                      ? "bg-slate-200 text-slate-500 hover:bg-slate-200 cursor-not-allowed"
+                      : "bg-emerald-600 hover:bg-emerald-700"
+                  }
                   size="lg"
                 >
                   {isSaving ? (
@@ -375,10 +398,17 @@ export function AttendanceForm({
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       Menyimpan...
                     </>
+                  ) : lockedEnrollmentIds.size === enrollments.length ? (
+                    <>
+                      <CheckCircle2 className="mr-2 h-4 w-4" />
+                      Semua Tersimpan (Final)
+                    </>
                   ) : (
                     <>
                       <CheckCircle2 className="mr-2 h-4 w-4" />
-                      Simpan Absensi
+                      {lockedEnrollmentIds.size > 0
+                        ? "Simpan Absensi Baru"
+                        : "Simpan Absensi"}
                     </>
                   )}
                 </Button>

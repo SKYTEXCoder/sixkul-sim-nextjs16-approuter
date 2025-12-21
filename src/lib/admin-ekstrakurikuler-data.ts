@@ -61,7 +61,9 @@ export interface EkstrakurikulerFilters {
 export async function getAllEkstrakurikuler(
   filters?: EkstrakurikulerFilters
 ): Promise<EkstrakurikulerListItem[]> {
-  const where: Record<string, unknown> = {};
+  const where: Record<string, unknown> = {
+    deleted_at: null, // Hardening: Exclude soft-deleted
+  };
 
   if (filters?.status) {
     where.status = filters.status;
@@ -145,10 +147,15 @@ export async function getEkstrakurikulerById(
 export async function getEkstrakurikulerStats(): Promise<EkstrakurikulerStats> {
   const [total, active, inactive, allEkskul, totalEnrollments] =
     await Promise.all([
-      prisma.extracurricular.count(),
-      prisma.extracurricular.count({ where: { status: "ACTIVE" } }),
-      prisma.extracurricular.count({ where: { status: "INACTIVE" } }),
+      prisma.extracurricular.count({ where: { deleted_at: null } }),
+      prisma.extracurricular.count({
+        where: { status: "ACTIVE", deleted_at: null },
+      }),
+      prisma.extracurricular.count({
+        where: { status: "INACTIVE", deleted_at: null },
+      }),
       prisma.extracurricular.findMany({
+        where: { deleted_at: null },
         select: { category: true },
       }),
       prisma.enrollment.count(),
@@ -174,6 +181,7 @@ export async function getEkstrakurikulerStats(): Promise<EkstrakurikulerStats> {
  */
 export async function getCategories(): Promise<string[]> {
   const categories = await prisma.extracurricular.findMany({
+    where: { deleted_at: null },
     select: { category: true },
     distinct: ["category"],
     orderBy: { category: "asc" },
@@ -194,7 +202,7 @@ export async function getTopEkstrakurikuler(limit: number = 5): Promise<
   }>
 > {
   const ekskul = await prisma.extracurricular.findMany({
-    where: { status: "ACTIVE" },
+    where: { status: "ACTIVE", deleted_at: null },
     select: {
       id: true,
       name: true,
