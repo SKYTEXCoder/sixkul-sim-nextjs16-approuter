@@ -20,10 +20,9 @@ import {
   Users,
   BookOpen,
   Settings,
-  Shield,
   BarChart3,
   Bell,
-  School,
+  User,
 } from "lucide-react";
 
 // ============================================
@@ -32,12 +31,12 @@ import {
 
 const adminMenuItems: NavItem[] = [
   {
-    label: "Dashboard",
+    label: "Dashboard Monitoring",
     href: "/admin/dashboard",
     icon: LayoutDashboard,
   },
   {
-    label: "Manajemen User",
+    label: "Manajemen Akun Pengguna",
     href: "/admin/users",
     icon: Users,
   },
@@ -46,11 +45,7 @@ const adminMenuItems: NavItem[] = [
     href: "/admin/ekstrakurikuler",
     icon: BookOpen,
   },
-  {
-    label: "Data Sekolah",
-    href: "/admin/school",
-    icon: School,
-  },
+
   {
     label: "Laporan",
     href: "/admin/reports",
@@ -62,9 +57,9 @@ const adminMenuItems: NavItem[] = [
     icon: Bell,
   },
   {
-    label: "Hak Akses",
-    href: "/admin/permissions",
-    icon: Shield,
+    label: "Profil Saya",
+    href: "/admin/profile",
+    icon: User,
   },
   {
     label: "Pengaturan",
@@ -121,7 +116,7 @@ export default function AdminLayout({
       <div
         className={cn(
           "transition-all duration-300",
-          isSidebarCollapsed ? "md:ml-20" : "md:ml-64"
+          isSidebarCollapsed ? "md:ml-20" : "md:ml-72"
         )}
       >
         {/* Top Navigation - Sticky & Styled */}

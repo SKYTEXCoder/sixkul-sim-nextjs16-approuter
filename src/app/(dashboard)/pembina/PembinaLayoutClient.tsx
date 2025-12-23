@@ -105,7 +105,7 @@ export function PembinaLayoutClient({
         <div
           className={cn(
             "transition-all duration-300",
-            isSidebarCollapsed ? "md:ml-20" : "md:ml-64"
+            isSidebarCollapsed ? "md:ml-20" : "md:ml-72"
           )}
         >
           {/* Top Navigation with glassmorphism */}

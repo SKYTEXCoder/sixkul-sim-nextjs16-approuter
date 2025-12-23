@@ -71,7 +71,7 @@ export default async function AdminDashboardPage() {
             Dashboard Monitoring 📊
           </h1>
           <p className="text-slate-500 dark:text-slate-400 mt-1">
-            Evaluasi kesehatan dan aktivitas ekstrakurikuler (Phase 2).
+            Evaluasi kesehatan dan aktivitas ekstrakurikuler.
           </p>
         </div>
         <div className="flex gap-2">
