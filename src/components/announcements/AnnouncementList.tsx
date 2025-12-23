@@ -42,40 +42,68 @@ interface GroupedData {
  */
 function filterAnnouncements(
   announcements: AnnouncementViewModel[],
-  query: string,
+  query: string
 ): AnnouncementViewModel[] {
   if (!query.trim()) return announcements;
 
   const lowerQuery = query.toLowerCase();
-  return announcements.filter(
-    (a) =>
-      a.title.toLowerCase().includes(lowerQuery) ||
-      a.content.toLowerCase().includes(lowerQuery) ||
-      a.extracurricular.name.toLowerCase().includes(lowerQuery),
-  );
+  return announcements.filter((a) => {
+    const titleMatch = a.title.toLowerCase().includes(lowerQuery);
+    const contentMatch = a.content.toLowerCase().includes(lowerQuery);
+    const extraMatch = a.extracurricular?.name
+      .toLowerCase()
+      .includes(lowerQuery);
+    return titleMatch || contentMatch || extraMatch;
+  });
 }
 
 /**
- * Group announcements by extracurricular
+ * Group announcements by extracurricular (handling System announcements)
  */
 function groupByExtracurricular(
-  announcements: AnnouncementViewModel[],
+  announcements: AnnouncementViewModel[]
 ): GroupedData[] {
   const grouped = new Map<string, GroupedData>();
 
+  // Special ID for System announcements
+  const SYSTEM_GROUP_ID = "system-announcements";
+
   for (const announcement of announcements) {
-    const existing = grouped.get(announcement.extracurricular.id);
-    if (existing) {
-      existing.announcements.push(announcement);
-    } else {
-      grouped.set(announcement.extracurricular.id, {
-        extracurricular: announcement.extracurricular,
-        enrollmentId: announcement.enrollmentId,
-        announcements: [announcement],
-      });
+    if (announcement.scope === "SYSTEM") {
+      const existing = grouped.get(SYSTEM_GROUP_ID);
+      if (existing) {
+        existing.announcements.push(announcement);
+      } else {
+        grouped.set(SYSTEM_GROUP_ID, {
+          extracurricular: {
+            id: SYSTEM_GROUP_ID,
+            name: "Pengumuman Sistem",
+            category: "Sekolah",
+          },
+          enrollmentId: "", // No enrollment for system
+          announcements: [announcement],
+        });
+      }
+      continue;
+    }
+
+    if (announcement.extracurricular) {
+      const existing = grouped.get(announcement.extracurricular.id);
+      if (existing) {
+        existing.announcements.push(announcement);
+      } else {
+        grouped.set(announcement.extracurricular.id, {
+          extracurricular: announcement.extracurricular,
+          enrollmentId: announcement.enrollmentId || "",
+          announcements: [announcement],
+        });
+      }
     }
   }
 
+  // Convert to array and maybe sort so System comes first?
+  // Current iteration order might be enough if System appears early.
+  // Or we can explicit sort. Let's just return values for now.
   return Array.from(grouped.values());
 }
 

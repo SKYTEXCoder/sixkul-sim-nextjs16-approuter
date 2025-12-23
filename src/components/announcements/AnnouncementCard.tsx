@@ -28,13 +28,6 @@ interface AnnouncementCardProps {
 /**
  * Format date to Indonesian locale
  */
-function formatDate(date: Date): string {
-  return new Date(date).toLocaleDateString("id-ID", {
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-  });
-}
 
 /**
  * Get relative time string (e.g., "2 hari yang lalu")
@@ -71,7 +64,13 @@ function truncateContent(content: string, maxLength: number = 150): string {
 
 export function AnnouncementCard({ announcement }: AnnouncementCardProps) {
   return (
-    <Link href={`/student/enrollments/${announcement.enrollmentId}`}>
+    <Link
+      href={
+        announcement.scope === "SYSTEM"
+          ? `/student/announcements/${announcement.id}`
+          : `/student/enrollments/${announcement.enrollmentId}`
+      }
+    >
       <Card className="hover:shadow-md transition-shadow cursor-pointer group">
         <CardContent className="p-4 md:p-6">
           <div className="flex items-start justify-between gap-4">
@@ -81,18 +80,26 @@ export function AnnouncementCard({ announcement }: AnnouncementCardProps) {
                 {announcement.title}
               </h3>
 
-              {/* Extracurricular + Date */}
+              {/* Scope Badge & Meta */}
               <div className="flex items-center gap-2 flex-wrap text-sm text-slate-500 dark:text-slate-400 mb-3">
-                <span className="font-medium text-slate-700 dark:text-slate-300">
-                  {announcement.extracurricular.name}
-                </span>
-                <Badge
-                  variant="secondary"
-                  className="text-xs bg-slate-100 dark:bg-slate-800"
-                >
-                  {announcement.extracurricular.category}
-                </Badge>
-                <span className="text-slate-400">•</span>
+                {announcement.scope === "SYSTEM" ? (
+                  <Badge variant="default" className="text-xs bg-slate-900">
+                    Sistem
+                  </Badge>
+                ) : (
+                  <>
+                    <span className="font-medium text-slate-700 dark:text-slate-300">
+                      {announcement.extracurricular?.name}
+                    </span>
+                    <Badge
+                      variant="secondary"
+                      className="text-xs bg-slate-100 dark:bg-slate-800"
+                    >
+                      {announcement.extracurricular?.category}
+                    </Badge>
+                    <span className="text-slate-400">•</span>
+                  </>
+                )}
                 <span className="flex items-center gap-1">
                   <Calendar className="h-3 w-3" />
                   {getRelativeTime(announcement.createdAt)}
@@ -111,7 +118,7 @@ export function AnnouncementCard({ announcement }: AnnouncementCardProps) {
             </div>
 
             {/* Chevron */}
-            <ChevronRight className="h-5 w-5 text-slate-400 flex-shrink-0 mt-1 group-hover:text-indigo-500 transition-colors" />
+            <ChevronRight className="h-5 w-5 text-slate-400 shrink-0 mt-1 group-hover:text-indigo-500 transition-colors" />
           </div>
         </CardContent>
       </Card>

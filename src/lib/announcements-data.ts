@@ -1,14 +1,16 @@
 /**
  * Server-side data fetching for Student Announcements
  *
- * Uses Prisma directly to fetch announcements from ACTIVE enrollments.
- * No API routes - data is fetched server-side for RSC.
+ * Uses Prisma directly to fetch a UNIFIED feed of announcements:
+ * 1. System-wide announcements (Scope: SYSTEM)
+ * 2. Extracurricular announcements from ACTIVE enrollments (Scope: EXTRACURRICULAR)
  *
  * @module lib/announcements-data
  */
 
 import prisma from "@/lib/prisma";
 import { auth } from "@clerk/nextjs/server";
+import { AnnouncementScope } from "@/generated/prisma";
 
 // ============================================
 // Types
@@ -20,27 +22,19 @@ export interface AnnouncementViewModel {
   content: string;
   createdAt: Date;
   authorName: string;
-  extracurricular: {
+  scope: "SYSTEM" | "EXTRACURRICULAR";
+  extracurricular?: {
     id: string;
     name: string;
     category: string;
   };
-  enrollmentId: string; // For navigation to /student/enrollments/[enrollment_id]
+  enrollmentId?: string; // Only for extracurricular announcements
 }
 
 export interface AnnouncementsResult {
   success: boolean;
   data?: {
     announcements: AnnouncementViewModel[];
-    /** Announcements grouped by extracurricular ID */
-    groupedByExtracurricular: Map<
-      string,
-      {
-        extracurricular: { id: string; name: string; category: string };
-        enrollmentId: string;
-        announcements: AnnouncementViewModel[];
-      }
-    >;
   };
   error?: string;
   errorCode?: "UNAUTHORIZED" | "FORBIDDEN" | "NOT_FOUND" | "SERVER_ERROR";
@@ -51,10 +45,11 @@ export interface AnnouncementsResult {
 // ============================================
 
 /**
- * Fetch all announcements for a student's ACTIVE enrollments
+ * Fetch unified announcements feed for a student
  *
- * This function is designed to be called from Server Components.
- * It handles authentication, authorization, and data fetching.
+ * Combining:
+ * - System announcements (visible to everyone)
+ * - Announcements from Extracurriculars where the student has ACTIVE enrollment
  *
  * Ordering: created_at DESC (newest first)
  */
@@ -83,11 +78,21 @@ export async function getStudentAnnouncements(): Promise<AnnouncementsResult> {
       };
     }
 
-    // Step 3: Find the user in our database
+    // Step 3: Find the user and their ACTIVE enrollments
     const user = await prisma.user.findUnique({
       where: { clerk_id: userId },
       include: {
-        studentProfile: true,
+        studentProfile: {
+          include: {
+            enrollments: {
+              where: { status: "ACTIVE" },
+              select: {
+                id: true, // Enrollment ID
+                extracurricular_id: true,
+              },
+            },
+          },
+        },
       },
     });
 
@@ -99,91 +104,81 @@ export async function getStudentAnnouncements(): Promise<AnnouncementsResult> {
       };
     }
 
-    // Step 4: Fetch ACTIVE enrollments with extracurricular and announcements
-    const enrollments = await prisma.enrollment.findMany({
+    // Get list of extracurricular IDs the student is active in
+    const activeExtracurricularIds = user.studentProfile.enrollments.map(
+      (e) => e.extracurricular_id
+    );
+
+    // Step 4: Fetch Unified Announcements
+    // We fetch where Scope is SYSTEM OR (Scope is EXTRACURRICULAR AND extracurricular_id is in active list)
+    const rawAnnouncements = await prisma.announcement.findMany({
       where: {
-        student_id: user.studentProfile.id,
-        status: "ACTIVE", // ONLY active enrollments
+        OR: [
+          { scope: AnnouncementScope.SYSTEM },
+          {
+            scope: AnnouncementScope.EXTRACURRICULAR,
+            extracurricular_id: { in: activeExtracurricularIds },
+          },
+        ],
       },
       include: {
+        author: {
+          select: { full_name: true },
+        },
         extracurricular: {
-          include: {
-            announcements: {
-              orderBy: {
-                created_at: "desc", // Newest first
-              },
-              include: {
-                author: {
-                  select: {
-                    full_name: true,
-                  },
-                },
-              },
-            },
+          select: {
+            id: true,
+            name: true,
+            category: true,
           },
         },
       },
+      orderBy: {
+        created_at: "desc",
+      },
     });
 
-    // Step 5: Flatten announcements and attach enrollment context
-    const allAnnouncements: AnnouncementViewModel[] = [];
-    const groupedByExtracurricular = new Map<
-      string,
-      {
-        extracurricular: { id: string; name: string; category: string };
-        enrollmentId: string;
-        announcements: AnnouncementViewModel[];
-      }
-    >();
+    // Step 5: Transform to ViewModel
+    // We need to map back to enrollmentId for extracurricular announcements to allow navigation
+    // We can use the user.studentProfile.enrollments array we already fetched.
 
-    for (const enrollment of enrollments) {
-      const extracurricular = enrollment.extracurricular;
-      const announcements = extracurricular.announcements.map(
-        (announcement) => ({
-          id: announcement.id,
-          title: announcement.title,
-          content: announcement.content,
-          createdAt: announcement.created_at,
-          authorName: announcement.author.full_name,
-          extracurricular: {
-            id: extracurricular.id,
-            name: extracurricular.name,
-            category: extracurricular.category,
-          },
-          enrollmentId: enrollment.id, // Link back to enrollment for navigation
-        }),
-      );
+    const enrollmentMap = new Map<string, string>(); // ExtracurricularID -> EnrollmentID
+    user.studentProfile.enrollments.forEach((e) => {
+      enrollmentMap.set(e.extracurricular_id, e.id);
+    });
 
-      allAnnouncements.push(...announcements);
+    const viewModels: AnnouncementViewModel[] = rawAnnouncements.map((a) => {
+      const isSystem = a.scope === AnnouncementScope.SYSTEM;
+      const enrollmentId = a.extracurricular_id
+        ? enrollmentMap.get(a.extracurricular_id)
+        : undefined;
 
-      // Group by extracurricular
-      if (announcements.length > 0) {
-        groupedByExtracurricular.set(extracurricular.id, {
-          extracurricular: {
-            id: extracurricular.id,
-            name: extracurricular.name,
-            category: extracurricular.category,
-          },
-          enrollmentId: enrollment.id,
-          announcements,
-        });
-      }
-    }
-
-    // Step 6: Sort all announcements by created_at DESC (global feed)
-    allAnnouncements.sort(
-      (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
-    );
+      return {
+        id: a.id,
+        title: a.title,
+        content: a.content,
+        createdAt: a.created_at,
+        authorName: a.author.full_name,
+        scope: isSystem ? "SYSTEM" : "EXTRACURRICULAR",
+        extracurricular: a.extracurricular
+          ? {
+              id: a.extracurricular.id,
+              name: a.extracurricular.name,
+              category: a.extracurricular.category,
+            }
+          : undefined,
+        enrollmentId: enrollmentId,
+      };
+    });
 
     return {
       success: true,
       data: {
-        announcements: allAnnouncements,
-        groupedByExtracurricular,
+        announcements: viewModels,
       },
     };
   } catch (error) {
-    console.error("[ANNOUNCEMENTS DATA ERROR]", error);
+    console.error("[STUDENT ANNOUNCEMENTS ERROR]", error);
     return {
       success: false,
       error: "An unexpected error occurred. Please try again later.",
