@@ -398,6 +398,8 @@ async function PembinaDashboardContent() {
 // Page Export with Suspense
 // ============================================
 
+export const dynamic = "force-dynamic";
+
 export default function PembinaDashboardPage() {
   return (
     <Suspense fallback={<DashboardSkeleton />}>

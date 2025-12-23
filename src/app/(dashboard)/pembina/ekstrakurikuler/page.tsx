@@ -27,6 +27,8 @@ import { Button } from "@/components/ui/button";
 // Page Component
 // ============================================
 
+export const dynamic = "force-dynamic";
+
 export default async function PembinaEkstrakurikulerPage() {
   const { userId } = await auth();
 

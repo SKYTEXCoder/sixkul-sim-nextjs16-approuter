@@ -27,8 +27,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-
 // ============================================
 // Page Component
 // ============================================
@@ -36,6 +34,8 @@ import { Button } from "@/components/ui/button";
 interface PageProps {
   params: Promise<{ id: string }>;
 }
+
+export const dynamic = "force-dynamic";
 
 export default async function ExtracurricularHubPage({ params }: PageProps) {
   const { userId } = await auth();

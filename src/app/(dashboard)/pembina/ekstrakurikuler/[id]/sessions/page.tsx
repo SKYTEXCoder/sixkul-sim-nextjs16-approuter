@@ -26,8 +26,10 @@ import { GenerateSessionsForm } from "./_components/GenerateSessionsForm";
 // ============================================
 
 interface PageProps {
-  params: Promise<{ id: string }>;
+  params: { id: string };
 }
+
+export const dynamic = "force-dynamic";
 
 export default async function SessionsPage({ params }: PageProps) {
   const { userId } = await auth();

@@ -30,7 +30,11 @@ interface PageProps {
   params: Promise<{ id: string }>;
 }
 
-export default async function AnnouncementsPage({ params }: PageProps) {
+export const dynamic = "force-dynamic";
+
+export default async function PembinaEkskulAnnouncementsPage({
+  params,
+}: PageProps) {
   const { userId } = await auth();
 
   if (!userId) {

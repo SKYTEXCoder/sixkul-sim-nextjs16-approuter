@@ -15,11 +15,7 @@ import { SecuritySection } from "./_components/SecuritySection";
 // Force dynamic rendering since this page uses Clerk auth
 export const dynamic = "force-dynamic";
 
-// ============================================
-// Main Page Component
-// ============================================
-
-export default function PembinaSettingsPage() {
+export default async function PembinaSettingsPage() {
   return (
     <div className="space-y-6">
       {/* Page Header */}

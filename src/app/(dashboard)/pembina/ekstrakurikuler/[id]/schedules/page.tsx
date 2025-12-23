@@ -29,7 +29,9 @@ interface PageProps {
   params: Promise<{ id: string }>;
 }
 
-export default async function SchedulesPage({ params }: PageProps) {
+export const dynamic = "force-dynamic";
+
+export default async function PembinaSchedulesPage({ params }: PageProps) {
   const { userId } = await auth();
 
   if (!userId) {

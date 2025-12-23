@@ -35,7 +35,6 @@ function ErrorDisplay({ message }: { message: string }) {
   );
 }
 
-// ============================================
 // Main Page Component
 // ============================================
 

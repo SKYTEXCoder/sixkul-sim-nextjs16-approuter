@@ -33,8 +33,10 @@ import { AttendanceForm } from "./_components/AttendanceForm";
 // ============================================
 
 interface PageProps {
-  params: Promise<{ id: string }>;
+  params: { id: string };
 }
+
+export const dynamic = "force-dynamic";
 
 export default async function AttendancePage({ params }: PageProps) {
   const { userId } = await auth();
