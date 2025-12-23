@@ -13,6 +13,7 @@
 
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { createAnnouncementNotifications } from "@/lib/notification-triggers";
 
 // ============================================
 // Type Definitions
@@ -98,14 +99,28 @@ export async function createAnnouncement(
       return { success: false, error: "User tidak ditemukan" };
     }
 
-    await prisma.announcement.create({
+    const announcement = await prisma.announcement.create({
       data: {
         extracurricular_id: extracurricularId,
         author_id: user.id,
         title: data.title,
         content: data.content,
       },
+      include: {
+        extracurricular: {
+          select: { name: true },
+        },
+      },
     });
+
+    // TRIGGER NOTIFICATIONS
+    if (announcement.extracurricular) {
+      await createAnnouncementNotifications(
+        extracurricularId,
+        data.title,
+        announcement.extracurricular.name
+      );
+    }
 
     revalidatePath(
       `/pembina/ekstrakurikuler/${extracurricularId}/announcements`
