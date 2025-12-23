@@ -62,7 +62,7 @@ const adminMenuItems: NavItem[] = [
     icon: User,
   },
   {
-    label: "Pengaturan",
+    label: "Pengaturan / Settings",
     href: "/admin/settings",
     icon: Settings,
   },

@@ -40,7 +40,7 @@ const pembinaMenuItems: NavItem[] = [
     icon: UserCircle,
   },
   {
-    label: "Pengaturan",
+    label: "Pengaturan / Settings",
     href: "/pembina/settings",
     icon: Settings,
   },

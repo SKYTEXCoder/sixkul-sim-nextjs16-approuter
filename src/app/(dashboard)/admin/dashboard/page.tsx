@@ -30,7 +30,12 @@ import {
 import Link from "next/link";
 import { AlertTriangle, UserX } from "lucide-react";
 
+import { currentUser } from "@clerk/nextjs/server";
+
 export default async function AdminDashboardPage() {
+  const user = await currentUser();
+  const userName = user?.fullName || "Administrator SIXKUL";
+
   // Fetch Phase 2 Aggregated Metrics
   const [metrics, recentActivity, topEkskul, healthList, pembinaMetrics] =
     await Promise.all([
@@ -67,9 +72,12 @@ export default async function AdminDashboardPage() {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
-            Dashboard Monitoring 📊
+          <h1 className="text-4xl font-bold tracking-tight text-slate-900 dark:text-white mb-2">
+            Selamat Datang, {userName}.
           </h1>
+          <h2 className="text-2xl font-semibold tracking-tight text-slate-700 dark:text-slate-200">
+            Dashboard Monitoring 📊
+          </h2>
           <p className="text-slate-500 dark:text-slate-400 mt-1">
             Evaluasi kesehatan dan aktivitas ekstrakurikuler.
           </p>

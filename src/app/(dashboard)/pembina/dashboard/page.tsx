@@ -9,7 +9,7 @@
  */
 
 import { Suspense } from "react";
-import { auth } from "@clerk/nextjs/server";
+import { currentUser } from "@clerk/nextjs/server";
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import {
@@ -79,11 +79,14 @@ function DashboardSkeleton() {
 // ============================================
 
 async function PembinaDashboardContent() {
-  const { userId } = await auth();
+  const user = await currentUser();
+  const userId = user?.id;
 
   if (!userId) {
     redirect("/sign-in");
   }
+
+  const userName = user?.fullName || "Pembina";
 
   // Fetch all dashboard data in parallel
   const [summary, extracurriculars, upcomingSessions, pendingEnrollments] =
@@ -140,7 +143,7 @@ async function PembinaDashboardContent() {
       <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
         <div>
           <h1 className="text-2xl md:text-3xl font-bold text-slate-900 dark:text-white">
-            Selamat Datang, Pembina! 🎓
+            Selamat Datang, {userName}! 🎓
           </h1>
           <p className="text-slate-500 dark:text-slate-400 mt-1">
             Kelola ekstrakurikuler dan pantau perkembangan siswa.
@@ -158,7 +161,7 @@ async function PembinaDashboardContent() {
       {/* Summary Stats Cards - All route to /pembina/ekstrakurikuler (no item context) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <Link href="/pembina/ekstrakurikuler" className="cursor-pointer">
-          <Card className="bg-gradient-to-br from-emerald-500 to-teal-600 text-white border-0 hover:shadow-lg transition-shadow cursor-pointer">
+          <Card className="bg-linear-to-br from-emerald-500 to-teal-600 text-white border-0 hover:shadow-lg transition-shadow cursor-pointer">
             <CardHeader className="pb-2">
               <CardDescription className="text-emerald-100">
                 Ekskul Dikelola
@@ -176,7 +179,7 @@ async function PembinaDashboardContent() {
         </Link>
 
         <Link href="/pembina/ekstrakurikuler" className="cursor-pointer">
-          <Card className="bg-gradient-to-br from-blue-500 to-indigo-600 text-white border-0 hover:shadow-lg transition-shadow cursor-pointer">
+          <Card className="bg-linear-to-br from-blue-500 to-indigo-600 text-white border-0 hover:shadow-lg transition-shadow cursor-pointer">
             <CardHeader className="pb-2">
               <CardDescription className="text-blue-100">
                 Total Anggota Aktif
@@ -194,7 +197,7 @@ async function PembinaDashboardContent() {
         </Link>
 
         <Link href="/pembina/ekstrakurikuler" className="cursor-pointer">
-          <Card className="bg-gradient-to-br from-amber-500 to-orange-600 text-white border-0 hover:shadow-lg transition-shadow cursor-pointer">
+          <Card className="bg-linear-to-br from-amber-500 to-orange-600 text-white border-0 hover:shadow-lg transition-shadow cursor-pointer">
             <CardHeader className="pb-2">
               <CardDescription className="text-amber-100">
                 Jadwal 7 Hari Ke Depan
@@ -212,7 +215,7 @@ async function PembinaDashboardContent() {
         </Link>
 
         <Link href="/pembina/ekstrakurikuler" className="cursor-pointer">
-          <Card className="bg-gradient-to-br from-red-500 to-rose-600 text-white border-0 hover:shadow-lg transition-shadow cursor-pointer">
+          <Card className="bg-linear-to-br from-red-500 to-rose-600 text-white border-0 hover:shadow-lg transition-shadow cursor-pointer">
             <CardHeader className="pb-2">
               <CardDescription className="text-red-100">
                 Perlu Persetujuan
