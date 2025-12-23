@@ -32,6 +32,8 @@ import { AlertTriangle, UserX } from "lucide-react";
 
 import { currentUser } from "@clerk/nextjs/server";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminDashboardPage() {
   const user = await currentUser();
   const userName = user?.fullName || "Administrator SIXKUL";

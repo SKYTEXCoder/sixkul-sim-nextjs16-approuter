@@ -14,6 +14,8 @@ import { ExtrasHealthList } from "@/components/admin/ExtrasHealthList";
 import { MetricCard } from "@/components/admin/MetricCard";
 import { Activity, CheckCircle, AlertTriangle, BookOpen } from "lucide-react";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminEkstrakurikulerPage() {
   const healthList = await getExtracurricularHealthList();
 
