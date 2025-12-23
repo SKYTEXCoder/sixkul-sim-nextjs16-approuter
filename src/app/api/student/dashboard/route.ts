@@ -163,7 +163,7 @@ export async function GET(): Promise<
     if (!userId) {
       return NextResponse.json(
         { success: false, message: "Authentication required. Please login." },
-        { status: 401 },
+        { status: 401 }
       );
     }
 
@@ -173,7 +173,7 @@ export async function GET(): Promise<
     if (userRole !== "SISWA") {
       return NextResponse.json(
         { success: false, message: "Only students can access this resource." },
-        { status: 403 },
+        { status: 403 }
       );
     }
 
@@ -188,7 +188,7 @@ export async function GET(): Promise<
           success: false,
           message: "Student profile not found or could not be created.",
         },
-        { status: 404 },
+        { status: 404 }
       );
     }
 
@@ -257,7 +257,7 @@ export async function GET(): Promise<
           (r) =>
             r.status === "PRESENT" ||
             r.status === "SICK" ||
-            r.status === "PERMISSION",
+            r.status === "PERMISSION"
         ).length;
         attendancePercentage = Math.round((attendedCount / totalRecords) * 100);
       }
@@ -277,11 +277,11 @@ export async function GET(): Promise<
 
     // Create enrollment map for navigation
     const enrollmentMap = new Map(
-      activeEnrollments.map((e) => [e.extracurricular_id, e.id]),
+      activeEnrollments.map((e) => [e.extracurricular_id, e.id])
     );
 
     const extracurricularIds = activeEnrollments.map(
-      (e) => e.extracurricular.id,
+      (e) => e.extracurricular.id
     );
 
     // Fetch sessions from database (not computing virtual occurrences)
@@ -378,7 +378,7 @@ export async function GET(): Promise<
       recentAnnouncements = announcements.map((a) => ({
         id: a.id,
         title: a.title,
-        ekskulName: a.extracurricular.name,
+        ekskulName: a.extracurricular?.name ?? "Unknown",
         createdAt: a.created_at,
         relativeTime: getRelativeTimeString(a.created_at),
       }));
@@ -409,7 +409,7 @@ export async function GET(): Promise<
         success: false,
         message: "Terjadi kesalahan pada server. Silakan coba lagi.",
       },
-      { status: 500 },
+      { status: 500 }
     );
   }
 }

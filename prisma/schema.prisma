@@ -48,6 +48,11 @@ enum NotificationType {
   ENROLLMENT
 }
 
+enum AnnouncementScope {
+  EXTRACURRICULAR
+  SYSTEM
+}
+
 // ============================================
 // MODELS
 // ============================================
@@ -68,8 +73,9 @@ model User {
   // Relations
   studentProfile StudentProfile?
   pembinaProfile PembinaProfile?
-  notifications  Notification[]
-  announcements  Announcement[]
+  notifications    Notification[]
+  announcements    Announcement[]
+  adminPreferences AdminPreferences?
 
   @@map("users")
 }
@@ -209,18 +215,19 @@ model Attendance {
   @@map("attendances")
 }
 
-/// Announcements for extracurricular activities
+/// Announcements for extracurricular activities (or System)
 model Announcement {
-  id                 String   @id @default(cuid())
-  extracurricular_id String
+  id                 String            @id @default(cuid())
+  extracurricular_id String?
+  scope              AnnouncementScope @default(EXTRACURRICULAR)
   author_id          String
   title              String
   content            String
-  created_at         DateTime @default(now())
+  created_at         DateTime          @default(now())
 
   // Relations
-  extracurricular Extracurricular @relation(fields: [extracurricular_id], references: [id], onDelete: Cascade)
-  author          User            @relation(fields: [author_id], references: [id], onDelete: Cascade)
+  extracurricular Extracurricular? @relation(fields: [extracurricular_id], references: [id], onDelete: Cascade)
+  author          User             @relation(fields: [author_id], references: [id], onDelete: Cascade)
 
   @@map("announcements")
 }
@@ -267,4 +274,17 @@ model StudentPreferences {
   student StudentProfile @relation(fields: [student_id], references: [id], onDelete: Cascade)
 
   @@map("student_preferences")
+}
+
+/// Admin preferences for UI
+model AdminPreferences {
+  id         String   @id @default(cuid())
+  user_id    String   @unique
+  theme      String   @default("system") // light | dark | system
+  created_at DateTime @default(now())
+  updated_at DateTime @updatedAt
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("admin_preferences")
 }
