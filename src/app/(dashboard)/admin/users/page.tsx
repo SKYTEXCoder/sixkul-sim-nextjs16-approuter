@@ -11,6 +11,8 @@ import { getAllUsers, getUserStats } from "@/lib/admin-user-data";
 import { getPembinaActivityMetrics } from "@/lib/admin/admin-data-aggregation";
 import { UsersClientWrapper } from "@/components/admin/UsersClientWrapper";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminUsersPage() {
   const [users, stats, pembinaMetrics] = await Promise.all([
     getAllUsers(),

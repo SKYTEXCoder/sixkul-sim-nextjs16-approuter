@@ -11,6 +11,8 @@ export const metadata: Metadata = {
   description: "Buat dan kelola pengumuman sistem untuk seluruh sekolah.",
 };
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminAnnouncementsPage() {
   const announcements = await getSystemAnnouncements();
 

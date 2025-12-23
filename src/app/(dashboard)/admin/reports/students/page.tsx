@@ -7,6 +7,8 @@ import { StatSummary } from "@/components/admin/reporting/StatSummary";
 import { ReportTable } from "@/components/admin/reporting/ReportTable";
 import { Badge } from "@/components/ui/badge";
 
+export const dynamic = "force-dynamic";
+
 export default async function StudentReportPage(props: {
   searchParams: Promise<{ startDate?: string; endDate?: string }>;
 }) {

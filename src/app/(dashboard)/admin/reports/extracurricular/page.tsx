@@ -11,6 +11,8 @@ import { ReportTable } from "@/components/admin/reporting/ReportTable";
 import { TrendChart } from "@/components/admin/reporting/TrendChart";
 import { Badge } from "@/components/ui/badge";
 
+export const dynamic = "force-dynamic";
+
 export default async function ExtracurricularReportPage(props: {
   searchParams: Promise<{ startDate?: string; endDate?: string }>;
 }) {

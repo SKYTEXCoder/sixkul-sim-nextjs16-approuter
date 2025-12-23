@@ -11,6 +11,8 @@ import { Separator } from "@/components/ui/separator";
 import prisma from "@/lib/prisma";
 import { ManageAccountButton } from "@/components/admin/ManageAccountButton";
 
+export const dynamic = "force-dynamic";
+
 export default async function AdminProfilePage() {
   const { userId } = await auth();
   if (!userId) redirect("/sign-in");

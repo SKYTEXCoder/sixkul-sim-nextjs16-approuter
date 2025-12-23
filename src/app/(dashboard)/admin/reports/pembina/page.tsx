@@ -6,6 +6,8 @@ import { ExportToolbar } from "@/components/admin/reporting/ExportToolbar";
 import { StatSummary } from "@/components/admin/reporting/StatSummary";
 import { ReportTable } from "@/components/admin/reporting/ReportTable";
 
+export const dynamic = "force-dynamic";
+
 export default async function PembinaReportPage(props: {
   searchParams: Promise<{ startDate?: string; endDate?: string }>;
 }) {
