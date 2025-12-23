@@ -9,7 +9,6 @@
  */
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useClerk } from "@clerk/nextjs";
 import { toast } from "sonner";
@@ -53,11 +52,9 @@ interface TopNavbarProps {
 export function TopNavbar({
   user,
   onMenuClick,
-  showSearch = true,
   unreadNotificationCount = 0,
   pembinaNotifications = [],
 }: TopNavbarProps) {
-  const router = useRouter();
   const { signOut } = useClerk();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
 
@@ -112,7 +109,11 @@ export function TopNavbar({
         ) : (
           // SISWA: Link to notifications page, ADMIN: placeholder
           <Link
-            href={user?.role === "SISWA" ? "/student/notifications" : "#"}
+            href={
+              user?.role === "SISWA"
+                ? "/student/notifications"
+                : "/admin/announcements"
+            }
             className="relative p-2 rounded-md text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
           >
             <Bell className="h-5 w-5" />

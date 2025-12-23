@@ -1,31 +1,28 @@
-"use client"; // Wait, list page is server component?
-// Previous file content was Server Component importing AnnouncementList client component.
-// I should make sure I write the correct Server Component code.
 import { Suspense } from "react";
-import { Metadata } from "next"; // Metadata only works in Server Components
+import { Metadata } from "next";
 
 import { PageHeader } from "@/components/layout/PageHeader";
 import { AnnouncementList } from "@/components/admin/announcements/AnnouncementList";
 import { getSystemAnnouncements } from "@/lib/actions/admin-announcements";
 import { Skeleton } from "@/components/ui/skeleton";
 
-// export const metadata is not allowed in "use client" so this must be server component.
-// But wait, the content I prepared in thought process for StudentAnnouncementsPage had "import { Metadata }".
-// But the code block didn't have "use client".
-// So I will use the Server Component code.
+export const metadata: Metadata = {
+  title: "Kelola Pengumuman | Admin SIXKUL",
+  description: "Buat dan kelola pengumuman sistem untuk seluruh sekolah.",
+};
 
-export default async function StudentAnnouncementsPage() {
+export default async function AdminAnnouncementsPage() {
   const announcements = await getSystemAnnouncements();
 
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Pengumuman Sekolah"
-        description="Informasi terbaru seputar kegiatan sekolah dan ekstrakurikuler."
+        title="Pengumuman Admin"
+        description="Kelola informasi dan pengumuman yang akan ditampilkan kepada seluruh pengguna."
       />
 
       <Suspense fallback={<AnnouncementsSkeleton />}>
-        <AnnouncementList announcements={announcements} />
+        <AnnouncementList announcements={announcements} isAdminView={true} />
       </Suspense>
     </div>
   );
@@ -36,6 +33,7 @@ function AnnouncementsSkeleton() {
     <div className="space-y-4">
       <div className="flex justify-between">
         <Skeleton className="h-8 w-40" />
+        <Skeleton className="h-10 w-32" />
       </div>
       <div className="space-y-4">
         {[1, 2, 3].map((i) => (
