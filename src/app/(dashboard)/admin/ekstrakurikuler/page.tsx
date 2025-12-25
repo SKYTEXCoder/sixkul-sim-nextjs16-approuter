@@ -12,12 +12,17 @@ import {
 } from "@/lib/admin/admin-data-aggregation";
 import { ExtrasHealthList } from "@/components/admin/ExtrasHealthList";
 import { MetricCard } from "@/components/admin/MetricCard";
+import { CreateEkskulDialog } from "@/components/admin/CreateEkskulDialog";
+import { getAvailablePembina } from "@/lib/admin-user-data";
 import { Activity, CheckCircle, AlertTriangle, BookOpen } from "lucide-react";
 
 export const dynamic = "force-dynamic";
 
 export default async function AdminEkstrakurikulerPage() {
-  const healthList = await getExtracurricularHealthList();
+  const [healthList, availablePembinas] = await Promise.all([
+    getExtracurricularHealthList(),
+    getAvailablePembina(),
+  ]);
 
   // Compute stats on the fly
   const countByStatus = (status: HealthStatus) =>
@@ -32,13 +37,16 @@ export default async function AdminEkstrakurikulerPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
-          Monitoring Ekstrakurikuler 🏥
-        </h1>
-        <p className="text-slate-500 dark:text-slate-400 mt-1">
-          Pantau status kesehatan dan aktivitas masing-masing ekstrakurikuler.
-        </p>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
+            Monitoring Ekstrakurikuler 🏥
+          </h1>
+          <p className="text-slate-500 dark:text-slate-400 mt-1">
+            Pantau status kesehatan dan aktivitas masing-masing ekstrakurikuler.
+          </p>
+        </div>
+        <CreateEkskulDialog pembinas={availablePembinas} />
       </div>
 
       {/* Health Overview Cards */}
