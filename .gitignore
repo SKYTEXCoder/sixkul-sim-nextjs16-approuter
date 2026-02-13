@@ -55,3 +55,6 @@ next-env.d.ts
 /dashboard_status_report.html
 references/Kelompok 6_Laporan Project Sistem Informasi Manajemen (SIM) - Points 6, 7, 8, dan 9.pdf
 /docs/*
+
+# Agent workflows and private configuration
+/.agent/
