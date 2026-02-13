@@ -43,3 +43,13 @@ next-env.d.ts
 /src/generated/prisma
 
 .vercel
+
+# Project root documentation and media files (keep in local, exclude from git)
+/*.webp
+/*.png
+/*.pdf
+/*.txt
+/*.md
+!README.md
+!DEVELOPER_GUIDE.md
+/dashboard_status_report.html
