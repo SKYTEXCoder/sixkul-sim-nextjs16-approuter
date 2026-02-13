@@ -58,3 +58,4 @@ references/Kelompok 6_Laporan Project Sistem Informasi Manajemen (SIM) - Points 
 
 # Agent workflows and private configuration
 /.agent/
+/references/*
